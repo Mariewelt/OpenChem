@@ -201,7 +201,7 @@ class OpenChemModel(nn.Module):
             n_batches += 1
 
         cur_loss = loss_total / n_batches
-        if self.task == 'classificaton':
+        if self.task == 'classification':
             prediction = np.argmax(prediction, axis=1)
         metrics = calculate_metrics(prediction, ground_truth, self.eval_metrics)
         print('[%s %.4f  %.4f]' % (time_since(start), cur_loss, metrics))
