@@ -40,7 +40,7 @@ def main():
                         help='distributed backend')
     parser.add_argument('--seed', default=None, type=int,
                         help='seed for initializing training. ')
-    parser.add_argument('--gpu', default=None, type=int,
+    parser.add_argument('--gpu', default=None, type=list,
                         help='GPU id to use.')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
