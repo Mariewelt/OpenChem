@@ -13,8 +13,8 @@ class SmilesDataset(Dataset):
     def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
                  pad=True):
         super(SmilesDataset, self).__init__()
-        data, target = read_smiles_property_file(filename, delimiter,
-                                                 cols_to_read)
+        data, target = read_smiles_property_file(filename, cols_to_read,
+                                                 delimiter)
         clean_smiles, clean_idx = sanitize_smiles(data)
         target = np.array(target)
         self.target = target[clean_idx]
