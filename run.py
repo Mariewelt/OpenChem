@@ -31,6 +31,20 @@ def main():
     parser.add_argument('--continue_learning', dest='continue_learning',
                         action='store_true',
                         help="whether to continue learning")
+    parser.add_argument('--world_size', default=1, type=int,
+                        help='number of distributed processes')
+    parser.add_argument('--dist_url', default='tcp://224.66.41.62:23456',
+                        type=str,
+                        help='url used to set up distributed training')
+    parser.add_argument('--dist-backend', default='nccl', type=str,
+                        help='distributed backend')
+    parser.add_argument('--seed', default=None, type=int,
+                        help='seed for initializing training. ')
+    parser.add_argument('--gpu', default=None, type=int,
+                        help='GPU id to use.')
+    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+                        help='number of data loading workers (default: 4)')
+
     args, unknown = parser.parse_known_args()
 
     if args.mode not in ['train', 'eval', 'train_eval']:
@@ -153,10 +167,46 @@ def main():
         dist.init_process_group(backend=args.dist_backend,
                                 init_method=args.dist_url,
                                 world_size=args.world_size)
+        print('Distirbuted process initiated')
 
-    if len(args.gpu) == 1 is not None:
+    if args.gpu is not None and len(args.gpu) == 1:
         warnings.warn('You have chosen a specific GPU. This will completely '
                       'disable data parallelism.')
+
+    cudnn.benchmark = True
+
+    if args.mode == "train" or args.mode == "train_eval":
+        train_dataset = copy.deepcopy(model_config['train_data_layer'])
+        if args.distributed:
+            train_sampler = data.distributed.DistributedSampler(train_dataset)
+        else:
+            train_sampler = None
+        train_loader = create_loader(train_dataset,
+                                     batch_size=model_config['batch_size'],
+                                     shuffle=(train_sampler is None),
+                                     num_workers=args.workers,
+                                     pin_memory=True,
+                                     sampler=train_sampler)
+    else:
+        train_loader = None
+
+    if args.mode in ["eval", "train_eval"]:
+        val_dataset = copy.deepcopy(model_config['val_data_layer'])
+        if args.distributed:
+            val_sampler = data.distributed.DistributedSampler(val_dataset)
+        else:
+            val_sampler = None
+        val_loader = create_loader(val_dataset,
+                                   batch_size=model_config['batch_size'],
+                                   shuffle=(train_sampler is None),
+                                   num_workers=args.workers,
+                                   pin_memory=True,
+                                   sampler=val_sampler)
+    else:
+        val_loader = None
+
+    model_config['train_loader'] = train_loader
+    model_config['val_loader'] = val_loader
 
     # create model
     if args.continue_learning or args.mode == 'eval':
@@ -170,52 +220,24 @@ def main():
     if args.gpu is not None and len(args.gpu) == 1:
         my_model = model.cuda(args.gpu)
     elif args.distributed and args.gpu is None:
-        my_model.cuda()
+        my_model = my_model.cuda()
         my_model = torch.nn.parallel.DistributedDataParallel(my_model)
     elif args.distributed and len(args.gpu) > 1:
-        my_model.cuda(args.gpu)
+        my_model = my_model.cuda(args.gpu)
         my_model = torch.nn.parallel.DistributedDataParallel(my_model,
                                                              device_ids=args.gpu
                                                              )
-
-    cudnn.benchmark = True
-    train_dataset = copy.deepcopy(model_config['train_data_layer'])
-    val_dataset = copy.deepcopy(model_config['val_data_layer'])
-    if args.distributed:
-        train_sampler = data.distributed.DistributedSampler(train_dataset)
-        if args.mode in ["eval", "train_eval"]:
-            val_sampler = data.distributed.DistributedSampler(val_dataset)
-    else:
-        train_sampler = None
-        val_sampler = None
-
-    train_loader = create_loader(train_dataset,
-                                 batch_size=model_config['batch_size'],
-                                 shuffle=(train_sampler is None),
-                                 num_workers=args.workers,
-                                 pin_memory=True,
-                                 sampler=train_sampler)
-
-    if args.mode in ["eval", "train_eval"]:
-        val_loader = create_loader(val_dataset,
-                                   batch_size=model_config['batch_size'],
-                                   shuffle=(train_sampler is None),
-                                   num_workers=args.workers,
-                                   pin_memory=True,
-                                   sampler=val_sampler)
-    else:
-        val_loader = None
-
-    model_config['train_loader'] = train_loader
-    model_config['val_loader'] = val_loader
+    elif args.use_cuda:
+        my_model = torch.nn.DataParallel(my_model, device_ids=args.gpu).cuda()
 
     if args.mode == 'train':
-        my_model.fit(eval=False)
+        my_model.module.fit(eval=False)
     elif args.mode == 'train_eval':
-        my_model.fit(eval=True)
+        my_model.module.fit(eval=True)
     elif args.mode == "eval":
-        my_model.evaluate()
+        my_model.module.evaluate()
 
 
 if __name__ == '__main__':
+    torch.multiprocessing.set_start_method("spawn")
     main()
