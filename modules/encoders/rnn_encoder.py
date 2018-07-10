@@ -8,7 +8,8 @@ from utils.utils import check_params
 class RNNEncoder(OpenChemEncoder):
     def __init__(self, params, use_cuda):
         super(RNNEncoder, self).__init__(params, use_cuda)
-        check_params(params, self.get_params())
+        check_params(params, self.get_required_params(),
+                     self.get_optional_params())
         self.layer = self.params['layer']
         layers = ['LSTM', 'GRU', 'RNN']
         if self.layer not in ['LSTM', 'GRU', 'RNN']:
@@ -47,14 +48,19 @@ class RNNEncoder(OpenChemEncoder):
                                 dropout=self.dropout)
 
     @staticmethod
-    def get_params():
+    def get_required_params():
         return {
-            'layer': str,
             'input_size': int,
             'encoder_dim': int,
+        }
+
+    @staticmethod
+    def get_optional_params():
+        return{
+            'layer': str,
             'n_layers': int,
             'dropout': float,
-            'is_bidirectional': bool,
+            'is_bidirectional': bool
         }
 
     def forward(self, inp):
