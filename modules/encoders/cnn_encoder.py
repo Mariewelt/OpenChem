@@ -13,7 +13,8 @@ class CNNEncoder(OpenChemEncoder):
 
     def __init__(self, params, use_cuda):
         super(CNNEncoder, self).__init__(params, use_cuda)
-        check_params(params, self.get_params())
+        check_params(params, self.get_required_params(),
+                     self.get_optional_params())
         self.dropout = params['dropout']
         self.encoder_dim = params['encoder_dim']
         convolutions = params['convolutions']
@@ -31,7 +32,7 @@ class CNNEncoder(OpenChemEncoder):
         self.rnn = RNNEncoder(rnn_params, use_cuda)
 
     @staticmethod
-    def get_params():
+    def get_required_params():
         return {
             'convolutions': list,
             'encoder_dim': int,
