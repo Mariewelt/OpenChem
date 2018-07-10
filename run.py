@@ -40,12 +40,13 @@ def main():
                         help='distributed backend')
     parser.add_argument('--seed', default=None, type=int,
                         help='seed for initializing training. ')
-    parser.add_argument('--gpu', default=None, type=list,
+    parser.add_argument('--gpu', default=None, type=str,
                         help='GPU id to use.')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
 
     args, unknown = parser.parse_known_args()
+    args.gpu = args.gpu.split(',')
 
     if args.mode not in ['train', 'eval', 'train_eval']:
         raise ValueError("Mode has to be one of "
