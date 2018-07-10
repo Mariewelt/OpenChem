@@ -3,7 +3,7 @@ from modules.embeddings.basic_embedding import Embedding
 # from modules.encoders.rnn_encoder import RNNEncoder
 from modules.encoders.cnn_encoder import CNNEncoder
 from modules.mlp.openchem_mlp import OpenChemMLP
-from data.utils import OpenChemDataset
+from data.smiles_data_layer import SmilesDataset
 
 import torch.nn as nn
 from torch.optim import RMSprop, Adam
@@ -11,10 +11,10 @@ from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
 from sklearn.metrics import f1_score
 
-train_dataset = OpenChemDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
-                                cols=[0, 2])
-val_dataset = OpenChemDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
-                              cols=[0, 2])
+train_dataset = SmilesDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
+                              cols_to_read=[0, 2])
+val_dataset = SmilesDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
+                            cols_to_read=[0, 2])
 
 use_cuda = True
 
@@ -65,11 +65,3 @@ model_params = {
         'dropouts': [0.3, 0.8]
     }
 }
-
-my_model = model(model_params)
-
-if use_cuda:
-    my_model = my_model.cuda()
-
-my_model.fit()
-my_model.evaluate()
