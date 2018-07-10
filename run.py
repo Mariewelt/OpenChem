@@ -46,8 +46,9 @@ def main():
                         help='number of data loading workers (default: 4)')
 
     args, unknown = parser.parse_known_args()
-    args.gpu = args.gpu.split(',')
-    args.gpu = [int(x) for x in args.gpu]
+    if args.gpu is not None:
+        args.gpu = args.gpu.split(',')
+        args.gpu = [int(x) for x in args.gpu]
 
     if args.mode not in ['train', 'eval', 'train_eval']:
         raise ValueError("Mode has to be one of "
