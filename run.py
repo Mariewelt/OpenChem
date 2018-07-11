@@ -13,6 +13,7 @@ import torch
 import torch.utils.data as data
 import torch.distributed as dist
 import torch.backends.cudnn as cudnn
+from torch.utils.data.distributed import DistributedSampler
 
 from data.utils import create_loader
 from utils.utils import get_latest_checkpoint, deco_print
@@ -44,10 +45,15 @@ def main():
                         help='GPU id to use.')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
+    parser.add_argument("--local_rank", type=int)
 
     args, unknown = parser.parse_known_args()
+	
+    torch.cuda.set_device(args.local_rank)
+
     args.gpu = args.gpu.split(',')
     args.gpu = [int(x) for x in args.gpu]
+    print(args.gpu)
 
     if args.mode not in ['train', 'eval', 'train_eval']:
         raise ValueError("Mode has to be one of "
@@ -167,8 +173,10 @@ def main():
 
     if args.distributed:
         dist.init_process_group(backend=args.dist_backend,
-                                init_method=args.dist_url,
-                                world_size=args.world_size)
+                                     init_method=args.dist_url)
+        # dist.init_process_group(backend=args.dist_backend,
+        #                         init_method=args.dist_url,
+        #                         world_size=args.world_size)
         print('Distirbuted process initiated')
 
     if args.gpu is not None and len(args.gpu) == 1:
@@ -180,7 +188,7 @@ def main():
     if args.mode == "train" or args.mode == "train_eval":
         train_dataset = copy.deepcopy(model_config['train_data_layer'])
         if args.distributed:
-            train_sampler = data.distributed.DistributedSampler(train_dataset)
+            train_sampler = DistributedSampler(train_dataset)
         else:
             train_sampler = None
         train_loader = create_loader(train_dataset,
@@ -195,7 +203,7 @@ def main():
     if args.mode in ["eval", "train_eval"]:
         val_dataset = copy.deepcopy(model_config['val_data_layer'])
         if args.distributed:
-            val_sampler = data.distributed.DistributedSampler(val_dataset)
+            val_sampler = DistributedSampler(val_dataset)
         else:
             val_sampler = None
         val_loader = create_loader(val_dataset,
@@ -222,13 +230,15 @@ def main():
     if args.gpu is not None and len(args.gpu) == 1:
         my_model = model.cuda(args.gpu)
     elif args.distributed and args.gpu is None:
-        my_model = my_model.cuda()
-        my_model = torch.nn.parallel.DistributedDataParallel(my_model)
-    elif args.distributed and len(args.gpu) > 1:
-        my_model = my_model.cuda(args.gpu)
         my_model = torch.nn.parallel.DistributedDataParallel(my_model,
-                                                             device_ids=args.gpu
-                                                             )
+							     device_ids=[args.local_rank],
+                                                             output_device=args.local_rank
+                                                             ).cuda()
+    elif args.distributed and len(args.gpu) > 1:
+        my_model = torch.nn.parallel.DistributedDataParallel(my_model,
+                                                             device_ids=[args.local_rank],
+							     output_device=args.local_rank
+                                                             ).cuda()
     elif args.use_cuda:
         my_model = torch.nn.DataParallel(my_model, device_ids=args.gpu).cuda()
 
