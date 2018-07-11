@@ -4,13 +4,14 @@ import os
 import ast
 import copy
 import runpy
+import random
 import warnings
 import argparse
 
 from six import string_types
 
 import torch
-import torch.utils.data as data
+from torch.utils.data.distributed import DistributedSampler
 import torch.distributed as dist
 import torch.backends.cudnn as cudnn
 from torch.utils.data.distributed import DistributedSampler
@@ -34,26 +35,47 @@ def main():
                         help="whether to continue learning")
     parser.add_argument('--world_size', default=1, type=int,
                         help='number of distributed processes')
-    parser.add_argument('--dist_url', default='tcp://224.66.41.62:23456',
-                        type=str,
-                        help='url used to set up distributed training')
+    # parser.add_argument('--distributed_init_method',
+    #                    default='tcp://224.66.41.62:23456',
+    #                    type=str,
+    #                    help='url used to set up distributed training')
     parser.add_argument('--dist-backend', default='nccl', type=str,
                         help='distributed backend')
     parser.add_argument('--seed', default=None, type=int,
                         help='seed for initializing training. ')
     parser.add_argument('--gpu', default=None, type=str,
                         help='GPU id to use.')
-    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
-                        help='number of data loading workers (default: 4)')
-    parser.add_argument("--local_rank", type=int)
 
     args, unknown = parser.parse_known_args()
-	
-    torch.cuda.set_device(args.local_rank)
 
     args.gpu = args.gpu.split(',')
     args.gpu = [int(x) for x in args.gpu]
     print(args.gpu)
+
+    args.distributed_world_size = torch.cuda.device_count()
+    args.distributed_init_method = 'tcp://localhost:{port}'.format(
+        port=random.randint(10000, 20000))
+
+    mp = torch.multiprocessing.get_context('spawn')
+
+    # Create a thread to listen for errors in the child processes.
+    # error_queue = mp.SimpleQueue()
+    # error_handler = ErrorHandler(error_queue)
+
+    # Train with multiprocessing.
+    procs = []
+    for i in range(args.distributed_world_size):
+        args.distributed_rank = i
+        args.device_id = i
+        procs.append(mp.Process(target=run_model, args=(args, unknown, i),
+                                daemon=True))
+        procs[i].start()
+        # error_handler.add_child(procs[i].pid)
+    for p in procs:
+        p.join()
+
+
+def run_model(args, unknown, process_rank):
 
     if args.mode not in ['train', 'eval', 'train_eval']:
         raise ValueError("Mode has to be one of "
@@ -63,6 +85,7 @@ def main():
 
     model_config = config_module.get('model_params', None)
     model_config['use_cuda'] = args.use_cuda
+    model_config['world_size'] = args.distributed_world_size
     if model_config is None:
         raise ValueError('model_params dictionary has to be '
                          'defined in the config file')
@@ -84,67 +107,68 @@ def main():
     config_update = parser_unk.parse_args(unknown)
     nested_update(model_config, nest_dict(vars(config_update)))
 
-    # checking that everything is correct with log directory
-    logdir = model_config['logdir']
-    ckpt_dir = logdir + '/checkpoint/'
+    if process_rank == 0:
+        # checking that everything is correct with log directory
+        logdir = model_config['logdir']
+        ckpt_dir = logdir + '/checkpoint/'
 
-    try:
         try:
-            os.stat(logdir)
-        except:
-            os.mkdir(logdir)
-            print('Directory created')
-        # check if folder checkpoint within log directory exists,
-        # create if it doesn't
-        try:
-            os.stat(ckpt_dir)
-        except:
-            os.mkdir(logdir + '/checkpoint')
-            print("Directory created")
-            ckpt_dir = logdir + '/checkpoint'
-        if args.mode == 'train' or args.mode == 'train_eval':
-            if os.path.isfile(logdir):
-                raise IOError(
-                    "There is a file with the same name as \"logdir\" "
-                    "parameter. You should change the log directory path "
-                    "or delete the file to continue.")
+            try:
+                os.stat(logdir)
+            except:
+                os.mkdir(logdir)
+                print('Directory created')
+            # check if folder checkpoint within log directory exists,
+            # create if it doesn't
+            try:
+                os.stat(ckpt_dir)
+            except:
+                os.mkdir(logdir + '/checkpoint')
+                print("Directory created")
+                ckpt_dir = logdir + '/checkpoint'
+            if args.mode == 'train' or args.mode == 'train_eval':
+                if os.path.isfile(logdir):
+                    raise IOError(
+                        "There is a file with the same name as \"logdir\" "
+                        "parameter. You should change the log directory path "
+                        "or delete the file to continue.")
 
-            # check if 'logdir' directory exists and non-empty
-            if os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
-                if not args.continue_learning:
-                    raise IOError(
-                        "Log directory is not empty. If you want to continue "
-                        "learning, you should provide "
-                        "\"--continue_learning\" flag")
-                checkpoint = get_latest_checkpoint(ckpt_dir)
-                if checkpoint is None:
-                    raise IOError(
-                        "There is no model checkpoint in the "
-                        "{} directory. Can't load model".format(ckpt_dir)
-                    )
-            else:
-                if args.continue_learning:
-                    raise IOError(
-                        "The log directory is empty or does not exist. "
-                        "You should probably not provide "
-                        "\"--continue_learning\" flag?")
-                checkpoint = None
-        elif args.mode == 'eval':
-            if os.path.isdir(logdir) and os.listdir(logdir) != []:
-                checkpoint = get_latest_checkpoint(ckpt_dir)
-                if checkpoint is None:
-                    raise IOError(
+                # check if 'logdir' directory exists and non-empty
+                if os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
+                    if not args.continue_learning:
+                        raise IOError(
+                            "Log directory is not empty. If you want to continue "
+                            "learning, you should provide "
+                            "\"--continue_learning\" flag")
+                    checkpoint = get_latest_checkpoint(ckpt_dir)
+                    if checkpoint is None:
+                        raise IOError(
                             "There is no model checkpoint in the "
                             "{} directory. Can't load model".format(ckpt_dir)
+                        )
+                else:
+                    if args.continue_learning:
+                        raise IOError(
+                            "The log directory is empty or does not exist. "
+                            "You should probably not provide "
+                            "\"--continue_learning\" flag?")
+                    checkpoint = None
+            elif args.mode == 'eval':
+                if os.path.isdir(logdir) and os.listdir(logdir) != []:
+                    checkpoint = get_latest_checkpoint(ckpt_dir)
+                    if checkpoint is None:
+                        raise IOError(
+                                "There is no model checkpoint in the "
+                                "{} directory. Can't load model".format(ckpt_dir)
+                        )
+                else:
+                    raise IOError(
+                        "{} does not exist or is empty, can't restore model".format(
+                            ckpt_dir
+                        )
                     )
-            else:
-                raise IOError(
-                    "{} does not exist or is empty, can't restore model".format(
-                        ckpt_dir
-                    )
-                )
-    except IOError:
-            raise
+        except IOError:
+                raise
 
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
@@ -169,19 +193,19 @@ def main():
     elif args.mode == 'eval' or args.mode == 'infer':
         deco_print("Loading model from {}".format(checkpoint))
 
-    args.distributed = args.world_size > 1
+    args.distributed = args.distributed_world_size > 1
 
     if args.distributed:
         dist.init_process_group(backend=args.dist_backend,
-                                     init_method=args.dist_url)
-        # dist.init_process_group(backend=args.dist_backend,
-        #                         init_method=args.dist_url,
-        #                         world_size=args.world_size)
+                                init_method=args.distributed_init_method,
+                                world_size=args.distributed_world_size,
+                                rank=process_rank
+                                )
         print('Distirbuted process initiated')
 
-    if args.gpu is not None and len(args.gpu) == 1:
-        warnings.warn('You have chosen a specific GPU. This will completely '
-                      'disable data parallelism.')
+    # if args.gpu is not None and len(args.gpu) == 1:
+    #     warnings.warn('You have chosen a specific GPU. This will completely '
+    #                   'disable data parallelism.')
 
     cudnn.benchmark = True
 
@@ -194,7 +218,7 @@ def main():
         train_loader = create_loader(train_dataset,
                                      batch_size=model_config['batch_size'],
                                      shuffle=(train_sampler is None),
-                                     num_workers=args.workers,
+                                     # num_workers=args.workers,
                                      pin_memory=True,
                                      sampler=train_sampler)
     else:
@@ -209,7 +233,7 @@ def main():
         val_loader = create_loader(val_dataset,
                                    batch_size=model_config['batch_size'],
                                    shuffle=(train_sampler is None),
-                                   num_workers=args.workers,
+                                   # num_workers=args.workers,
                                    pin_memory=True,
                                    sampler=val_sampler)
     else:
@@ -227,27 +251,25 @@ def main():
         print("=> creating model")
         my_model = model(params=model_config)
 
-    if args.gpu is not None and len(args.gpu) == 1:
-        my_model = model.cuda(args.gpu)
-    elif args.distributed and args.gpu is None:
-        my_model = torch.nn.parallel.DistributedDataParallel(my_model,
-							     device_ids=[args.local_rank],
-                                                             output_device=args.local_rank
-                                                             ).cuda()
-    elif args.distributed and len(args.gpu) > 1:
-        my_model = torch.nn.parallel.DistributedDataParallel(my_model,
-                                                             device_ids=[args.local_rank],
-							     output_device=args.local_rank
-                                                             ).cuda()
-    elif args.use_cuda:
-        my_model = torch.nn.DataParallel(my_model, device_ids=args.gpu).cuda()
+    #if args.gpu is not None and len(args.gpu) == 1:
+    #    my_model = model.cuda(args.gpu)
+    #elif args.distributed and args.gpu is None:
+    #    my_model = torch.nn.parallel.DistributedDataParallel(my_model).cuda()
+    #elif args.distributed and len(args.gpu) > 1:
+    #    my_model = torch.nn.parallel.DistributedDataParallel(my_model,
+    #                                                         device_ids=args.gpu
+    #                                                         ).cuda()
+    #                                                         ).cuda()
+    #elif args.use_cuda:
+    #    my_model = torch.nn.DataParallel(my_model, device_ids=args.gpu).cuda()
+    my_model = my_model.cuda()
 
     if args.mode == 'train':
-        my_model.module.fit(eval=False)
+        my_model.fit(eval=False, multiprocess=True)
     elif args.mode == 'train_eval':
-        my_model.module.fit(eval=True)
+        my_model.fit(eval=True, multiprocess=True)
     elif args.mode == "eval":
-        my_model.module.evaluate()
+        my_model.evaluate()
 
 
 if __name__ == '__main__':
