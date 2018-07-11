@@ -106,11 +106,11 @@ def run_model(args, unknown, process_rank):
 
     config_update = parser_unk.parse_args(unknown)
     nested_update(model_config, nest_dict(vars(config_update)))
-
+	
+    # checking that everything is correct with log directory
+    logdir = model_config['logdir']
+    ckpt_dir = logdir + '/checkpoint/'
     if process_rank == 0:
-        # checking that everything is correct with log directory
-        logdir = model_config['logdir']
-        ckpt_dir = logdir + '/checkpoint/'
 
         try:
             try:
@@ -169,6 +169,8 @@ def run_model(args, unknown, process_rank):
                     )
         except IOError:
                 raise
+    else:
+        checkpoint = get_latest_checkpoint(ckpt_dir)
 
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
@@ -251,17 +253,16 @@ def run_model(args, unknown, process_rank):
         print("=> creating model")
         my_model = model(params=model_config)
 
-    #if args.gpu is not None and len(args.gpu) == 1:
-    #    my_model = model.cuda(args.gpu)
-    #elif args.distributed and args.gpu is None:
-    #    my_model = torch.nn.parallel.DistributedDataParallel(my_model).cuda()
-    #elif args.distributed and len(args.gpu) > 1:
-    #    my_model = torch.nn.parallel.DistributedDataParallel(my_model,
-    #                                                         device_ids=args.gpu
-    #                                                         ).cuda()
-    #                                                         ).cuda()
-    #elif args.use_cuda:
-    #    my_model = torch.nn.DataParallel(my_model, device_ids=args.gpu).cuda()
+    if args.gpu is not None and len(args.gpu) == 1:
+        my_model = model.cuda(args.gpu)
+    elif args.distributed and args.gpu is None:
+        my_model = torch.nn.parallel.DistributedDataParallel(my_model).cuda()
+    elif args.distributed and len(args.gpu) > 1:
+        my_model = torch.nn.parallel.DistributedDataParallel(my_model,
+                                                             device_ids=args.gpu
+                                                             ).cuda()
+    elif args.use_cuda:
+        my_model = torch.nn.DataParallel(my_model, device_ids=args.gpu).cuda()
     my_model = my_model.cuda()
 
     if args.mode == 'train':
