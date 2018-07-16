@@ -1,14 +1,16 @@
 import torch
 from torch import nn
-from torch.nn.utils import clip_grad_norm, clip_grad_norm_
+from torch.nn.utils import clip_grad_norm_
+import torch.distributed as dist
 
 from utils.utils import check_params
 
-import os
 import time
 
 from utils.logger import Logger
 from utils.utils import time_since, calculate_metrics
+from optimizer.openchem_optimizer import OpenChemOptimizer
+from optimizer.openchem_lr_scheduler import OpenChemLRScheduler
 
 import numpy as np
 
@@ -22,34 +24,14 @@ class OpenChemModel(nn.Module):
         self.params = params
         self.use_cuda = self.params['use_cuda']
         self.batch_size = self.params['batch_size']
-        self.train_loader = self.params['train_loader']
-        self.val_loader = self.params['val_loader']
         self.eval_metrics = self.params['eval_metrics']
         self.task = self.params['task']
         self.criterion = self.params['criterion']
         if self.use_cuda:
             self.criterion = self.criterion.cuda()
-        self.optimizer = None
         self.lr_scheduler = self.params['lr_scheduler']
         self.logdir = self.params['logdir']
-        self._flat_grads = None
-        self.distributed_world_size = self.params['world_size']
-
-        # check if log directory exists, create if it doesn't
-        # try:
-        #    os.stat(self.logdir)
-        # except UserWarning(self.logdir + ' directory not found. '
-        #                                  'Creating...'):
-        #     os.mkdir(self.logdir)
-        #     print('Directory created')
-        # check if folder checkpoint within log directory exists,
-        # create if it doesn't
-        # try:
-        #    os.stat(self.logdir + '/checkpoint')
-        # except UserWarning(self.logdir + '/checkpoint directory not found. '
-        #                                  'Creating...'):
-        #     os.mkdir(self.logdir + '/checkpoint')
-        #     print('Directory created')
+        self.world_size = self.params['world_size']
 
         self.num_epochs = self.params['num_epochs']
         self.use_clip_grad = self.params['use_clip_grad']
@@ -60,29 +42,6 @@ class OpenChemModel(nn.Module):
         self.random_seed = self.params['random_seed']
         self.print_every = self.params['print_every']
         self.save_every = self.params['save_every']
-
-    @staticmethod
-    def get_params():
-        return {
-            'use_cuda': bool,
-            'task': str,  # could be classification, regression, multi-task
-            'random_seed': int,
-            'use_clip_grad': bool,
-            'max_grad_norm': float,
-            'batch_size': int,
-            'num_epochs': int,
-            'logdir': str,
-            'print_every': int,
-            'save_every': int,
-            'train_loader': None,  # could be any user defined class
-            'val_loader': None,  # could be any user defined class
-            'criterion': None,  # any valid PyTorch loss function
-            'optimizer': None,  # any valid PyTorch optimizer
-            'optimizer_params': dict,
-            'lr_scheduler': None,  # any valid PyTorch optimizer scheduler
-            'lr_scheduler_params': dict,
-            'eval_metrics': None  # any function specified by user
-        }
 
     @staticmethod
     def get_required_params():
@@ -118,104 +77,6 @@ class OpenChemModel(nn.Module):
     def cast_inputs(self, sample):
         raise NotImplementedError
 
-    def train_step(self, inp, target, multiprocess=False):
-        self.optimizer.zero_grad()
-        output = self.forward(inp, eval=False)
-        loss = self.criterion(output, target)
-        loss.backward()
-        if multiprocess:
-            try:
-                self._all_reduce_and_rescale()
-            except OverflowError as e:
-                self.zero_grad()
-                print('| WARNING: overflow detected, ' + str(e))
-        else:
-            self.optimizer.step()
-            if self.use_clip_grad:
-                clip_grad_norm(self.parameters(), self.max_grad_norm)
-
-        return loss.item()
-
-    def fit(self, eval=True, multiprocess=False):
-        cur_epoch = 0
-        logdir = self.logdir
-        print_every = self.print_every
-        save_every = self.save_every
-        n_epochs = self.num_epochs
-        logger = Logger(logdir + '/tensorboard_log/')
-        start = time.time()
-        loss_total = 0
-        n_batches = 0
-        scheduler = self.scheduler.scheduler
-        all_losses = []
-        val_losses = []
-
-        for epoch in range(cur_epoch, n_epochs + cur_epoch):
-            for i_batch, sample_batched in enumerate(self.train_loader):
-                batch_input, batch_target = self.cast_inputs(sample_batched)
-                loss = self.train_step(batch_input, batch_target, multiprocess)
-                loss_total += loss
-                n_batches += 1
-            cur_loss = loss_total / n_batches
-            all_losses.append(cur_loss)
-
-            if epoch % print_every == 0:
-                print('[%s (%d %d%%) %.4f]' % (time_since(start), epoch,
-                                               epoch / n_epochs * 100,
-                                               cur_loss))
-                if eval:
-                    val_loss, metrics = self.evaluate()
-                    val_losses.append(val_loss)
-                    info = {'Train loss': cur_loss, 'Validation loss': val_loss,
-                            'Validation metrics': metrics,
-                            'LR': self.optimizer.param_groups[0]['lr']}
-                else:
-                    info = {'Train loss': cur_loss,
-                            'LR': self.optimizer.param_groups[0]['lr']}
-
-                for tag, value in info.items():
-                    logger.scalar_summary(tag, value, epoch + 1)
-
-                for tag, value in self.named_parameters():
-                    tag = tag.replace('.', '/')
-                    logger.histo_summary(tag, value.detach().cpu().numpy(),
-                                         epoch + 1)
-                    logger.histo_summary(tag + '/grad',
-                                         value.grad.detach().cpu().numpy(),
-                                         epoch + 1)
-            if epoch % save_every == 0:
-                torch.save(self.state_dict(), logdir + '/checkpoint/epoch_' +
-                           str(epoch))
-
-            loss_total = 0
-            n_batches = 0
-            scheduler.step()
-
-        return all_losses, val_losses
-
-    def evaluate(self):
-        loss_total = 0
-        n_batches = 0
-        start = time.time()
-        prediction = []
-        ground_truth = []
-        for i_batch, sample_batched in enumerate(self.val_loader):
-            batch_input, batch_target = self.cast_inputs(sample_batched)
-            predicted = self.forward(batch_input, eval=True)
-            prediction += list(predicted.detach().cpu().numpy())
-            ground_truth += list(batch_target.cpu().numpy())
-            loss = self.criterion(predicted, batch_target)
-            loss_total += loss.item()
-            n_batches += 1
-
-        cur_loss = loss_total / n_batches
-        if self.task == 'classification':
-            prediction = np.argmax(prediction, axis=1)
-        metrics = calculate_metrics(prediction, ground_truth, self.eval_metrics)
-        print('[%s %.4f  %.4f]' % (time_since(start), cur_loss, metrics))
-
-        return cur_loss, metrics
-
     def load_model(self, path):
         weights = torch.load(path)
         self.load_state_dict(weights)
@@ -223,51 +84,133 @@ class OpenChemModel(nn.Module):
     def save_model(self, path):
         torch.save(self.state_dict(), path)
 
-    def _all_reduce_and_rescale(self):
-        # modified from fairseq
-        # flatten grads into a single buffer and all-reduce
-        flat_grads = self._flat_grads = self._get_flat_grads(
-            self._flat_grads)
-        if self.distributed_world_size > 1:
-            torch.distributed.all_reduce(flat_grads)
 
-        # rescale and clip gradients
-        if self.use_clip_grad:
-            clip_grad_norm_(flat_grads, self.max_grad_norm)
+def build_training(model, params):
+    optimizer = OpenChemOptimizer([params['optimizer'],
+                                   params['optimizer_params']],
+                                  model.parameters())
+    lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'],
+                                        params['lr_scheduler_params']],
+                                       optimizer.optimizer)
+    use_cuda = params['use_cuda']
+    criterion = params['criterion']
+    if use_cuda:
+        criterion = criterion.cuda()
+    # train_loader = params['train_loader']
+    # val_loader = params['val_loader']
+    return criterion, optimizer, lr_scheduler #, train_loader, val_loader
 
-        # copy grads back into model parameters
-        self._set_flat_grads(flat_grads)
 
-    def _get_grads(self):
-        grads = []
-        for name, p in self.named_parameters():
-            if not p.requires_grad:
-                continue
-            if p.grad is None:
-                raise RuntimeError(
-                    'Model parameter did not receive gradient: ' + name + '. '
-                    'Use the param in the forward pass or set '
-                    'requires_grad=False')
-            grads.append(p.grad.data)
-        return grads
+def train_step(model, optimizer, criterion, inp, target):
+    optimizer.zero_grad()
+    output = model.forward(inp, eval=False)
+    loss = criterion(output, target)
+    loss.backward()
+    optimizer.step()
+    if model.module.use_clip_grad:
+        clip_grad_norm_(model.parameters(), model.module.max_grad_norm)
 
-    def _get_flat_grads(self, out=None):
-        grads = self._get_grads()
-        if out is None:
-            grads_size = sum(g.numel() for g in grads)
-            out = grads[0].new(grads_size).zero_()
-        offset = 0
-        for g in grads:
-            numel = g.numel()
-            out[offset:offset + numel].copy_(g.view(-1))
-            offset += numel
-        return out[:offset]
+    return loss.data
 
-    def _set_flat_grads(self, new_grads):
-        grads = self._get_grads()
-        offset = 0
-        for g in grads:
-            numel = g.numel()
-            g.copy_(new_grads[offset:offset + numel].view_as(g))
 
-        offset += numel
+def fit(model, scheduler, train_loader, optimizer, criterion, params,
+        eval=False, val_loader=None):
+    cur_epoch = 0
+    logdir = params['logdir']
+    print_every = params['print_every']
+    save_every = params['save_every']
+    n_epochs = params['num_epochs']
+    logger = Logger(logdir + '/tensorboard_log/')
+    start = time.time()
+    loss_total = 0
+    n_batches = 0
+    scheduler = scheduler.scheduler
+    all_losses = []
+    val_losses = []
+
+    for epoch in range(cur_epoch, n_epochs + cur_epoch):
+        for i_batch, sample_batched in enumerate(train_loader):
+            batch_input, batch_target = model.module.cast_inputs(sample_batched)
+            loss = train_step(model, optimizer, criterion,
+                              batch_input, batch_target)
+            reduced_loss = reduce_tensor(loss, model.module.world_size)
+            loss_total += reduced_loss.item()
+            n_batches += 1
+        cur_loss = loss_total / n_batches
+        all_losses.append(cur_loss)
+
+        if epoch % print_every == 0:
+            if torch.distributed.get_rank() == 0:
+                print('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
+                      'Loss: %.4f]' % (time_since(start), epoch,
+                                       epoch / n_epochs * 100, cur_loss))
+            if eval:
+                assert val_loader is not None
+                val_loss, metrics = evaluate(model, val_loader, criterion)
+                val_losses.append(val_loss)
+                info = {'Train loss': cur_loss, 'Validation loss': val_loss,
+                        'Validation metrics': metrics,
+                        'LR': optimizer.param_groups[0]['lr']}
+            else:
+                info = {'Train loss': cur_loss,
+                        'LR': optimizer.param_groups[0]['lr']}
+
+            if torch.distributed.get_rank() == 0:
+                for tag, value in info.items():
+                    logger.scalar_summary(tag, value, epoch + 1)
+
+                for tag, value in model.named_parameters():
+                    tag = tag.replace('.', '/')
+                    logger.histo_summary(tag, value.detach().cpu().numpy(),
+                                         epoch + 1)
+                    logger.histo_summary(tag + '/grad',
+                                         value.grad.detach().cpu().numpy(),
+                                         epoch + 1)
+        if (epoch % save_every == 0) and (torch.distributed.get_rank() == 0):
+            torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
+
+        loss_total = 0
+        n_batches = 0
+        scheduler.step()
+
+    return all_losses, val_losses
+
+
+def reduce_tensor(tensor, world_size):
+    rt = tensor.clone()
+    dist.all_reduce(rt, op=dist.reduce_op.SUM)
+    rt /= world_size
+    return rt
+
+
+def gather_tensor(tensor, gather_list):
+    t = tensor.clone()
+    dist.all_gather(tensor_list=gather_list, tensor=t)
+
+
+def evaluate(model, val_loader, criterion):
+    loss_total = 0
+    n_batches = 0
+    start = time.time()
+    prediction = []
+    ground_truth = []
+    input_ = []
+    for i_batch, sample_batched in enumerate(val_loader):
+        batch_input, batch_target = model.module.cast_inputs(sample_batched)
+        predicted = model.forward(batch_input, eval=True)
+        input_ += list(batch_input.detach().cpu().numpy())
+        prediction += list(predicted.detach().cpu().numpy())
+        ground_truth += list(batch_target.cpu().numpy())
+        loss = criterion(predicted, batch_target)
+        loss_total += loss.item()
+        n_batches += 1
+
+    cur_loss = loss_total / n_batches
+    if model.module.task == 'classification':
+        prediction = np.argmax(prediction, axis=1)
+    metrics = calculate_metrics(prediction, ground_truth,
+                                model.module.eval_metrics)
+    if torch.distributed.get_rank() == 0:
+        print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
+              (time_since(start), cur_loss, metrics))
+    return cur_loss, metrics
