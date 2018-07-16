@@ -5,16 +5,16 @@ from modules.mlp.openchem_mlp import OpenChemMLP
 from data.smiles_data_layer import SmilesDataset
 
 import torch.nn as nn
-from torch.optim import RMSprop
+
+from torch.optim import RMSprop, Adam
 from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
-from sklearn.metrics import f1_score
+from sklearn.metrics import roc_auc_score
 
-train_dataset = SmilesDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
-                              cols_to_read=[0, 2])
-val_dataset = SmilesDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
-                            cols_to_read=[0, 2])
-
+train_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_train.csv',
+                              cols_to_read=[0, 1])
+val_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_test.csv',
+                            cols_to_read=[0, 1])
 use_cuda = True
 
 model = Smiles2Label
@@ -32,7 +32,7 @@ model_params = {
     'save_every': 5,
     'train_data_layer': train_dataset,
     'val_data_layer': val_dataset,
-    'eval_metrics': f1_score,
+    'eval_metrics': roc_auc_score,
     'criterion': nn.CrossEntropyLoss(),
     'optimizer': RMSprop,
     'optimizer_params': {
@@ -50,11 +50,12 @@ model_params = {
     },
     'encoder': RNNEncoder,
     'encoder_params': {
+        'input_size': 256,
         'layer': "LSTM",
         'encoder_dim': 512,
         'n_layers': 2,
-        'dropout': 0.0,
-        'bidirectional': False
+        'dropout': 0.3,
+        'is_bidirectional': False
     },
     'mlp': OpenChemMLP,
     'mlp_params': {
@@ -62,6 +63,5 @@ model_params = {
         'n_layers': 2,
         'hidden_size': [256, 2],
         'activations': [F.relu, F.relu],
-        'dropouts': [0.0, 0.0]
     }
 }
