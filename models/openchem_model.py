@@ -84,7 +84,7 @@ class OpenChemModel(nn.Module):
     def save_model(self, path):
         torch.save(self.state_dict(), path)
 
-
+        
 def build_training(model, params):
     optimizer = OpenChemOptimizer([params['optimizer'],
                                    params['optimizer_params']],
@@ -214,4 +214,3 @@ def evaluate(model, val_loader, criterion):
         print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
               (time_since(start), cur_loss, metrics))
     return cur_loss, metrics
-
