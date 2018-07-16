@@ -165,6 +165,7 @@ def tokenize(smiles, tokens=None):
     """
     if tokens is None:
         tokens = list(set(''.join(smiles)))
+        tokens = np.sort(tokens)
         tokens = ''.join(tokens)
     token2idx = dict((token, i) for i, token in enumerate(tokens))
     num_tokens = len(tokens)
