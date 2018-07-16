@@ -5,6 +5,7 @@ import ast
 import copy
 import runpy
 import argparse
+import subprocess
 
 from six import string_types
 
@@ -19,14 +20,6 @@ from models.openchem_model import build_training, fit, evaluate
 from data.utils import create_loader
 from utils.utils import get_latest_checkpoint, deco_print
 from utils.utils import flatten_dict, nested_update, nest_dict
-
-
-def one_process_main():
-    raise NotImplementedError
-
-
-def distributed_main():
-    raise NotImplementedError
 
 
 def main():
@@ -54,12 +47,12 @@ def main():
     if args.mode not in ['train', 'eval', 'train_eval']:
         raise ValueError("Mode has to be one of "
                          "['train', 'eval', 'train_eval']")
-    torch.manual_seed(1234)
-    torch.cuda.manual_seed_all(1234)
+
     config_module = runpy.run_path(args.config_file)
 
     model_config = config_module.get('model_params', None)
     model_config['use_cuda'] = args.use_cuda
+    model_config['world_size'] = None
     if model_config is None:
         raise ValueError('model_params dictionary has to be '
                          'defined in the config file')
@@ -99,7 +92,7 @@ def main():
             except:
                 os.mkdir(logdir + '/checkpoint')
                 print("Directory created")
-                ckpt_dir = logdir + '/checkpoint/'
+                ckpt_dir = logdir + '/checkpoint'
             if args.mode == 'train' or args.mode == 'train_eval':
                 if os.path.isfile(logdir):
                     raise IOError(
@@ -111,8 +104,8 @@ def main():
                 if os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
                     if not args.continue_learning:
                         raise IOError(
-                            "Log directory is not empty. If you want to "
-                            "continue learning, you should provide "
+                            "Log directory is not empty. If you want to continue "
+                            "learning, you should provide "
                             "\"--continue_learning\" flag")
                     checkpoint = get_latest_checkpoint(ckpt_dir)
                     if checkpoint is None:
@@ -133,20 +126,18 @@ def main():
                     if checkpoint is None:
                         raise IOError(
                                 "There is no model checkpoint in the "
-                                "{} directory. Can't load model".format(
-                                    ckpt_dir
-                                )
+                                "{} directory. Can't load model".format(ckpt_dir)
                         )
                 else:
                     raise IOError(
-                        "{} does not exist or is empty, can't restore".format(
+                        "{} does not exist or is empty, can't restore model".format(
                             ckpt_dir
                         )
                     )
         except IOError:
                 raise
     else:
-        if args.continue_learning or args.mode == 'eval':
+        if args.continue_learning:
             checkpoint = get_latest_checkpoint(ckpt_dir)
         else:
             checkpoint = None
@@ -165,8 +156,7 @@ def main():
 
     if args.mode == 'train' or args.mode == 'train_eval':
         if not args.continue_learning:
-            deco_print("Starting training from scratch process " +
-                       str(args.local_rank))
+            deco_print("Starting training from scratch")
         else:
             deco_print(
                 "Restored checkpoint from {}. Resuming training".format(
@@ -176,18 +166,15 @@ def main():
         deco_print("Loading model from {}".format(checkpoint))
 
     args.distributed = True
+    print("I am here!")
     torch.cuda.set_device(args.local_rank)
 
     if args.distributed:
         dist.init_process_group(backend=args.dist_backend,
                                 init_method='env://')
-        print('Distributed process with rank ' + str(args.local_rank) +
-              ' initiated')
+        print('Distributed process initiated')
 
         args.world_size = torch.distributed.get_world_size()
-        model_config['world_size'] = args.world_size
-    else:
-        model_config['world_size'] = 1
 
     cudnn.benchmark = True
 
@@ -208,11 +195,16 @@ def main():
 
     if args.mode in ["eval", "train_eval"]:
         val_dataset = copy.deepcopy(model_config['val_data_layer'])
+        if args.distributed:
+            val_sampler = DistributedSampler(val_dataset)
+        else:
+            val_sampler = None
         val_loader = create_loader(val_dataset,
                                    batch_size=model_config['batch_size'],
-                                   shuffle=False,
-                                   num_workers=1,
-                                   pin_memory=True)
+                                   shuffle=(train_sampler is None),
+                                   num_workers=args.workers,
+                                   pin_memory=True,
+                                   sampler=val_sampler)
     else:
         val_loader = None
 
@@ -220,18 +212,19 @@ def main():
     model_config['val_loader'] = val_loader
 
     # create model
-    model = model_object(params=model_config)
+    if args.continue_learning or args.mode == 'eval':
+        print("=> loading model  pre-trained model")
+        model = model_object(params=model_config)
+        model.load_model(ckpt_dir)
+    else:
+        print("=> creating model")
+        model = model_object(params=model_config)
 
     model = model.cuda()
 
     model = DistributedDataParallel(model, device_ids=[args.local_rank],
                                     output_device=args.local_rank
-                                    )
-    if args.continue_learning or args.mode == 'eval':
-        print("=> loading model  pre-trained model")
-        weights = torch.load(checkpoint)
-        model.load_state_dict(weights)
-
+                                   )
     criterion, optimizer, lr_scheduler = build_training(model, model_config)
 
     if args.mode == 'train':
@@ -241,7 +234,7 @@ def main():
         fit(model, lr_scheduler, train_loader, optimizer, criterion,
             model_config, eval=True, val_loader=val_loader)
     elif args.mode == "eval":
-        evaluate(model, val_loader, criterion)
+        model.evaluate()
 
 
 if __name__ == '__main__':
