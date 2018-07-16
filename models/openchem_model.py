@@ -206,14 +206,8 @@ def evaluate(model, val_loader, criterion):
         n_batches += 1
 
     cur_loss = loss_total / n_batches
-    np.save(model.module.logdir + '/prediction_' + str(
-        torch.distributed.get_rank()), prediction)
     if model.module.task == 'classification':
         prediction = np.argmax(prediction, axis=1)
-    np.save(model.module.logdir + '/ground_truth_' + str(
-        torch.distributed.get_rank()), np.array(ground_truth))
-    np.save(model.module.logdir + '/input_' + str(
-        torch.distributed.get_rank()), np.array(input_))
     metrics = calculate_metrics(prediction, ground_truth,
                                 model.module.eval_metrics)
     if torch.distributed.get_rank() == 0:
