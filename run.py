@@ -111,8 +111,8 @@ def main():
                 if os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
                     if not args.continue_learning:
                         raise IOError(
-                            "Log directory is not empty. If you want to continue "
-                            "learning, you should provide "
+                            "Log directory is not empty. If you want to "
+                            "continue learning, you should provide "
                             "\"--continue_learning\" flag")
                     checkpoint = get_latest_checkpoint(ckpt_dir)
                     if checkpoint is None:
@@ -133,11 +133,13 @@ def main():
                     if checkpoint is None:
                         raise IOError(
                                 "There is no model checkpoint in the "
-                                "{} directory. Can't load model".format(ckpt_dir)
+                                "{} directory. Can't load model".format(
+                                    ckpt_dir
+                                )
                         )
                 else:
                     raise IOError(
-                        "{} does not exist or is empty, can't restore model".format(
+                        "{} does not exist or is empty, can't restore".format(
                             ckpt_dir
                         )
                     )
@@ -206,10 +208,6 @@ def main():
 
     if args.mode in ["eval", "train_eval"]:
         val_dataset = copy.deepcopy(model_config['val_data_layer'])
-        #if args.distributed:
-        #    val_sampler = DistributedSampler(val_dataset)
-        #else:
-        val_sampler = None
         val_loader = create_loader(val_dataset,
                                    batch_size=model_config['batch_size'],
                                    shuffle=False,
