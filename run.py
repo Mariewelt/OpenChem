@@ -4,16 +4,17 @@ import os
 import ast
 import copy
 import runpy
-import random
-import warnings
 import argparse
 
 from six import string_types
 
 import torch
-from torch.utils.data.distributed import DistributedSampler
 import torch.distributed as dist
 import torch.backends.cudnn as cudnn
+from torch.utils.data.distributed import DistributedSampler
+from torch.nn.parallel import DistributedDataParallel
+
+from models.openchem_model import build_training, fit, evaluate
 
 from data.utils import create_loader
 from utils.utils import get_latest_checkpoint, deco_print
@@ -32,63 +33,30 @@ def main():
     parser.add_argument('--continue_learning', dest='continue_learning',
                         action='store_true',
                         help="whether to continue learning")
-    parser.add_argument('--world_size', default=1, type=int,
-                        help='number of distributed processes')
-    # parser.add_argument('--distributed_init_method',
-    #                    default='tcp://224.66.41.62:23456',
-    #                    type=str,
-    #                    help='url used to set up distributed training')
     parser.add_argument('--dist-backend', default='nccl', type=str,
                         help='distributed backend')
     parser.add_argument('--seed', default=None, type=int,
                         help='seed for initializing training. ')
-    parser.add_argument('--gpu', default=None, type=str,
-                        help='GPU id to use.')
+    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+                        help='number of data loading workers (default: 4)')
+    parser.add_argument("--local_rank", type=int)
 
     args, unknown = parser.parse_known_args()
-
-    args.gpu = args.gpu.split(',')
-    args.gpu = [int(x) for x in args.gpu]
-
-    args.distributed_world_size = torch.cuda.device_count()
-    args.distributed_init_method = 'tcp://localhost:{port}'.format(
-        port=random.randint(10000, 20000))
-
-    mp = torch.multiprocessing.get_context('spawn')
-
-    # Create a thread to listen for errors in the child processes.
-    # error_queue = mp.SimpleQueue()
-    # error_handler = ErrorHandler(error_queue)
-
-    # Train with multiprocessing.
-    procs = []
-    for i in range(args.distributed_world_size):
-        args.distributed_rank = i
-        args.device_id = i
-        procs.append(mp.Process(target=run_model, args=(args, unknown, i),
-                                daemon=True))
-        procs[i].start()
-        # error_handler.add_child(procs[i].pid)
-    for p in procs:
-        p.join()
-
-
-def run_model(args, unknown, process_rank):
 
     if args.mode not in ['train', 'eval', 'train_eval']:
         raise ValueError("Mode has to be one of "
                          "['train', 'eval', 'train_eval']")
-
+    torch.manual_seed(1234)
+    torch.cuda.manual_seed_all(1234)
     config_module = runpy.run_path(args.config_file)
 
     model_config = config_module.get('model_params', None)
     model_config['use_cuda'] = args.use_cuda
-    model_config['world_size'] = args.distributed_world_size
     if model_config is None:
         raise ValueError('model_params dictionary has to be '
                          'defined in the config file')
-    model = config_module.get('model', None)
-    if model is None:
+    model_object = config_module.get('model', None)
+    if model_object is None:
         raise ValueError('model class has to be defined in the config file')
 
         # after we read the config, trying to overwrite some of the properties
@@ -105,11 +73,11 @@ def run_model(args, unknown, process_rank):
     config_update = parser_unk.parse_args(unknown)
     nested_update(model_config, nest_dict(vars(config_update)))
 
-    if process_rank == 0:
-        # checking that everything is correct with log directory
-        logdir = model_config['logdir']
-        ckpt_dir = logdir + '/checkpoint/'
+    # checking that everything is correct with log directory
+    logdir = model_config['logdir']
+    ckpt_dir = logdir + '/checkpoint/'
 
+    if args.local_rank == 0:
         try:
             try:
                 os.stat(logdir)
@@ -123,7 +91,7 @@ def run_model(args, unknown, process_rank):
             except:
                 os.mkdir(logdir + '/checkpoint')
                 print("Directory created")
-                ckpt_dir = logdir + '/checkpoint'
+                ckpt_dir = logdir + '/checkpoint/'
             if args.mode == 'train' or args.mode == 'train_eval':
                 if os.path.isfile(logdir):
                     raise IOError(
@@ -135,8 +103,8 @@ def run_model(args, unknown, process_rank):
                 if os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
                     if not args.continue_learning:
                         raise IOError(
-                            "Log directory is not empty. If you want to continue "
-                            "learning, you should provide "
+                            "Log directory is not empty. If you want to "
+                            "continue learning, you should provide "
                             "\"--continue_learning\" flag")
                     checkpoint = get_latest_checkpoint(ckpt_dir)
                     if checkpoint is None:
@@ -157,16 +125,23 @@ def run_model(args, unknown, process_rank):
                     if checkpoint is None:
                         raise IOError(
                                 "There is no model checkpoint in the "
-                                "{} directory. Can't load model".format(ckpt_dir)
+                                "{} directory. Can't load model".format(
+                                    ckpt_dir
+                                )
                         )
                 else:
                     raise IOError(
-                        "{} does not exist or is empty, can't restore model".format(
+                        "{} does not exist or is empty, can't restore".format(
                             ckpt_dir
                         )
                     )
         except IOError:
                 raise
+    else:
+        if args.continue_learning or args.mode == 'eval':
+            checkpoint = get_latest_checkpoint(ckpt_dir)
+        else:
+            checkpoint = None
 
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
@@ -181,8 +156,9 @@ def run_model(args, unknown, process_rank):
                           copy.deepcopy(config_module['eval_params']))
 
     if args.mode == 'train' or args.mode == 'train_eval':
-        if checkpoint is None:
-            deco_print("Starting training from scratch")
+        if not args.continue_learning:
+            deco_print("Starting training from scratch process " +
+                       str(args.local_rank))
         else:
             deco_print(
                 "Restored checkpoint from {}. Resuming training".format(
@@ -191,19 +167,19 @@ def run_model(args, unknown, process_rank):
     elif args.mode == 'eval' or args.mode == 'infer':
         deco_print("Loading model from {}".format(checkpoint))
 
-    args.distributed = args.distributed_world_size > 1
+    args.distributed = True
+    torch.cuda.set_device(args.local_rank)
 
     if args.distributed:
         dist.init_process_group(backend=args.dist_backend,
-                                init_method=args.distributed_init_method,
-                                world_size=args.distributed_world_size,
-                                rank=process_rank
-                                )
-        print('Distirbuted process initiated')
+                                init_method='env://')
+        print('Distributed process with rank ' + str(args.local_rank) +
+              ' initiated')
 
-    # if args.gpu is not None and len(args.gpu) == 1:
-    #     warnings.warn('You have chosen a specific GPU. This will completely '
-    #                   'disable data parallelism.')
+        args.world_size = torch.distributed.get_world_size()
+        model_config['world_size'] = args.world_size
+    else:
+        model_config['world_size'] = 1
 
     cudnn.benchmark = True
 
@@ -216,7 +192,7 @@ def run_model(args, unknown, process_rank):
         train_loader = create_loader(train_dataset,
                                      batch_size=model_config['batch_size'],
                                      shuffle=(train_sampler is None),
-                                     # num_workers=args.workers,
+                                     num_workers=args.workers,
                                      pin_memory=True,
                                      sampler=train_sampler)
     else:
@@ -224,16 +200,11 @@ def run_model(args, unknown, process_rank):
 
     if args.mode in ["eval", "train_eval"]:
         val_dataset = copy.deepcopy(model_config['val_data_layer'])
-        if args.distributed:
-            val_sampler = DistributedSampler(val_dataset)
-        else:
-            val_sampler = None
         val_loader = create_loader(val_dataset,
                                    batch_size=model_config['batch_size'],
-                                   shuffle=(train_sampler is None),
-                                   # num_workers=args.workers,
-                                   pin_memory=True,
-                                   sampler=val_sampler)
+                                   shuffle=False,
+                                   num_workers=1,
+                                   pin_memory=True)
     else:
         val_loader = None
 
@@ -241,35 +212,29 @@ def run_model(args, unknown, process_rank):
     model_config['val_loader'] = val_loader
 
     # create model
+    model = model_object(params=model_config)
+
+    model = model.cuda()
+
+    model = DistributedDataParallel(model, device_ids=[args.local_rank],
+                                    output_device=args.local_rank
+                                    )
     if args.continue_learning or args.mode == 'eval':
         print("=> loading model  pre-trained model")
-        my_model = model(params=model_config)
-        my_model.load_model(ckpt_dir)
-    else:
-        print("=> creating model")
-        my_model = model(params=model_config)
+        weights = torch.load(checkpoint)
+        model.load_state_dict(weights)
 
-    #if args.gpu is not None and len(args.gpu) == 1:
-    #    my_model = model.cuda(args.gpu)
-    #elif args.distributed and args.gpu is None:
-    #    my_model = torch.nn.parallel.DistributedDataParallel(my_model).cuda()
-    #elif args.distributed and len(args.gpu) > 1:
-    #    my_model = torch.nn.parallel.DistributedDataParallel(my_model,
-    #                                                         device_ids=args.gpu
-    #                                                         ).cuda()
-    #                                                         ).cuda()
-    #elif args.use_cuda:
-    #    my_model = torch.nn.DataParallel(my_model, device_ids=args.gpu).cuda()
-    my_model = my_model.cuda()
+    criterion, optimizer, lr_scheduler = build_training(model, model_config)
 
     if args.mode == 'train':
-        my_model.fit(eval=False, multiprocess=True)
+        fit(model, lr_scheduler, train_loader, optimizer, criterion,
+            model_config, eval=False)
     elif args.mode == 'train_eval':
-        my_model.fit(eval=True, multiprocess=True)
+        fit(model, lr_scheduler, train_loader, optimizer, criterion,
+            model_config, eval=True, val_loader=val_loader)
     elif args.mode == "eval":
-        my_model.evaluate()
+        evaluate(model, val_loader, criterion)
 
 
 if __name__ == '__main__':
-    torch.multiprocessing.set_start_method("spawn")
     main()
