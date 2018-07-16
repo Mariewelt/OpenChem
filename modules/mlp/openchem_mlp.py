@@ -51,3 +51,4 @@ def Linear(in_features, out_features, dropout=0):
                     std=math.sqrt((1 - dropout) / in_features))
     nn.init.constant_(m.bias, 0)
     return nn.utils.weight_norm(m)
+
