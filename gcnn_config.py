@@ -15,7 +15,7 @@ import pandas as pd
 
 import copy
 
-ref_data = pd.read_csv('/home/mpopova/Work/EAGCN/Data/atomic_data.csv',
+ref_data = pd.read_csv('/home/mpopova/Work/OpenChem/benchmark_datasets/atomic_data.csv',
                        index_col=0)
 
 
@@ -93,7 +93,7 @@ node_attributes['atom_element'] = Attribute('node', 'atom_element',
                                             values=list(range(11)))
 
 train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-                             '/home/mpopova/Work/EAGCN/Data/Lipophilicity.csv',
+                             '/home/mpopova/Work/OpenChem/benchmark_datasets/Lipophilicity.csv',
                              delimiter=',', cols_to_read=[2, 1])
 train_dataset.target = train_dataset.target.reshape(-1, 1)
 val_dataset = copy.deepcopy(train_dataset)

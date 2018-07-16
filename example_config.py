@@ -9,12 +9,12 @@ import torch.nn as nn
 from torch.optim import RMSprop, Adam
 from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, roc_auc_score
 
-train_dataset = SmilesDataset('./benchmark_datasets/HIV_updated.csv',
-                              cols_to_read=[0, 2])
-val_dataset = SmilesDataset('./benchmark_datasets/HIV_updated.csv',
-                            cols_to_read=[0, 2])
+train_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_train.csv',
+                              cols_to_read=[0, 1])
+val_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_test.csv',
+                            cols_to_read=[0, 1])
 
 use_cuda = True
 
@@ -28,12 +28,12 @@ model_params = {
     'max_grad_norm': 10.0,
     'batch_size': 128,
     'num_epochs': 100,
-    'logdir': '/home/mpopova/Work/Project/logs',
+    'logdir': '/home/mpopova/Work/OpenChem/logs',
     'print_every': 1,
     'save_every': 5,
     'train_data_layer': train_dataset,
     'val_data_layer': val_dataset,
-    'eval_metrics': f1_score,
+    'eval_metrics': roc_auc_score,
     'criterion': nn.CrossEntropyLoss(),
     'optimizer': RMSprop,
     'optimizer_params': {
