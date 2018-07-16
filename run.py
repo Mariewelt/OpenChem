@@ -82,7 +82,7 @@ def main():
     nested_update(model_config, nest_dict(vars(config_update)))
 
     # checking that everything is correct with log directory
-    logdir = '/home/mpopova/Work/OpenChem/logs'  #model_config['logdir']
+    logdir = model_config['logdir']
     ckpt_dir = logdir + '/checkpoint/'
 
     if args.local_rank == 0:
