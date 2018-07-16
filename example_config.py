@@ -11,9 +11,9 @@ from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
 from sklearn.metrics import f1_score
 
-train_dataset = SmilesDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
+train_dataset = SmilesDataset('./benchmark_datasets/HIV_updated.csv',
                               cols_to_read=[0, 2])
-val_dataset = SmilesDataset('/home/mpopova/Work/EAGCN/Data/HIV_updated.csv',
+val_dataset = SmilesDataset('./benchmark_datasets/HIV_updated.csv',
                             cols_to_read=[0, 2])
 
 use_cuda = True
