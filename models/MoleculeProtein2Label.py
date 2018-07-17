@@ -42,7 +42,7 @@ class MoleculeProtein2Label(OpenChemModel):
         mol = inp[0]
         prot = inp[1]
         mol_embedded = self.MolEmbedding(mol)
-        mol_output = self.Encoder(mol_embedded)
+        mol_output = self.MolEncoder(mol_embedded)
         prot_embedded = self.ProtEmbedding(prot)
         prot_output = self.ProtEncoder(prot_embedded)
         if self.merge == 'sum':

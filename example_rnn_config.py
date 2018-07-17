@@ -1,11 +1,11 @@
 from models.Smiles2Label import Smiles2Label
 from modules.embeddings.basic_embedding import Embedding
 from modules.encoders.rnn_encoder import RNNEncoder
-from modules.encoders.cnn_encoder import CNNEncoder
 from modules.mlp.openchem_mlp import OpenChemMLP
 from data.smiles_data_layer import SmilesDataset
 
 import torch.nn as nn
+
 from torch.optim import RMSprop, Adam
 from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
@@ -15,6 +15,7 @@ train_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_train.csv',
                               cols_to_read=[0, 1])
 val_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_test.csv',
                             cols_to_read=[0, 1], tokens=train_dataset.tokens)
+
 assert train_dataset.tokens == val_dataset.tokens
 
 use_cuda = True
@@ -39,8 +40,8 @@ model_params = {
     'optimizer': RMSprop,
     'optimizer_params': {
         'lr': 0.0001,
-	'weight_decay': 1e-5
-    },
+        'weight_decay': 1e-5
+        },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
         'gamma': 0.97
