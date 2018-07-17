@@ -133,7 +133,10 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
             batch_input, batch_target = model.module.cast_inputs(sample_batched)
             loss = train_step(model, optimizer, criterion,
                               batch_input, batch_target)
-            reduced_loss = reduce_tensor(loss, model.module.world_size)
+            if model.module.world_size > 1:
+                reduced_loss = reduce_tensor(loss, model.module.world_size)
+            else:
+                reduced_loss = loss.clone()
             loss_total += reduced_loss.item()
             n_batches += 1
         cur_loss = loss_total / n_batches
