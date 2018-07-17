@@ -12,7 +12,7 @@ import torch
 import torch.distributed as dist
 import torch.backends.cudnn as cudnn
 from torch.utils.data.distributed import DistributedSampler
-from torch.nn.parallel import DistributedDataParallel
+from torch.nn.parallel import DistributedDataParallel, DataParallel
 
 from models.openchem_model import build_training, fit, evaluate
 
@@ -175,10 +175,10 @@ def main():
     elif args.mode == 'eval' or args.mode == 'infer':
         deco_print("Loading model from {}".format(checkpoint))
 
-    args.distributed = True
-    torch.cuda.set_device(args.local_rank)
+    args.distributed = args.local_rank > 0
 
     if args.distributed:
+        torch.cuda.set_device(args.local_rank)
         dist.init_process_group(backend=args.dist_backend,
                                 init_method='env://')
         print('Distributed process with rank ' + str(args.local_rank) +
@@ -224,9 +224,12 @@ def main():
 
     model = model.cuda()
 
-    model = DistributedDataParallel(model, device_ids=[args.local_rank],
-                                    output_device=args.local_rank
-                                    )
+    if args.distributed:
+        model = DistributedDataParallel(model, device_ids=[args.local_rank],
+                                        output_device=args.local_rank
+                                        )
+    else:
+        model = DataParallel(model)
     if args.continue_learning or args.mode == 'eval':
         print("=> loading model  pre-trained model")
         weights = torch.load(checkpoint)
