@@ -186,28 +186,39 @@ def main():
     current_env["MASTER_PORT"] = str(args.master_port)
     current_env["WORLD_SIZE"] = str(dist_world_size)
 
-    processes = []
+    if args.nproc_per_node > 1:
 
-    for local_rank in range(0, args.nproc_per_node):
-        # each process's rank
-        dist_rank = args.nproc_per_node * args.node_rank + local_rank
-        current_env["RANK"] = str(dist_rank)
+        processes = []
 
-        # spawn the processes
+        for local_rank in range(0, args.nproc_per_node):
+            # each process's rank
+            dist_rank = args.nproc_per_node * args.node_rank + local_rank
+            current_env["RANK"] = str(dist_rank)
+
+            # spawn the processes
+            cmd = ["python",
+                   "-u",
+                   args.training_script,
+                   "--local_rank={}".format(local_rank)] + \
+                args.training_script_args
+
+            process = subprocess.Popen(cmd, env=current_env)
+            processes.append(process)
+
+        try:
+            for process in processes:
+                process.wait()
+        except KeyboardInterrupt:
+            for process in processes:
+                process.terminate()
+
+    elif args.nproc_per_node == 1:
         cmd = ["python",
                "-u",
                args.training_script,
-               "--local_rank={}".format(local_rank)] + args.training_script_args
+               "--local_rank={}".format(-1)] + args.training_script_args
+        subprocess.Popen(cmd, env=current_env)
 
-        process = subprocess.Popen(cmd, env=current_env)
-        processes.append(process)
-
-    try: 
-        for process in processes:
-            process.wait()
-    except KeyboardInterrupt:
-        for process in processes:
-            process.terminate()
 
 if __name__ == "__main__":
     main()
