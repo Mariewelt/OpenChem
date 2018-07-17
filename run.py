@@ -77,7 +77,7 @@ def main():
     logdir = model_config['logdir']
     ckpt_dir = logdir + '/checkpoint/'
 
-    if args.local_rank == 0:
+    if args.local_rank == 0 or args.local_rank == -1:
         try:
             try:
                 os.stat(logdir)
