@@ -194,11 +194,9 @@ def evaluate(model, val_loader, criterion):
     start = time.time()
     prediction = []
     ground_truth = []
-    input_ = []
     for i_batch, sample_batched in enumerate(val_loader):
         batch_input, batch_target = model.module.cast_inputs(sample_batched)
         predicted = model.forward(batch_input, eval=True)
-        input_ += list(batch_input.detach().cpu().numpy())
         prediction += list(predicted.detach().cpu().numpy())
         ground_truth += list(batch_target.cpu().numpy())
         loss = criterion(predicted, batch_target)
