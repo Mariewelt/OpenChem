@@ -17,7 +17,9 @@ class OpenChemMLP(nn.Module):
         self.activations = self.params['activations']
         self.dropouts = self.params['dropouts']
         self.layers = nn.ModuleList([])
+        self.bn = nn.ModuleList([])
         for i in range(self.n_layers):
+            self.bn.append(nn.BatchNorm1d(self.input_size[i]))
             self.layers.append(Linear(in_features=self.input_size[i],
                                       out_features=self.hidden_size[i],
                                       dropout=self.dropouts[i]))
@@ -39,6 +41,7 @@ class OpenChemMLP(nn.Module):
     def forward(self, inp):
         output = inp
         for i in range(self.n_layers):
+            output = self.bn[i](output)
             output = self.layers[i](output)
             output = self.activations[i](output)
         return output
