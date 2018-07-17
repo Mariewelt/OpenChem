@@ -113,6 +113,15 @@ def train_step(model, optimizer, criterion, inp, target):
     return loss.data
 
 
+def print_logs(world_size):
+    if world_size == 1:
+        return True
+    elif torch.distributed.get_rank() == 0:
+        return True
+    else:
+        return False
+
+
 def fit(model, scheduler, train_loader, optimizer, criterion, params,
         eval=False, val_loader=None):
     cur_epoch = 0
@@ -143,7 +152,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
         all_losses.append(cur_loss)
 
         if epoch % print_every == 0:
-            if torch.distributed.get_rank() == 0:
+            if print_logs(model.module.world_size):
                 print('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
                       'Loss: %.4f]' % (time_since(start), epoch,
                                        epoch / n_epochs * 100, cur_loss))
@@ -158,7 +167,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                 info = {'Train loss': cur_loss,
                         'LR': optimizer.param_groups[0]['lr']}
 
-            if torch.distributed.get_rank() == 0:
+            if print_logs(model.module.world_size):
                 for tag, value in info.items():
                     logger.scalar_summary(tag, value, epoch + 1)
 
@@ -169,7 +178,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                     logger.histo_summary(tag + '/grad',
                                          value.grad.detach().cpu().numpy(),
                                          epoch + 1)
-        if (epoch % save_every == 0) and (torch.distributed.get_rank() == 0):
+        if epoch % save_every == 0 and print_logs(model.module.world_size):
             torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
 
         loss_total = 0
@@ -211,7 +220,7 @@ def evaluate(model, val_loader, criterion):
         prediction = np.argmax(prediction, axis=1)
     metrics = calculate_metrics(prediction, ground_truth,
                                 model.module.eval_metrics)
-    if torch.distributed.get_rank() == 0:
+    if print_logs(model.module.world_size):
         print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
               (time_since(start), cur_loss, metrics))
     return cur_loss, metrics
