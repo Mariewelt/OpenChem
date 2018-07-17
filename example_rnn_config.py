@@ -27,7 +27,7 @@ model_params = {
     'task': 'classification',
     'random_seed': 5,
     'use_clip_grad': True,
-    'max_grad_norm': 1.0,
+    'max_grad_norm': 10.0,
     'batch_size': 128,
     'num_epochs': 200,
     'logdir': '/home/mpopova/Work/OpenChem/logs/rnn_log',
@@ -39,7 +39,7 @@ model_params = {
     'criterion': nn.CrossEntropyLoss(),
     'optimizer': RMSprop,
     'optimizer_params': {
-        'lr': 0.0001,
+        'lr': 0.001,
         'weight_decay': 1e-5
         },
     'lr_scheduler': ExponentialLR,
@@ -49,24 +49,24 @@ model_params = {
     'embedding': Embedding,
     'embedding_params': {
         'num_embeddings': max(train_dataset.num_tokens, val_dataset.num_tokens),
-        'embedding_dim': 128,
-        'padding_idx': 0
+        'embedding_dim': 200,
+        'padding_idx': train_dataset.tokens.index(' ')
     },
     'encoder': RNNEncoder,
     'encoder_params': {
-        'input_size': 128,
+        'input_size': 200,
         'layer': "LSTM",
-        'encoder_dim': 64,
-        'n_layers': 2,
-        'dropout': 0.8,
+        'encoder_dim': 100,
+        'n_layers': 1,
+        'dropout': 0.0,
         'is_bidirectional': False
     },
     'mlp': OpenChemMLP,
     'mlp_params': {
-        'input_size': 64,
-        'n_layers': 2,
-        'hidden_size': [64, 2],
-        'activations': [F.relu, F.relu],
-        'dropout': 0.8
+        'input_size': 100,
+        'n_layers': 1,
+        'hidden_size': [2],
+        'activations': [F.relu],
+        'dropouts': [0.5]
     }
 }
