@@ -36,8 +36,10 @@ class SmilesProteinDataset(Dataset):
         else:
             f = open(filename, 'rb')
             data = pickle.load(f)
-            self.molecules = data['smiles_tensor']
-            self.proteins = data['protein_tensor']
+            self.mol_num_tokens = len(data['smiles_tokens'])
+            self.prot_num_tokens = len(data['proteins_tokens'])
+            self.molecules = data['smiles']
+            self.proteins = data['protein']
             self.target = data['labels']
         assert len(self.molecules) == len(self.proteins)
         assert len(self.molecules) == len(self.target)
