@@ -36,7 +36,7 @@ model_params = {
     'criterion': nn.CrossEntropyLoss(),
     'optimizer': RMSprop,
     'optimizer_params': {
-        'lr': 0.001
+        'lr': 0.01
     },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
@@ -79,6 +79,6 @@ model_params = {
         'n_layers': 2,
         'hidden_size': [128, 2],
         'activations': [F.relu, F.relu],
-        'dropout': 0.8
+        'dropouts': [0.8, 0.8]
     }
 }
