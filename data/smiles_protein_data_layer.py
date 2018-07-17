@@ -36,6 +36,8 @@ class SmilesProteinDataset(Dataset):
         else:
             f = open(filename, 'rb')
             data = pickle.load(f)
+            self.mol_tokens = data['smiles_tokens']
+            self.prot_tokens = data['proteins_tokens']
             self.mol_num_tokens = len(data['smiles_tokens'])
             self.prot_num_tokens = len(data['proteins_tokens'])
             self.molecules = data['smiles']
