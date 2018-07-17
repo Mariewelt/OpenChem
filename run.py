@@ -165,8 +165,11 @@ def main():
 
     if args.mode == 'train' or args.mode == 'train_eval':
         if not args.continue_learning:
-            deco_print("Starting training from scratch process " +
-                       str(args.local_rank))
+            if args.distributed:
+                deco_print("Starting training from scratch process " +
+                           str(args.local_rank))
+            else:
+                deco_print("Starting training from scratch")
         else:
             deco_print(
                 "Restored checkpoint from {}. Resuming training".format(
