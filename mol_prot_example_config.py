@@ -46,19 +46,19 @@ model_params = {
     'mol_embedding_params': {
         'num_embeddings': train_dataset.mol_num_tokens,
         'embedding_dim': 256,
-        'padding_idx': 0
+        'padding_idx': train_dataset.mol_tokens.index(' ')
     },
     'prot_embedding': Embedding,
     'prot_embedding_params': {
         'num_embeddings': train_dataset.prot_num_tokens,
         'embedding_dim': 256,
-        'padding_idx': 0
+        'padding_idx': train_dataset.prot_tokens.index(' ')
     },
     'mol_encoder': RNNEncoder,
     'mol_encoder_params': {
         'input_size': 256,
         'layer': "LSTM",
-        'encoder_dim': 512,
+        'encoder_dim': 128,
         'n_layers': 2,
         'dropout': 0.3,
         'is_bidirectional': False
@@ -67,7 +67,7 @@ model_params = {
     'prot_encoder_params': {
         'input_size': 256,
         'layer': "LSTM",
-        'encoder_dim': 512,
+        'encoder_dim': 128,
         'n_layers': 2,
         'dropout': 0.3,
         'is_bidirectional': False
@@ -75,9 +75,9 @@ model_params = {
     'merge': 'sum',
     'mlp': OpenChemMLP,
     'mlp_params': {
-        'input_size': 512,
+        'input_size': 128,
         'n_layers': 2,
-        'hidden_size': [256, 2],
+        'hidden_size': [128, 2],
         'activations': [F.relu, F.relu],
         'dropout': 0.8
     }
