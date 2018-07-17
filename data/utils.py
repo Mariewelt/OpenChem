@@ -188,8 +188,8 @@ def read_smiles_property_file(path, cols_to_read, delimiter=',',
     else:
         start_position = 1
     assert len(data_full) > start_position
-    data = []
+    data = [[] for _ in range(len(cols_to_read))]
     for col in cols_to_read:
-        data += data_full[start_position:, col]
+        data[col] = data_full[start_position:, col]
 
     return data
