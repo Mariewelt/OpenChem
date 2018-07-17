@@ -45,39 +45,39 @@ model_params = {
     'mol_embedding': Embedding,
     'mol_embedding_params': {
         'num_embeddings': train_dataset.mol_num_tokens,
-        'embedding_dim': 256,
+        'embedding_dim': 200,
         'padding_idx': train_dataset.mol_tokens.index(' ')
     },
     'prot_embedding': Embedding,
     'prot_embedding_params': {
         'num_embeddings': train_dataset.prot_num_tokens,
-        'embedding_dim': 256,
+        'embedding_dim': 200,
         'padding_idx': train_dataset.prot_tokens.index(' ')
     },
     'mol_encoder': RNNEncoder,
     'mol_encoder_params': {
-        'input_size': 256,
+        'input_size': 200,
         'layer': "LSTM",
-        'encoder_dim': 128,
+        'encoder_dim': 100,
         'n_layers': 2,
-        'dropout': 0.3,
+        'dropout': 0.8,
         'is_bidirectional': False
     },
     'prot_encoder': RNNEncoder,
     'prot_encoder_params': {
-        'input_size': 256,
+        'input_size': 200,
         'layer': "LSTM",
-        'encoder_dim': 128,
+        'encoder_dim': 100,
         'n_layers': 2,
-        'dropout': 0.3,
+        'dropout': 0.8,
         'is_bidirectional': False
     },
     'merge': 'sum',
     'mlp': OpenChemMLP,
     'mlp_params': {
-        'input_size': 128,
+        'input_size': 100,
         'n_layers': 2,
-        'hidden_size': [128, 2],
+        'hidden_size': [200, 2],
         'activations': [F.relu, F.relu],
         'dropouts': [0.8, 0.8]
     }
