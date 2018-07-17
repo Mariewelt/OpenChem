@@ -21,14 +21,6 @@ from utils.utils import get_latest_checkpoint, deco_print
 from utils.utils import flatten_dict, nested_update, nest_dict
 
 
-def one_process_main():
-    raise NotImplementedError
-
-
-def distributed_main():
-    raise NotImplementedError
-
-
 def main():
     parser = argparse.ArgumentParser(description='Experiment parameters')
     parser.add_argument("--use_cuda", default=torch.cuda.is_available(),
@@ -154,6 +146,8 @@ def main():
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
 
+    args.distributed = args.local_rank > 0
+
     if args.mode == 'train' or args.mode == 'train_eval':
         if 'train_params' in config_module:
             nested_update(train_config,
@@ -177,8 +171,6 @@ def main():
             )
     elif args.mode == 'eval' or args.mode == 'infer':
         deco_print("Loading model from {}".format(checkpoint))
-
-    args.distributed = args.local_rank > 0
 
     if args.distributed:
         torch.cuda.set_device(args.local_rank)
