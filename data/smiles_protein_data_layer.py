@@ -41,7 +41,7 @@ class SmilesProteinDataset(Dataset):
             self.mol_num_tokens = len(data['smiles_tokens'])
             self.prot_num_tokens = len(data['proteins_tokens'])
             self.molecules = data['smiles']
-            self.proteins = data['protein']
+            self.proteins = data['proteins']
             self.target = data['labels']
         assert len(self.molecules) == len(self.proteins)
         assert len(self.molecules) == len(self.target)
