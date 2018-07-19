@@ -10,9 +10,11 @@ from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
 from sklearn.metrics import f1_score
 
-train_dataset = SmilesProteinDataset('/home/mpopova/Work/data/cv0_train.pkl',
+i = 2
+train_dataset = SmilesProteinDataset('/home/mpopova/Work/data/cv' + str(i) + '_train.pkl',
                               tokenized=True)
-val_dataset = SmilesProteinDataset('/home/mpopova/Work/data/cv0_test.pkl',
+val_dataset = SmilesProteinDataset('/home/mpopova/Work/data/test.pkl',
+#val_dataset = SmilesProteinDataset('/home/mpopova/Work/data/cv' + str(i) + '_test.pkl',
                             tokenized=True)
 
 use_cuda = True
@@ -27,7 +29,7 @@ model_params = {
     'max_grad_norm': 10.0,
     'batch_size': 128,
     'num_epochs': 100,
-    'logdir': '/home/mpopova/Work/OpenChem/logs/kinase_model_logs',
+    'logdir': '/home/mpopova/Work/OpenChem/logs/kinase_model_logs/cv' + str(i),
     'print_every': 1,
     'save_every': 5,
     'train_data_layer': train_dataset,
@@ -36,7 +38,7 @@ model_params = {
     'criterion': nn.CrossEntropyLoss(),
     'optimizer': RMSprop,
     'optimizer_params': {
-        'lr': 0.01
+        'lr': 0.001
     },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
@@ -78,7 +80,7 @@ model_params = {
         'input_size': 100,
         'n_layers': 2,
         'hidden_size': [200, 2],
-        'activations': [F.relu, F.relu],
-        'dropouts': [0.8, 0.8]
+        'activation': F.relu,
+        'dropout': 0.8
     }
 }
