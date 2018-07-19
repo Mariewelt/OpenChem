@@ -9,14 +9,17 @@ import torch.nn as nn
 from torch.optim import RMSprop, Adam
 from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, mean_squared_error
 
-train_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_train.csv',
-                              cols_to_read=[0, 1])
-val_dataset = SmilesDataset('./benchmark_datasets/HIV_dataset/HIV_test.csv',
-                            cols_to_read=[0, 1], tokens=train_dataset.tokens)
+train_dataset = SmilesDataset('./benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv',
+                              cols_to_read=[0, 1], augment=False)
+val_dataset = SmilesDataset('./benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv',
+                            cols_to_read=[0, 1], tokens=train_dataset.tokens, augment=False)
 
 assert train_dataset.tokens == val_dataset.tokens
+
+train_dataset.target = train_dataset.target.reshape(-1, 1)
+val_dataset.target = val_dataset.target.reshape(-1, 1)
 
 use_cuda = True
 
@@ -24,7 +27,7 @@ model = Smiles2Label
 
 model_params = {
     'use_cuda': use_cuda,
-    'task': 'classification',
+    'task': 'regression',
     'random_seed': 5,
     'use_clip_grad': True,
     'max_grad_norm': 10.0,
@@ -35,12 +38,12 @@ model_params = {
     'save_every': 5,
     'train_data_layer': train_dataset,
     'val_data_layer': val_dataset,
-    'eval_metrics': roc_auc_score,
-    'criterion': nn.CrossEntropyLoss(),
+    'eval_metrics': mean_squared_error,
+    'criterion': nn.MSELoss(),
     'optimizer': RMSprop,
     'optimizer_params': {
-        'lr': 0.001,
-        'weight_decay': 1e-5
+        'lr': 0.005,
+        #'weight_decay': 1e-4
         },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
@@ -48,25 +51,25 @@ model_params = {
     },
     'embedding': Embedding,
     'embedding_params': {
-        'num_embeddings': max(train_dataset.num_tokens, val_dataset.num_tokens),
-        'embedding_dim': 200,
+        'num_embeddings': train_dataset.num_tokens,
+        'embedding_dim': 100,
         'padding_idx': train_dataset.tokens.index(' ')
     },
     'encoder': RNNEncoder,
     'encoder_params': {
-        'input_size': 200,
+        'input_size': 100,
         'layer': "LSTM",
         'encoder_dim': 100,
-        'n_layers': 1,
-        'dropout': 0.0,
+        'n_layers': 2,
+        'dropout': 0.8,
         'is_bidirectional': False
     },
     'mlp': OpenChemMLP,
     'mlp_params': {
         'input_size': 100,
-        'n_layers': 1,
-        'hidden_size': [2],
-        'activations': [F.relu],
-        'dropouts': [0.5]
+        'n_layers': 2,
+        'hidden_size': [100, 1],
+        'activation': F.relu,
+        'dropout': 0.5
     }
 }
