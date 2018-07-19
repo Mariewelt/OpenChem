@@ -6,12 +6,12 @@ from torch.utils.data import Dataset
 
 from data.utils import read_smiles_property_file
 from data.utils import sanitize_smiles, pad_sequences, seq2tensor
-from data.utils import tokenize
+from data.utils import tokenize, augment_smiles
 
 
 class SmilesDataset(Dataset):
     def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
-                 pad=True):
+                 pad=True, augment=True):
         super(SmilesDataset, self).__init__()
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
         smiles = data[0]
@@ -19,6 +19,9 @@ class SmilesDataset(Dataset):
         clean_smiles, clean_idx = sanitize_smiles(smiles)
         target = np.array(target)
         self.target = target[clean_idx]
+        if augment:
+            clean_smiles, self.target = augment_smiles(clean_smiles,
+                                                       self.target)
         if pad:
             clean_smiles = pad_sequences(clean_smiles)
         self.tokens, self.token2idx, self.num_tokens = tokenize(clean_smiles,
@@ -33,3 +36,4 @@ class SmilesDataset(Dataset):
         sample = {'tokenized_smiles': self.data[index],
                   'labels': self.target[index]}
         return sample
+
