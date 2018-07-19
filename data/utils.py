@@ -8,6 +8,7 @@ import csv
 from rdkit import Chem
 
 from torch.utils.data import DataLoader
+from data.smiles_enumerator import SmilesEnumerator
 
 
 def seq2tensor(seqs, tokens, flip=True):
@@ -165,11 +166,25 @@ def tokenize(smiles, tokens=None):
     """
     if tokens is None:
         tokens = list(set(''.join(smiles)))
-        tokens = np.sort(tokens)
+        #tokens = np.sort(tokens)[::-1]
         tokens = ''.join(tokens)
     token2idx = dict((token, i) for i, token in enumerate(tokens))
     num_tokens = len(tokens)
     return tokens, token2idx, num_tokens
+
+
+def augment_smiles(smiles, labels, n_augment=2):
+    smiles_augmentation = SmilesEnumerator()
+    augmented_smiles = []
+    augmented_labels = []
+    for i in range(len(smiles)):
+        sm = smiles[i]
+        for _ in range(n_augment):
+            augmented_smiles.append(smiles_augmentation.randomize_smiles(sm))
+            augmented_labels.append(labels[i])
+        augmented_smiles.append(sm)
+        augmented_labels.append(labels[i])
+    return augmented_smiles, augmented_labels
 
 
 def time_since(since):
@@ -189,7 +204,8 @@ def read_smiles_property_file(path, cols_to_read, delimiter=',',
         start_position = 1
     assert len(data_full) > start_position
     data = [[] for _ in range(len(cols_to_read))]
-    for col in cols_to_read:
-        data[col] = data_full[start_position:, col]
+    for i in range(len(cols_to_read)):
+        col = cols_to_read[i]
+        data[i] = data_full[start_position:, col]
 
     return data
