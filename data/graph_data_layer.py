@@ -38,7 +38,7 @@ class GraphDataset(Dataset):
         return len(self.target)
 
     def __getitem__(self, index):
-        sample = {'adj_matrix': self.adj_matrix[index],
-                  'node_feature_matrix': self.node_feature_matrix[index],
-                  'labels': self.target[index]}
+        sample = {'adj_matrix': self.adj_matrix[index].astype('float32'),
+                  'node_feature_matrix': self.node_feature_matrix[index].astype('float32'),
+                  'labels': self.target[index].astype('float32')}
         return sample
