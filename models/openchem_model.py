@@ -173,11 +173,15 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
                 for tag, value in model.named_parameters():
                     tag = tag.replace('.', '/')
-                    logger.histo_summary(tag, value.detach().cpu().numpy(),
+                    try:
+                        logger.histo_summary(tag, value.detach().cpu().numpy(),
                                          epoch + 1)
-                    logger.histo_summary(tag + '/grad',
+                        logger.histo_summary(tag + '/grad',
                                          value.grad.detach().cpu().numpy(),
                                          epoch + 1)
+                    except:
+                        pass
+
         if epoch % save_every == 0 and print_logs(model.module.world_size):
             torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
 
