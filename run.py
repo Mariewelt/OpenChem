@@ -146,7 +146,7 @@ def main():
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
 
-    args.distributed = args.local_rank > 0
+    args.distributed = args.local_rank >= 0
 
     if args.mode == 'train' or args.mode == 'train_eval':
         if 'train_params' in config_module:
