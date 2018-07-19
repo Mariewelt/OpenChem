@@ -14,15 +14,17 @@ class OpenChemMLP(nn.Module):
         self.hidden_size = self.params['hidden_size']
         self.input_size = [self.params['input_size']] + self.hidden_size[:-1]
         self.n_layers = self.params['n_layers']
-        self.activations = self.params['activations']
-        self.dropouts = self.params['dropouts']
+        self.activation = self.params['activation']
+        self.dropout = self.params['dropout']
         self.layers = nn.ModuleList([])
         self.bn = nn.ModuleList([])
+        self.dropouts = nn.ModuleList([])
         for i in range(self.n_layers):
-            self.bn.append(nn.BatchNorm1d(self.input_size[i]))
-            self.layers.append(Linear(in_features=self.input_size[i],
-                                      out_features=self.hidden_size[i],
-                                      dropout=self.dropouts[i]))
+            self.dropouts.append(nn.Dropout(self.dropout))
+            self.bn.append(nn.BatchNorm1d(self.hidden_size[i]))
+            self.layers.append(nn.Linear(in_features=self.input_size[i],
+                                      out_features=self.hidden_size[i]))#,
+                                      #dropout=self.dropouts[i]))
 
     @staticmethod
     def get_required_params():
@@ -30,8 +32,8 @@ class OpenChemMLP(nn.Module):
             'input_size': int,
             'n_layers': int,
             'hidden_size': list,
-            'activations': list,
-            'dropouts': list
+            'activation': None,
+            'dropout': float
         }
 
     @staticmethod
@@ -40,10 +42,13 @@ class OpenChemMLP(nn.Module):
 
     def forward(self, inp):
         output = inp
-        for i in range(self.n_layers):
-            output = self.bn[i](output)
+        for i in range(self.n_layers-1):
             output = self.layers[i](output)
-            output = self.activations[i](output)
+            output = self.bn[i](output)
+            output = self.activation(output)
+            #output = self.dropouts[i](output)
+        #output = self.dropouts[-1](output)
+        output = self.layers[-1](output)
         return output
 
 
