@@ -1,5 +1,6 @@
 # TODO: encoding of molecular graph into vector
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
