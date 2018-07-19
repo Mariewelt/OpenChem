@@ -135,14 +135,14 @@ model_params = {
     'encoder': GraphCNNEncoder,
     'encoder_params': {
         'input_size': num_features,
-        'encoder_dim': 128,
+        'encoder_dim': 256,
         'dropout': 0.0,
         'n_layers': 3,
-        'hidden_size': [64, 128, 64],
+        'hidden_size': [128, 256, 128],
     },
     'mlp': OpenChemMLP,
     'mlp_params': {
-        'input_size': 128,
+        'input_size': 256,
         'n_layers': 2,
         'hidden_size': [128, 1],
         'activation': F.relu,
