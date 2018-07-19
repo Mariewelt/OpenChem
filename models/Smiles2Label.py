@@ -38,7 +38,7 @@ class Smiles2Label(OpenChemModel):
     def cast_inputs(self, sample):
         batch_mols = torch.tensor(sample['tokenized_smiles'],
                                   requires_grad=True).long()
-        batch_labels = torch.tensor(sample['labels'])
+        batch_labels = torch.tensor(sample['labels']).float()
         if self.task == 'classification':
             batch_labels = batch_labels.long()
         if self.use_cuda:
