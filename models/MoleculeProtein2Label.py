@@ -45,8 +45,8 @@ class MoleculeProtein2Label(OpenChemModel):
         mol_output = self.MolEncoder(mol_embedded)
         prot_embedded = self.ProtEmbedding(prot)
         prot_output = self.ProtEncoder(prot_embedded)
-        if self.merge == 'sum':
-            output = mol_output + prot_output
+        if self.merge == 'mul':
+            output = mol_output*prot_output
         elif self.merge == 'concat':
             output = torch.cat((mol_output, prot_output), 1)
         else:
@@ -66,5 +66,6 @@ class MoleculeProtein2Label(OpenChemModel):
             batch_labels = batch_labels.float()
         if self.use_cuda:
             batch_mols = batch_mols.cuda()
+            batch_prots = batch_prots.cuda()
             batch_labels = batch_labels.cuda()
         return (batch_mols, batch_prots), batch_labels
