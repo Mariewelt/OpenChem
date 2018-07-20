@@ -15,16 +15,18 @@ class GraphDataset(Dataset):
     def __init__(self, get_atomic_attributes, node_attributes, filename,
                  cols_to_read, delimiter=','):
         super(GraphDataset, self).__init__()
-        data, target = read_smiles_property_file(filename, cols_to_read,
+        data_set = read_smiles_property_file(filename, cols_to_read,
                                                  delimiter)
+        data = data_set[0]
+        target = data_set[1:]
         clean_smiles, clean_idx = sanitize_smiles(data)
-        target = np.array(target)
+        target = np.array(target).T
         max_size = 0
         for sm in clean_smiles:
             mol = Chem.MolFromSmiles(sm)
             if mol.GetNumAtoms() > max_size:
                 max_size = mol.GetNumAtoms()
-        self.target = target[clean_idx]
+        self.target = target[clean_idx, :]
         self.graphs = []
         self.node_feature_matrix = []
         self.adj_matrix = []
@@ -42,3 +44,4 @@ class GraphDataset(Dataset):
                   'node_feature_matrix': self.node_feature_matrix[index].astype('float32'),
                   'labels': self.target[index].astype('float32')}
         return sample
+

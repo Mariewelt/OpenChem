@@ -1,5 +1,6 @@
 import torch.nn as nn
 import math
+import torch.nn.functional as F
 
 from utils.utils import check_params
 
@@ -49,6 +50,7 @@ class OpenChemMLP(nn.Module):
             #output = self.dropouts[i](output)
         #output = self.dropouts[-1](output)
         output = self.layers[-1](output)
+        output = F.sigmoid(output)
         return output
 
 
