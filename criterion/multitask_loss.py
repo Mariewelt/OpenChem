@@ -1,9 +1,9 @@
 import torch
 import torch.nn.functional as F
-from torch.nn.modules.loss import BCELoss, _assert_no_grad
+from torch.nn.modules.loss import _WeightedLoss, _assert_no_grad
 
 
-class MultitaskLoss(BCELoss):
+class MultitaskLoss(_WeightedLoss):
     def __init__(self, ignore_index, n_tasks):
         super(MultitaskLoss, self).__init__(reduce=False)
         self.n_tasks = n_tasks
@@ -13,13 +13,13 @@ class MultitaskLoss(BCELoss):
         _assert_no_grad(target)
         assert target.size()[1] == self.n_tasks
         assert output.size()[1] == self.n_tasks
-        x = torch.zeros(target.size())
-        y = torch.ones(target.size())
+        x = torch.zeros(target.size()).cuda()
+        y = torch.ones(target.size()).cuda()
         mask = torch.where(target == self.ignore_index, x, y)
-        loss = F.binary_cross_entropy(output, target,
+        loss = F.binary_cross_entropy(output, mask*target,
                                       weight=self.weight,
                                       size_average=self.size_average,
                                       reduce=self.reduce)
-        loss += loss*mask
+        loss = loss*mask
         n_samples = mask.sum(dim=0)
-        return loss.sum(dim=0)/n_samples/self.n_tasks
+        return (loss.sum(dim=0)/n_samples).mean()
