@@ -66,7 +66,7 @@ node_attributes = {}
 #node_attributes['density'] = Attribute('node', 'density', one_hot=False)
 # mol structure
 node_attributes['valence'] = Attribute('node', 'valence', one_hot=True, values=[1, 2, 3, 4, 5, 6])
-node_attributes['charge'] = Attribute('node', 'charge', one_hot=True, values=[0, 1, 2, 3, 4])
+node_attributes['charge'] = Attribute('node', 'charge', one_hot=True, values=[-1, 0, 1, 2, 3, 4])
 node_attributes['hybridization'] = Attribute('node', 'hybridization',
                                              one_hot=True, values=[0, 1, 2, 3, 4, 5, 6, 7])
 node_attributes['aromatic'] = Attribute('node', 'aromatic', one_hot=True,
@@ -126,25 +126,26 @@ model_params = {
     'criterion': nn.MSELoss(),
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.001,
+        'lr': 0.0001,
+        'weight_decay': 1e-5
     },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
-        'gamma': 1.0
+        'gamma': 0.97
     },
     'encoder': GraphCNNEncoder,
     'encoder_params': {
         'input_size': num_features,
-        'encoder_dim': 256,
+        'encoder_dim': 128,
         'dropout': 0.0,
         'n_layers': 3,
-        'hidden_size': [128, 256, 128],
+        'hidden_size': [64, 128, 64],
     },
     'mlp': OpenChemMLP,
     'mlp_params': {
-        'input_size': 256,
+        'input_size': 128,
         'n_layers': 2,
-        'hidden_size': [128, 1],
+        'hidden_size': [64, 1],
         'activation': F.relu,
         'dropout': 0.8
     }
