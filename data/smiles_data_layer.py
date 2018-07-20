@@ -15,7 +15,7 @@ class SmilesDataset(Dataset):
         super(SmilesDataset, self).__init__()
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
         smiles = data[0]
-        target = np.array(data[1], dtype='float')
+        target = np.array(data[1:], dtype='float')
         clean_smiles, clean_idx = sanitize_smiles(smiles)
         target = np.array(target)
         self.target = target[clean_idx]
