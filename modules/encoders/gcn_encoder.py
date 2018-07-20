@@ -50,7 +50,14 @@ class GraphCNNEncoder(OpenChemEncoder):
             #if i < self.n_layers - 1:
             #    x = F.dropout(x, self.dropout)
             x = F.relu(x)
-            x = torch.bmm(adj, x)
-        x = F.tanh(self.dense(x))
+            n = adj.size(1)
+            d = x.size()[-1]
+            adj_new = adj.unsqueeze(3)
+            adj_new = adj_new.expand(-1, n, n, d)
+            x_new = x.repeat(1, n, 1).view(-1, n, n, d)
+            res = x_new*adj_new
+            r = res.max(dim=2)[0]
+            #x = torch.bmm(adj, x)
+        x = F.tanh(self.dense(r))
         x = F.tanh(x.sum(dim=1))
         return x
