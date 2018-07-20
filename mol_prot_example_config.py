@@ -10,7 +10,7 @@ from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
 from sklearn.metrics import f1_score
 
-i = 2
+i = 3
 train_dataset = SmilesProteinDataset('/home/mpopova/Work/data/cv' + str(i) + '_train.pkl',
                               tokenized=True)
 val_dataset = SmilesProteinDataset('/home/mpopova/Work/data/test.pkl',
@@ -74,7 +74,7 @@ model_params = {
         'dropout': 0.8,
         'is_bidirectional': False
     },
-    'merge': 'sum',
+    'merge': 'mul',
     'mlp': OpenChemMLP,
     'mlp_params': {
         'input_size': 100,
