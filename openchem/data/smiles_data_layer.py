@@ -4,9 +4,9 @@ import numpy as np
 
 from torch.utils.data import Dataset
 
-from data.utils import read_smiles_property_file
-from data.utils import sanitize_smiles, pad_sequences, seq2tensor
-from data.utils import tokenize, augment_smiles
+from openchem.data.utils import read_smiles_property_file
+from openchem.data.utils import sanitize_smiles, pad_sequences, seq2tensor
+from openchem.data.utils import tokenize, augment_smiles
 
 
 class SmilesDataset(Dataset):

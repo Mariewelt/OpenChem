@@ -1,11 +1,11 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from modules.encoders.openchem_encoder import OpenChemEncoder
-from modules.encoders.rnn_encoder import RNNEncoder
+from openchem.modules.encoders.openchem_encoder import OpenChemEncoder
+from openchem.modules.encoders.rnn_encoder import RNNEncoder
 
-from utils.utils import check_params
+from openchem.utils.utils import check_params
 
-from layers.conv_bn_relu import ConvBNReLU
+from openchem.layers.conv_bn_relu import ConvBNReLU
 
 
 class CNNEncoder(OpenChemEncoder):
