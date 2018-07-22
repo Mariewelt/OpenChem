@@ -1,11 +1,23 @@
-from models.openchem_model import OpenChemModel
-from optimizer.openchem_optimizer import OpenChemOptimizer
-from optimizer.openchem_lr_scheduler import OpenChemLRScheduler
+from openchem.models.openchem_model import OpenChemModel
 
 import torch
 
 
 class Graph2Label(OpenChemModel):
+    r"""
+    Creates a model that predicts one or multiple labels given object of
+    class graph as input. Consists of 'graph convolution neural network
+    encoder'__, followed by 'graph max pooling layer'__ and
+    multilayer perceptron.
+
+    __https://arxiv.org/abs/1609.02907
+    __https://pubs.acs.org/doi/full/10.1021/acscentsci.6b00367
+
+    Args:
+        params (dict): dictionary of parameters describing the model
+            architecture.
+
+    """
     def __init__(self, params):
         super(Graph2Label, self).__init__(params)
         self.encoder = self.params['encoder']

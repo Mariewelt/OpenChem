@@ -1,11 +1,21 @@
-from models.openchem_model import OpenChemModel
-from optimizer.openchem_optimizer import OpenChemOptimizer
-from optimizer.openchem_lr_scheduler import OpenChemLRScheduler
+from openchem.models.openchem_model import OpenChemModel
+from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
+from openchem.optimizer.openchem_lr_scheduler import OpenChemLRScheduler
 
 import torch
 
 
 class MoleculeProtein2Label(OpenChemModel):
+    r"""
+    Creates a model that predicts one or multiple labels given two sequences as
+    input. Embeddings for each input are extracted separately with Embedding
+    layer, followed by encoder (could be RNN or CNN encoder) and then merged
+    together. Last layer of the model is multi-layer perceptron.
+
+    Args:
+        params (dict): dictionary describing model architecture.
+
+    """
     def __init__(self, params):
         super(MoleculeProtein2Label, self).__init__(params)
         self.mol_embedding = self.params['mol_embedding']

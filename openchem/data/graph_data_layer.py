@@ -3,12 +3,12 @@
 import numpy as np
 
 
-from utils.graph import Graph
+from openchem.utils.graph import Graph
 
 from rdkit import Chem
 
 from torch.utils.data import Dataset
-from data.utils import read_smiles_property_file, sanitize_smiles
+from openchem.data.utils import read_smiles_property_file, sanitize_smiles
 
 
 class GraphDataset(Dataset):

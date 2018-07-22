@@ -2,7 +2,7 @@ import torch.nn as nn
 import math
 import torch.nn.functional as F
 
-from utils.utils import check_params
+from openchem.utils.utils import check_params
 
 
 class OpenChemMLP(nn.Module):

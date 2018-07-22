@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from utils.utils import check_params
+from openchem.utils.utils import check_params
 
 
 class OpenChemEmbedding(nn.Module):

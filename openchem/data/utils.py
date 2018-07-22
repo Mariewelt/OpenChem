@@ -8,7 +8,7 @@ import csv
 from rdkit import Chem
 
 from torch.utils.data import DataLoader
-from data.smiles_enumerator import SmilesEnumerator
+from openchem.data.smiles_enumerator import SmilesEnumerator
 
 
 def seq2tensor(seqs, tokens, flip=True):

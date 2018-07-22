@@ -1,4 +1,4 @@
-from modules.embeddings.openchem_embedding import OpenChemEmbedding
+from openchem.modules.embeddings.openchem_embedding import OpenChemEmbedding
 
 
 class Embedding(OpenChemEmbedding):

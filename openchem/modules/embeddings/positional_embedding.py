@@ -1,6 +1,6 @@
-from modules.embeddings.openchem_embedding import OpenChemEmbedding
+from openchem.modules.embeddings.openchem_embedding import OpenChemEmbedding
 
-from utils import utils
+from openchem.utils import utils
 
 
 class PositionalEmbedding(OpenChemEmbedding):

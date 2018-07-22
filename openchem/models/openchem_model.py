@@ -3,20 +3,23 @@ from torch import nn
 from torch.nn.utils import clip_grad_norm_
 import torch.distributed as dist
 
-from utils.utils import check_params
+from openchem.utils.utils import check_params
 
 import time
 
-from utils.logger import Logger
-from utils.utils import time_since, calculate_metrics
-from optimizer.openchem_optimizer import OpenChemOptimizer
-from optimizer.openchem_lr_scheduler import OpenChemLRScheduler
+from openchem.utils.logger import Logger
+from openchem.utils.utils import time_since, calculate_metrics
+from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
+from openchem.optimizer.openchem_lr_scheduler import OpenChemLRScheduler
 
 import numpy as np
 
 
 class OpenChemModel(nn.Module):
-    """Base class for OpenChem models"""
+    """Base class for all OpenChem models. Function :func:'forward' and
+    :func:'cast' inputs must be overridden for every class, that inherits from
+    OpenChemModel.
+    """
     def __init__(self, params):
         super(OpenChemModel, self).__init__()
         check_params(params, self.get_required_params(),
@@ -86,6 +89,7 @@ class OpenChemModel(nn.Module):
 
         
 def build_training(model, params):
+
     optimizer = OpenChemOptimizer([params['optimizer'],
                                    params['optimizer_params']],
                                   model.parameters())
@@ -192,18 +196,6 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
     return all_losses, val_losses
 
 
-def reduce_tensor(tensor, world_size):
-    rt = tensor.clone()
-    dist.all_reduce(rt, op=dist.reduce_op.SUM)
-    rt /= world_size
-    return rt
-
-
-def gather_tensor(tensor, gather_list):
-    t = tensor.clone()
-    dist.all_gather(tensor_list=gather_list, tensor=t)
-
-
 def evaluate(model, val_loader, criterion):
     loss_total = 0
     n_batches = 0
@@ -228,3 +220,17 @@ def evaluate(model, val_loader, criterion):
         print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
               (time_since(start), cur_loss, metrics))
     return cur_loss, metrics
+
+
+def reduce_tensor(tensor, world_size):
+    r"""
+    Reduces input ''tensor'' across all processes in such a way that everyone
+    gets the sum of ''tensor'' from all of the processes.
+    Args:
+        tensor (Tensor): data to be reduced.
+        world_size (int): number of processes.
+    """
+    rt = tensor.clone()
+    dist.all_reduce(rt, op=dist.reduce_op.SUM)
+    rt /= world_size
+    return rt

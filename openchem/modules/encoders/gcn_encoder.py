@@ -1,12 +1,11 @@
 # TODO: encoding of molecular graph into vector
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from modules.encoders.openchem_encoder import OpenChemEncoder
-from utils.utils import check_params
-from layers.gcn import GraphConvolution
+from openchem.modules.encoders.openchem_encoder import OpenChemEncoder
+from openchem.utils.utils import check_params
+from openchem.layers.gcn import GraphConvolution
 
 
 class GraphCNNEncoder(OpenChemEncoder):
