@@ -2,7 +2,7 @@
 import torch
 from torch import nn
 
-from utils.utils import check_params
+from openchem.utils.utils import check_params
 
 
 class OpenChemEncoder(nn.Module):

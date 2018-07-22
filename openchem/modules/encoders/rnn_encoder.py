@@ -1,8 +1,8 @@
 import torch
 from torch import nn
-from modules.encoders.openchem_encoder import OpenChemEncoder
+from openchem.modules.encoders.openchem_encoder import OpenChemEncoder
 
-from utils.utils import check_params
+from openchem.utils.utils import check_params
 
 
 class RNNEncoder(OpenChemEncoder):
