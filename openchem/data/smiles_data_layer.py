@@ -10,13 +10,35 @@ from openchem.data.utils import tokenize, augment_smiles
 
 
 class SmilesDataset(Dataset):
+    """
+    Creates dataset for SMILES-property data.
+    Args:
+        filename (str): string with full path to dataset file. Dataset file
+            must be csv file.
+        cols_to_read (list): list specifying columns to read from dataset file.
+            Could be of various length, `cols_to_read[0]` will be used as index
+            as index for column with SMILES, `cols_to_read[1:]` will be used as
+            indices for labels values.
+        delimiter (str): columns delimiter in `filename`. `default` is `,`.
+        tokens (list): list of unique tokens from SMILES. If not specified, will
+            be extracted from provided dataset.
+        pad (bool): argument specifying whether to pad SMILES. If `true` SMILES
+            will be padded from right and the flipped. `default` is `True`.
+        augment (bool): argument specifying whether to augment SMILES.
+
+    """
     def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
                  pad=True, augment=True):
         super(SmilesDataset, self).__init__()
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
         smiles = data[0]
-        target = np.array(data[1:], dtype='float')
         clean_smiles, clean_idx = sanitize_smiles(smiles)
+        if len(data) > 1:
+            target = np.array(data[1:], dtype='float')
+            target = np.array(target)
+            self.target = target[clean_idx]
+        else:
+            self.target = None
         target = np.array(target)
         self.target = target[clean_idx]
         if augment:
@@ -33,7 +55,7 @@ class SmilesDataset(Dataset):
         return len(self.target)
 
     def __getitem__(self, index):
-        sample = {'tokenized_smiles': self.data[index],
-                  'labels': self.target[index]}
+        sample = {'tokenized_smiles': self.data[index]}
+        if self.target is not None:
+            sample['labels'] = self.target[index]
         return sample
-
