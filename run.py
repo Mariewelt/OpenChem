@@ -14,11 +14,11 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data.distributed import DistributedSampler
 from torch.nn.parallel import DistributedDataParallel, DataParallel
 
-from models.openchem_model import build_training, fit, evaluate
+from openchem.models.openchem_model import build_training, fit, evaluate
 
-from data.utils import create_loader
-from utils.utils import get_latest_checkpoint, deco_print
-from utils.utils import flatten_dict, nested_update, nest_dict
+from openchem.data.utils import create_loader
+from openchem.utils.utils import get_latest_checkpoint, deco_print
+from openchem.utils.utils import flatten_dict, nested_update, nest_dict
 
 
 def main():
