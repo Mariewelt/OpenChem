@@ -28,7 +28,7 @@ class SmilesDataset(Dataset):
 
     """
     def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
-                 pad=True, augment=True):
+                 pad=True, augment=False):
         super(SmilesDataset, self).__init__()
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
         smiles = data[0]
@@ -40,6 +40,7 @@ class SmilesDataset(Dataset):
         else:
             self.target = None
         target = np.array(target)
+        target = target.T
         self.target = target[clean_idx]
         if augment:
             clean_smiles, self.target = augment_smiles(clean_smiles,
