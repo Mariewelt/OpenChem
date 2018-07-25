@@ -1,8 +1,8 @@
-from models.MoleculeProtein2Label import MoleculeProtein2Label
-from modules.embeddings.basic_embedding import Embedding
-from modules.encoders.rnn_encoder import RNNEncoder
-from modules.mlp.openchem_mlp import OpenChemMLP
-from data.smiles_protein_data_layer import SmilesProteinDataset
+from openchem.models.MoleculeProtein2Label import MoleculeProtein2Label
+from openchem.modules.embeddings.basic_embedding import Embedding
+from openchem.modules.encoders.rnn_encoder import RNNEncoder
+from openchem.modules.mlp.openchem_mlp import OpenChemMLP
+from openchem.data.smiles_protein_data_layer import SmilesProteinDataset
 
 import torch.nn as nn
 from torch.optim import RMSprop
