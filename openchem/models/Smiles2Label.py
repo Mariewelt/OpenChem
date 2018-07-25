@@ -41,7 +41,7 @@ class Smiles2Label(OpenChemModel):
         else:
             self.train()
         embedded = self.Embedding(inp)
-        output = self.Encoder(embedded)
+        output, _ = self.Encoder(embedded)
         output = self.MLP(output)
         return output
 
