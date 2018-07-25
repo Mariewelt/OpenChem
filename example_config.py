@@ -61,7 +61,7 @@ model_params = {
         'input_size': 400,
         'n_layers': 2,
         'hidden_size': [128, 2],
-        'activations': [F.relu, F.relu],
-        'dropouts': [0.3, 0.8]
+        'activation': F.relu,
+        'dropout': 0.8
     }
 }

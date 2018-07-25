@@ -1,8 +1,8 @@
-from models.Smiles2Label import Smiles2Label
-from modules.embeddings.basic_embedding import Embedding
-from modules.encoders.rnn_encoder import RNNEncoder
-from modules.mlp.openchem_mlp import OpenChemMLP
-from data.smiles_data_layer import SmilesDataset
+from openchem.models.Smiles2Label import Smiles2Label
+from openchem.modules.embeddings.basic_embedding import Embedding
+from openchem.modules.encoders.rnn_encoder import RNNEncoder
+from openchem.modules.mlp.openchem_mlp import OpenChemMLP
+from openchem.data.smiles_data_layer import SmilesDataset
 
 import torch.nn as nn
 
