@@ -11,7 +11,10 @@ class OpenChemEmbedding(nn.Module):
         self.params = params
         self.num_embeddings = self.params['num_embeddings']
         self.embedding_dim = self.params['embedding_dim']
-        self.padding_idx = self.params['padding_idx']
+        if 'padding_idx' in params.keys():
+            self.padding_idx = self.params['padding_idx']
+        else:
+            self.padding_idx = None
         self.embedding = nn.Embedding(num_embeddings=self.num_embeddings,
                                       embedding_dim=self.embedding_dim,
                                       padding_idx=self.padding_idx)
@@ -22,12 +25,13 @@ class OpenChemEmbedding(nn.Module):
     @staticmethod
     def get_optional_params():
         return {
+            'padding_idx': int
         }
 
     @staticmethod
     def get_required_params():
         return {
             'num_embeddings': int,
-            'embedding_dim': int,
-            'padding_idx': int
+            'embedding_dim': int
         }
+
