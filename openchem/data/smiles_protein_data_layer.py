@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 
 from openchem.data.utils import read_smiles_property_file
 from openchem.data.utils import sanitize_smiles, pad_sequences, seq2tensor
-from openchem.data.utils import tokenize
+from openchem.data.utils import get_tokens
 
 
 class SmilesProteinDataset(Dataset):
@@ -23,12 +23,12 @@ class SmilesProteinDataset(Dataset):
             self.target = target[clean_idx]
             proteins = list(proteins[clean_idx])
             if pad:
-                clean_smiles = pad_sequences(clean_smiles)
-                proteins = pad_sequences(proteins)
+                clean_smiles, self.mol_lengths = pad_sequences(clean_smiles)
+                proteins, self.prot_lengths = pad_sequences(proteins)
             self.mol_tokens, self.mol_token2idx, self.mol_num_tokens = \
-                tokenize(clean_smiles, mol_tokens)
+                get_tokens(clean_smiles, mol_tokens)
             self.prot_tokens, self.prot_token2idx, self.prot_num_tokens = \
-                tokenize(proteins, prot_tokens)
+                get_tokens(proteins, prot_tokens)
             clean_smiles = seq2tensor(clean_smiles, self.mol_tokens)
             proteins = seq2tensor(proteins, self.prot_tokens)
             self.molecules = clean_smiles
@@ -52,5 +52,8 @@ class SmilesProteinDataset(Dataset):
     def __getitem__(self, index):
         sample = {'tokenized_smiles': self.molecules[index],
                   'tokenized_protein': self.proteins[index],
-                  'labels': self.target[index]}
+                  'labels': self.target[index],
+                  'mol_length': self.mol_lengths[index],
+                  'prot_length': self.prot_lengths[index]}
         return sample
+

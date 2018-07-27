@@ -63,7 +63,7 @@ class RNNEncoder(OpenChemEncoder):
             'is_bidirectional': bool
         }
 
-    def forward(self, inp):
+    def forward(self, inp, previous_hidden=None):
         """
         inp: shape batch_size, seq_len, input_size
         previous_hidden: if given shape n_layers * num_directions,
@@ -73,14 +73,14 @@ class RNNEncoder(OpenChemEncoder):
         """
         inp = inp.permute(1, 0, 2)
         batch_size = inp.size()[1]
-        previous_hidden = self.init_hidden(batch_size)
-        if self.layer == 'LSTM':
-            cell = self.init_cell(batch_size)
-            previous_hidden = (previous_hidden, cell)
+        if previous_hidden is None:
+            previous_hidden = self.init_hidden(batch_size)
+            if self.layer == 'LSTM':
+                cell = self.init_cell(batch_size)
+                previous_hidden = (previous_hidden, cell)
         output, _ = self.rnn(inp, previous_hidden)
-        # output shape (batch_size, hidden_size*num_direction)
         embedded = output[-1, :, :].squeeze(0)
-        return embedded
+        return embedded, previous_hidden
 
     def init_hidden(self, batch_size):
         if self.use_cuda:
@@ -105,3 +105,4 @@ class RNNEncoder(OpenChemEncoder):
                                             batch_size,
                                             self.encoder_dim),
                                 requires_grad=True)
+
