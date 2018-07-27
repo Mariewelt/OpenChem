@@ -5,8 +5,8 @@ import numpy as np
 from torch.utils.data import Dataset
 
 from openchem.data.utils import read_smiles_property_file
-from openchem.data.utils import sanitize_smiles, pad_sequences, seq2tensor
-from openchem.data.utils import tokenize, augment_smiles
+from openchem.data.utils import sanitize_smiles, pad_sequences, seq2tensor, canonize_smiles
+from openchem.data.utils import get_tokens, augment_smiles
 
 
 class SmilesDataset(Dataset):
@@ -28,35 +28,44 @@ class SmilesDataset(Dataset):
 
     """
     def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
-                 pad=True, augment=False):
+                 pad=True, tokenize=True, augment=False):
         super(SmilesDataset, self).__init__()
+        self.tokenize = tokenize
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
         smiles = data[0]
         clean_smiles, clean_idx = sanitize_smiles(smiles)
         if len(data) > 1:
             target = np.array(data[1:], dtype='float')
             target = np.array(target)
+            target = target.T
             self.target = target[clean_idx]
         else:
             self.target = None
-        target = np.array(target)
-        target = target.T
-        self.target = target[clean_idx]
         if augment:
             clean_smiles, self.target = augment_smiles(clean_smiles,
                                                        self.target)
         if pad:
             clean_smiles = pad_sequences(clean_smiles)
-        self.tokens, self.token2idx, self.num_tokens = tokenize(clean_smiles,
+        self.tokens, self.token2idx, self.num_tokens = get_tokens(clean_smiles,
                                                                 tokens)
-        clean_smiles = seq2tensor(clean_smiles, self.tokens)
+        if tokenize:
+            clean_smiles = seq2tensor(clean_smiles, self.tokens)
         self.data = clean_smiles
 
     def __len__(self):
-        return len(self.target)
+        return len(self.data)
 
     def __getitem__(self, index):
-        sample = {'tokenized_smiles': self.data[index]}
+        sample = {}
+        seq = self.data[index]
+        if ' ' in seq:
+            sample['length'] = seq.index(' ')
+        else:
+            sample['length'] = len(seq)
+        if not self.tokenize:
+            seq = seq2tensor('<' + seq[:sample['length']] + '>' +
+                             seq[sample['length']:], self.tokens, flip=False)
+        sample['tokenized_smiles'] = seq
         if self.target is not None:
             sample['labels'] = self.target[index]
         return sample
