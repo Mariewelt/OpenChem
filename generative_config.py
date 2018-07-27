@@ -6,19 +6,15 @@ from openchem.data.smiles_data_layer import SmilesDataset
 
 import torch.nn as nn
 
-from torch.optim import RMSprop
+from torch.optim import RMSprop, Adadelta
 from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
 
-train_dataset = SmilesDataset('./benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv',
-                              cols_to_read=[0], pad=False, augment=False)
-val_dataset = SmilesDataset('./benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv',
-                            cols_to_read=[0], pad=False, tokens=train_dataset.tokens, augment=False)
-
-assert train_dataset.tokens == val_dataset.tokens
-
-train_dataset.target = train_dataset.target.reshape(-1, 1)
-val_dataset.target = val_dataset.target.reshape(-1, 1)
+train_dataset = SmilesDataset('./benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv', #delimiter='\t',
+                              cols_to_read=[0], pad=True, tokenize=False, augment=False)
+train_dataset.tokens += '<>'
+train_dataset.num_tokens = len(train_dataset.tokens)
+print(train_dataset.tokens)
 
 use_cuda = True
 
@@ -36,17 +32,16 @@ model_params = {
     'print_every': 1,
     'save_every': 5,
     'train_data_layer': train_dataset,
-    'val_data_layer': val_dataset,
+    'val_data_layer': None,
     'eval_metrics': None,
-    'criterion': nn.CrossEntropyLoss,
+    'criterion': nn.CrossEntropyLoss(),
     'optimizer': RMSprop,
     'optimizer_params': {
-        'lr': 0.005,
-        #'weight_decay': 1e-4
+        'lr': 0.0001,
         },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
-        'gamma': 0.97
+        'gamma': 1.0
     },
     'embedding': Embedding,
     'embedding_params': {
@@ -56,15 +51,16 @@ model_params = {
     },
     'encoder': RNNEncoder,
     'encoder_params': {
-        'input_size': 100,
+        'input_size': 200,
         'layer': "GRU",
         'encoder_dim': 100,
-        'n_layers': 2,
-        'dropout': 0.8,
+        'n_layers': 1,
+        'dropout': 0.0,
         'is_bidirectional': False
     },
     'has_stack': True,
     'stack_params': {
+        'in_features': 100,
         'stack_width': 100,
         'stack_depth': 200
     },

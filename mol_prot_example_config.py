@@ -10,13 +10,11 @@ from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
 from sklearn.metrics import f1_score
 
-i = 3
-train_dataset = SmilesProteinDataset('/home/mpopova/Work/data/cv' + str(i) + '_train.pkl',
-                              tokenized=True)
-val_dataset = SmilesProteinDataset('/home/mpopova/Work/data/test.pkl',
-#val_dataset = SmilesProteinDataset('/home/mpopova/Work/data/cv' + str(i) + '_test.pkl',
-                            tokenized=True)
-
+i = 4
+train_dataset = SmilesProteinDataset('/home/mpopova/Work/data/kinome_l1o/train/AAK1.txt', cols_to_read=[0, 1, 2],
+                              tokenized=False)
+val_dataset = SmilesProteinDataset('/home/mpopova/Work/data/kinome_l1o/test/AAK1.txt', cols_to_read=[0, 1, 2],
+                                   mol_tokens=train_dataset.mol_tokens, prot_tokens=train_dataset.prot_tokens, tokenized=False)
 use_cuda = True
 
 model = MoleculeProtein2Label
@@ -28,7 +26,7 @@ model_params = {
     'use_clip_grad': True,
     'max_grad_norm': 10.0,
     'batch_size': 128,
-    'num_epochs': 100,
+    'num_epochs': 150,
     'logdir': '/home/mpopova/Work/OpenChem/logs/kinase_model_logs/cv' + str(i),
     'print_every': 1,
     'save_every': 5,
@@ -47,29 +45,29 @@ model_params = {
     'mol_embedding': Embedding,
     'mol_embedding_params': {
         'num_embeddings': train_dataset.mol_num_tokens,
-        'embedding_dim': 200,
+        'embedding_dim': 256,
         'padding_idx': train_dataset.mol_tokens.index(' ')
     },
     'prot_embedding': Embedding,
     'prot_embedding_params': {
         'num_embeddings': train_dataset.prot_num_tokens,
-        'embedding_dim': 200,
+        'embedding_dim': 256,
         'padding_idx': train_dataset.prot_tokens.index(' ')
     },
     'mol_encoder': RNNEncoder,
     'mol_encoder_params': {
-        'input_size': 200,
+        'input_size': 256,
         'layer': "LSTM",
-        'encoder_dim': 100,
+        'encoder_dim': 128,
         'n_layers': 2,
         'dropout': 0.8,
         'is_bidirectional': False
     },
     'prot_encoder': RNNEncoder,
     'prot_encoder_params': {
-        'input_size': 200,
+        'input_size': 256,
         'layer': "LSTM",
-        'encoder_dim': 100,
+        'encoder_dim': 128,
         'n_layers': 2,
         'dropout': 0.8,
         'is_bidirectional': False
@@ -77,9 +75,9 @@ model_params = {
     'merge': 'mul',
     'mlp': OpenChemMLP,
     'mlp_params': {
-        'input_size': 100,
+        'input_size': 128,
         'n_layers': 2,
-        'hidden_size': [200, 2],
+        'hidden_size': [256, 2],
         'activation': F.relu,
         'dropout': 0.8
     }
