@@ -4,11 +4,25 @@ import time
 import math
 import numpy as np
 import csv
+import warnings
 
 from rdkit import Chem
 
 from torch.utils.data import DataLoader
 from openchem.data.smiles_enumerator import SmilesEnumerator
+
+
+def cut_padding(samples, lengths, padding='left'):
+    max_len = lengths.max(dim=0)[0].cpu().numpy()
+    if padding == 'right':
+        cut_samples = samples[:, :max_len]
+    elif padding == 'left':
+        total_len = samples.size()[1]
+        cut_samples = samples[:, total_len-max_len:]
+    else:
+        raise ValueError('Invalid value for padding argument. Must be right'
+                         'or left')
+    return cut_samples
 
 
 def seq2tensor(seqs, tokens, flip=True):
@@ -26,10 +40,12 @@ def pad_sequences(seqs, max_length=None, pad_symbol=' '):
         max_length = -1
         for seq in seqs:
             max_length = max(max_length, len(seq))
+    lengths = []
     for i in range(len(seqs)):
         cur_len = len(seqs[i])
+        lengths.append(cur_len)
         seqs[i] = seqs[i] + pad_symbol*(max_length - cur_len)
-    return seqs
+    return seqs, lengths
 
 
 def create_loader(dataset, batch_size, shuffle=True, num_workers=1,
@@ -69,7 +85,8 @@ def sanitize_smiles(smiles, canonize=True):
             else:
                 new_smiles.append(sm)
                 idx.append(i)
-        except UserWarning('Unsanitized SMILES string: ' + sm):
+        except: 
+            warnings.warn('Unsanitized SMILES string: ' + sm)
             new_smiles.append('')
     return new_smiles, idx
 
@@ -96,8 +113,9 @@ def canonize_smiles(smiles, sanitize=True):
             new_smiles.append(
                 Chem.MolToSmiles(Chem.MolFromSmiles(sm, sanitize=sanitize))
             )
-        except UserWarning(sm + ' can not be canonized: i'
-                                'nvalid SMILES string!'):
+        except: 
+            warnings.warn(sm + ' can not be canonized: i'
+                                'nvalid SMILES string!')
             new_smiles.append('')
     return new_smiles
 
@@ -151,7 +169,7 @@ def read_smi_file(filename, unique=True):
     return molecules, f.closed
 
 
-def tokenize(smiles, tokens=None):
+def get_tokens(smiles, tokens=None):
     """
     Returns list of unique tokens, token-2-index dictionary and
     number of unique tokens from the list of SMILES
@@ -166,7 +184,7 @@ def tokenize(smiles, tokens=None):
     """
     if tokens is None:
         tokens = list(set(''.join(smiles)))
-        #tokens = np.sort(tokens)[::-1]
+        tokens = np.sort(tokens)[::-1]
         tokens = ''.join(tokens)
     token2idx = dict((token, i) for i, token in enumerate(tokens))
     num_tokens = len(tokens)

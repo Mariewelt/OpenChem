@@ -1,7 +1,5 @@
 from openchem.models.openchem_model import OpenChemModel
 from openchem.layers.stack_augmentation import StackAugmentation
-from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
-from openchem.optimizer.openchem_lr_scheduler import OpenChemLRScheduler
 
 import torch
 import torch.nn.functional as F
@@ -10,14 +8,10 @@ import torch.nn.functional as F
 class GenerativeRNN(OpenChemModel):
     def __init__(self, params):
         super(GenerativeRNN, self).__init__(params)
-        self.has_cell = True
-        self.has_stack = True
-        self.input_size = params['input_size']
-        self.hidden_size = params['hidden_size']
-        self.output_size = params['output_size']
         self.has_stack = params['has_stack']
         if self.has_stack:
-            self.Stack = StackAugmentation(**self.params['stack_params'])
+            self.Stack = StackAugmentation(use_cuda=self.use_cuda,
+                                           **self.params['stack_params'])
         self.embedding = self.params['embedding']
         self.embed_params = self.params['embedding_params']
         self.Embedding = self.embedding(self.embed_params)
@@ -27,37 +21,43 @@ class GenerativeRNN(OpenChemModel):
         self.mlp = self.params['mlp']
         self.mlp_params = self.params['mlp_params']
         self.MLP = self.mlp(self.mlp_params)
-        self.optimizer = OpenChemOptimizer([self.params['optimizer'],
-                                            self.params['optimizer_params']],
-                                           self.parameters())
-        self.scheduler = OpenChemLRScheduler([self.params['lr_scheduler'],
-                                              self.params['lr_scheduler_params']
-                                              ],
-                                             self.optimizer.optimizer)
 
-    def forward(self, inp_seq):
+    def forward(self, inp_seq, eval=False):
         """Generator forward function."""
-        output = torch.zeros(inp_seq.size()[0])
-        hidden = None
-        for c in range(len(inp_seq)):
-            inp_token = self.Embedding(inp_seq[c].view(1, -1))
-            if self.module.has_stack:
-                stack_controls = self.stack_controls_layer(hidden.squeeze(0))
-                stack_controls = F.softmax(stack_controls, dim=1)
-                stack_input = self.stack_input_layer(hidden)
-                stack_input = F.tanh(stack_input)
-                stack = self.stack_augmentation(stack_input.permute(1, 0, 2),
-                                                stack, stack_controls)
-                stack_top = stack[:, 0, :].unsqueeze(0)
+        if eval:
+            self.eval()
+        else:
+            self.train()
+        batch_size = inp_seq.size()[0]
+        seq_len = inp_seq.size()[1]
+        result = torch.zeros(batch_size, seq_len, self.MLP.hidden_size[-1], requires_grad=True)
+        if self.use_cuda:
+            result = result.cuda()
+        hidden = self.Encoder.init_hidden(batch_size)
+        if self.has_stack:
+            stack = self.Stack.init_stack(batch_size)
+        for c in range(seq_len):
+            inp_token = self.Embedding(inp_seq[:, c].view(batch_size, -1))
+            if self.has_stack:
+                stack = self.Stack(hidden, stack)
+                stack_top = stack[:, 0, :].unsqueeze(1)
                 inp_token = torch.cat((inp_token, stack_top), dim=2)
-            output, hidden = self.Encoder(inp_token.view(1, 1, -1),
-                                          hidden)
-            output[c] = self.decoder(output.view(1, -1))
-
-        return output
+            output, hidden = self.Encoder(inp_token, hidden)
+            result[:, c, :] = self.MLP(output)
+        
+        n_classes = result.size()[2] 
+        return result.view(-1, n_classes)
 
     def cast_inputs(self, sample):
-        seq = torch.tensor(sample['seq'],
-                               requires_grad=True).long()
-        target = torch.tensor(sample['target']).long()
-        return seq, target
+        sample_seq = sample['tokenized_smiles']
+        lengths = sample['length']
+        max_len = lengths.max(dim=0)[0].cpu().numpy()
+        batch_size = len(lengths)
+        sample_seq = sample_seq[:, :max_len]
+        target = sample_seq[:, 1:, 0].contiguous().view((batch_size*(max_len-1), 1))
+        seq = sample_seq[:, :-1, 0]
+        seq = torch.tensor(seq, requires_grad=True).long()
+        target = torch.tensor(target).long()
+        seq = seq.cuda()
+        target = target.cuda()
+        return seq, target.squeeze(1)

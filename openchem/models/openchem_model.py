@@ -29,10 +29,6 @@ class OpenChemModel(nn.Module):
         self.batch_size = self.params['batch_size']
         self.eval_metrics = self.params['eval_metrics']
         self.task = self.params['task']
-        self.criterion = self.params['criterion']
-        if self.use_cuda:
-            self.criterion = self.criterion.cuda()
-        self.lr_scheduler = self.params['lr_scheduler']
         self.logdir = self.params['logdir']
         self.world_size = self.params['world_size']
 
@@ -54,9 +50,6 @@ class OpenChemModel(nn.Module):
             'num_epochs': int,
             'train_data_layer': None,
             'val_data_layer': None,
-            'criterion': None,
-            'optimizer': None,
-            'optimizer_params': dict,
         }
 
     @staticmethod
@@ -114,7 +107,7 @@ def train_step(model, optimizer, criterion, inp, target):
     if model.module.use_clip_grad:
         clip_grad_norm_(model.parameters(), model.module.max_grad_norm)
 
-    return loss.data
+    return loss
 
 
 def print_logs(world_size):

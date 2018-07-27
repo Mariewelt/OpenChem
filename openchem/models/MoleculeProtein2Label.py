@@ -1,6 +1,8 @@
 from openchem.models.openchem_model import OpenChemModel
 from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
 from openchem.optimizer.openchem_lr_scheduler import OpenChemLRScheduler
+from openchem.data.utils import cut_padding
+
 
 import torch
 
@@ -36,13 +38,6 @@ class MoleculeProtein2Label(OpenChemModel):
         self.mlp = self.params['mlp']
         self.mlp_params = self.params['mlp_params']
         self.MLP = self.mlp(self.mlp_params)
-        self.optimizer = OpenChemOptimizer([self.params['optimizer'],
-                                            self.params['optimizer_params']],
-                                           self.parameters())
-        self.scheduler = OpenChemLRScheduler([self.params['lr_scheduler'],
-                                              self.params['lr_scheduler_params']
-                                              ],
-                                             self.optimizer.optimizer)
 
     def forward(self, inp, eval=False):
         if eval:
@@ -52,9 +47,9 @@ class MoleculeProtein2Label(OpenChemModel):
         mol = inp[0]
         prot = inp[1]
         mol_embedded = self.MolEmbedding(mol)
-        mol_output = self.MolEncoder(mol_embedded)
+        mol_output, _ = self.MolEncoder(mol_embedded)
         prot_embedded = self.ProtEmbedding(prot)
-        prot_output = self.ProtEncoder(prot_embedded)
+        prot_output, _ = self.ProtEncoder(prot_embedded)
         if self.merge == 'mul':
             output = mol_output*prot_output
         elif self.merge == 'concat':
@@ -65,10 +60,12 @@ class MoleculeProtein2Label(OpenChemModel):
         return output
 
     def cast_inputs(self, sample):
-        batch_mols = torch.tensor(sample['tokenized_smiles'],
-                                  requires_grad=True).long()
-        batch_prots = torch.tensor(sample['tokenized_protein'],
-                                  requires_grad=True).long()
+        batch_mols = cut_padding(sample['tokenized_smiles'], sample['mol_length'],
+                                  padding='left')
+        batch_prots = cut_padding(sample['tokenized_protein'], sample['prot_length'],
+                                  padding='left')
+        batch_mols = torch.tensor(batch_mols, requires_grad=True).long()
+        batch_prots = torch.tensor(batch_prots, requires_grad=True).long()
         batch_labels = torch.tensor(sample['labels'])
         if self.task == 'classification':
             batch_labels = batch_labels.long()
