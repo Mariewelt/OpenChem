@@ -19,8 +19,8 @@ def main():
 
     names = list(all_data.keys())
     for k in names:
-        f_2 = open('/data/train.txt', 'w')
-        f = open('/data/test.txt', 'w')
+        f_2 = open('/result/train.txt', 'w')
+        f = open('/result/test.txt', 'w')
         for i in range(len(names)):
             if names[i] == args.target:
                 write_file(all_data[k], f)
