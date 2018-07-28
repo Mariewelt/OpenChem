@@ -15,7 +15,7 @@ def main():
 
     args, unknown = parser.parse_known_args()
 
-    all_data = pickle.load(open('/data/all_data.pkl', 'rb'))
+    all_data = pickle.load(open('/data/kinome.pkl', 'rb'))
 
     names = list(all_data.keys())
     for k in names:
