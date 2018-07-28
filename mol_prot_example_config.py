@@ -11,9 +11,9 @@ import torch.nn.functional as F
 from sklearn.metrics import f1_score
 
 i = 4
-train_dataset = SmilesProteinDataset('/data/train.txt', cols_to_read=[0, 1, 2],
+train_dataset = SmilesProteinDataset('/result/train.txt', cols_to_read=[0, 1, 2],
                               tokenized=False)
-val_dataset = SmilesProteinDataset('/data/test.txt', cols_to_read=[0, 1, 2],
+val_dataset = SmilesProteinDataset('/result/test.txt', cols_to_read=[0, 1, 2],
                                    mol_tokens=train_dataset.mol_tokens, prot_tokens=train_dataset.prot_tokens, tokenized=False)
 use_cuda = True
 
