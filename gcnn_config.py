@@ -1,9 +1,9 @@
-from models.Graph2Label import Graph2Label
-from modules.encoders.gcn_encoder import GraphCNNEncoder
-from modules.mlp.openchem_mlp import OpenChemMLP
-from data.graph_data_layer import GraphDataset
+from openchem.models.Graph2Label import Graph2Label
+from openchem.modules.encoders.gcn_encoder import GraphCNNEncoder
+from openchem.modules.mlp.openchem_mlp import OpenChemMLP
+from openchem.data.graph_data_layer import GraphDataset
 
-from utils.graph import Attribute
+from openchem.utils.graph import Attribute
 
 import torch.nn as nn
 from torch.optim import RMSprop, SGD, Adam
@@ -116,7 +116,7 @@ model_params = {
     'use_clip_grad': False,
     'max_grad_norm': 10.0,
     'batch_size': 256,
-    'num_epochs': 100,
+    'num_epochs': 200,
     'logdir': '/home/mpopova/Work/OpenChem/logs/gcnn_logs',
     'print_every': 1,
     'save_every': 5,
@@ -126,12 +126,12 @@ model_params = {
     'criterion': nn.MSELoss(),
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.0001,
-        'weight_decay': 1e-5
+        'lr': 0.0005,
+        #'weight_decay': 0.0001
     },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
-        'gamma': 0.97
+        'gamma': 0.99
     },
     'encoder': GraphCNNEncoder,
     'encoder_params': {
@@ -139,13 +139,14 @@ model_params = {
         'encoder_dim': 128,
         'dropout': 0.0,
         'n_layers': 3,
-        'hidden_size': [64, 128, 64],
+        'hidden_size': [
+128, 128, 128],
     },
     'mlp': OpenChemMLP,
     'mlp_params': {
         'input_size': 128,
         'n_layers': 2,
-        'hidden_size': [64, 1],
+        'hidden_size': [128, 1],
         'activation': F.relu,
         'dropout': 0.8
     }
