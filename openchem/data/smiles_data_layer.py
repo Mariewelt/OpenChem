@@ -28,7 +28,7 @@ class SmilesDataset(Dataset):
 
     """
     def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
-                 pad=True, tokenize=True, augment=False):
+                 pad=True, tokenize=True, augment=False, flip=True):
         super(SmilesDataset, self).__init__()
         self.tokenize = tokenize
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
@@ -45,11 +45,11 @@ class SmilesDataset(Dataset):
             clean_smiles, self.target = augment_smiles(clean_smiles,
                                                        self.target)
         if pad:
-            clean_smiles = pad_sequences(clean_smiles)
+            clean_smiles, self.length = pad_sequences(clean_smiles)
         self.tokens, self.token2idx, self.num_tokens = get_tokens(clean_smiles,
                                                                 tokens)
         if tokenize:
-            clean_smiles = seq2tensor(clean_smiles, self.tokens)
+            clean_smiles = seq2tensor(clean_smiles, self.tokens, flip)
         self.data = clean_smiles
 
     def __len__(self):
@@ -57,15 +57,8 @@ class SmilesDataset(Dataset):
 
     def __getitem__(self, index):
         sample = {}
-        seq = self.data[index]
-        if ' ' in seq:
-            sample['length'] = seq.index(' ')
-        else:
-            sample['length'] = len(seq)
-        if not self.tokenize:
-            seq = seq2tensor('<' + seq[:sample['length']] + '>' +
-                             seq[sample['length']:], self.tokens, flip=False)
-        sample['tokenized_smiles'] = seq
+        sample['tokenized_smiles'] = self.data[index] 
+        sample['length'] = self.length[index]
         if self.target is not None:
             sample['labels'] = self.target[index]
         return sample
