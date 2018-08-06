@@ -48,9 +48,9 @@ class OpenChemMLP(nn.Module):
             output = self.bn[i](output)
             output = self.activation(output)
             #output = self.dropouts[i](output)
-        #output = self.dropouts[-1](output)
+        output = self.dropouts[-1](output)
         output = self.layers[-1](output)
-        output = F.sigmoid(output)
+        #output = torch.sigmoid(output)
         return output
 
 
