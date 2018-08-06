@@ -79,7 +79,7 @@ def sanitize_smiles(smiles, canonize=True):
         try:
             if canonize:
                 new_smiles.append(
-                    Chem.MolToSmiles(Chem.MolFromSmiles(sm, sanitize=True))
+                    Chem.MolToSmiles(Chem.MolFromSmiles(sm, sanitize=False))
                 )
                 idx.append(i)
             else:
