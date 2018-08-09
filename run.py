@@ -28,8 +28,8 @@ def main():
     parser.add_argument("--config_file", required=True,
                         help="Path to the configuration file")
     parser.add_argument("--mode", default='train',
-                        help="Could be \"train\", \"eval\", or  "
-                             "\"train_eval\"")
+                        help="Could be \"train\", \"eval\", "
+                             "\"train_eval\" or \"infer\"")
     parser.add_argument('--continue_learning', dest='continue_learning',
                         action='store_true',
                         help="whether to continue learning")
@@ -43,9 +43,9 @@ def main():
 
     args, unknown = parser.parse_known_args()
 
-    if args.mode not in ['train', 'eval', 'train_eval']:
+    if args.mode not in ['train', 'eval', 'train_eval', 'infer']:
         raise ValueError("Mode has to be one of "
-                         "['train', 'eval', 'train_eval']")
+                         "['train', 'eval', 'train_eval', 'infer']")
     torch.manual_seed(1234)
     torch.cuda.manual_seed_all(1234)
     config_module = runpy.run_path(args.config_file)
@@ -119,7 +119,7 @@ def main():
                             "You should probably not provide "
                             "\"--continue_learning\" flag?")
                     checkpoint = None
-            elif args.mode == 'eval':
+            elif args.mode == 'eval' or args.mode == 'infer':
                 if os.path.isdir(logdir) and os.listdir(logdir) != []:
                     checkpoint = get_latest_checkpoint(ckpt_dir)
                     if checkpoint is None:
@@ -152,7 +152,7 @@ def main():
         if 'train_params' in config_module:
             nested_update(train_config,
                           copy.deepcopy(config_module['train_params']))
-    if args.mode == 'eval' or args.mode == 'train_eval':
+    if args.mode == 'eval' or args.mode == 'train_eval' or args.mode == 'infer':
         if 'eval_params' in config_module:
             nested_update(eval_config,
                           copy.deepcopy(config_module['eval_params']))

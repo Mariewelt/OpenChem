@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from openchem.modules.encoders.openchem_encoder import OpenChemEncoder
 from openchem.utils.utils import check_params
 from openchem.layers.gcn import GraphConvolution
+from openchem.layers.graph_pooling import GraphPooling
 
 
 class GraphCNNEncoder(OpenChemEncoder):
@@ -20,6 +21,7 @@ class GraphCNNEncoder(OpenChemEncoder):
         #self.hidden_size += [self.encoder_dim]
         self.hidden_size = [self.input_size] + self.hidden_size
         self.graph_convolutions = nn.ModuleList()
+        self.graph_pooling = GraphPooling()
         self.dense = nn.Linear(in_features=self.hidden_size[-1],
                                       out_features=self.encoder_dim)
         for i in range(1, self.n_layers+1):
@@ -48,15 +50,16 @@ class GraphCNNEncoder(OpenChemEncoder):
             x = self.graph_convolutions[i](x, adj)
             #if i < self.n_layers - 1:
             #    x = F.dropout(x, self.dropout)
-            x = F.relu(x)
+            x = F.tanh(x)
             n = adj.size(1)
             d = x.size()[-1]
             adj_new = adj.unsqueeze(3)
             adj_new = adj_new.expand(-1, n, n, d)
             x_new = x.repeat(1, n, 1).view(-1, n, n, d)
             res = x_new*adj_new
-            r = res.max(dim=2)[0]
+            x = res.max(dim=2)[0]
             #x = torch.bmm(adj, x)
-        x = F.tanh(self.dense(r))
+            #x = self.graph_pooling()
+        x = F.tanh(self.dense(x))
         x = F.tanh(x.sum(dim=1))
         return x
