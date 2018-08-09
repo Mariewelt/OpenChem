@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to define and train models &mdash; OpenChem 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials and Recipes" href="tutorials/blocks.html" />
+    <link rel="prev" title="Installation instructions" href="installation_instructions.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html">
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api-docs/blocks.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api-docs/models.html">models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#vanilla-model">vanilla_model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api-docs/modules.html">modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/modules.encoders.html">encoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.encoders.html#module-modules.encoders.openchem_encoder">openchem_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.encoders.html#module-modules.encoders.rnn_encoder">rnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.encoders.html#module-modules.encoders.cnn_encoder">cnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.encoders.html#gcnn-encoder">gcnn_encoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/modules.embeddings.html">embeddings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/modules.mlp.html">mlp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api-docs/layers.html">layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/layers.html#module-layers.conv_bn_relu">conv_bn_relu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/layers.html#module-layers.gcn">gcn</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api-docs/data.html">data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#smiles-data-layer">smiles_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#smiles-protein-data-layer">smiles_protein_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#vanilla-data-layer">vanilla_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#smiles-enumerator">smiles_enumerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api-docs/criterion.html">criterion</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api-docs/optimizer.html">optimizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/optimizer.html#module-optimizer.openchem_optimizer">openchem_optimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/optimizer.html#module-optimizer.openchem_lr_scheduler">openchem_lr_scheduler</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api-docs/utils.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#graph">graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenChem</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>How to define and train models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/Mariewelt/OpenChem" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="how-to-define-and-train-models">
+<h1>How to define and train models<a class="headerlink" href="#how-to-define-and-train-models" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will discuss how to construct and run models in OpenChem
+without writing any code.</p>
+<p>Models in Openchem are defined in Python configuration file as a dictionary of parameters.
+The dictionary must contain parameters that define how to run/train/evaluate
+a model as well as parameters defining model architecture. Openchem also contains
+2 Python files run.py and launch.py that handle model creation and launching
+distributed processes.</p>
+<div class="section" id="arguments-for-launch-py">
+<h2>Arguments for launch.py<a class="headerlink" href="#arguments-for-launch-py" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">--nproc_per_node</span></code> — number of processes per node. This should be equal to the number of GPUs on the node.</li>
+</ul>
+</div>
+<div class="section" id="arguments-for-run-py">
+<h2>Arguments for run.py<a class="headerlink" href="#arguments-for-run-py" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">--config_gile</span></code> — path to python configuration file where model is defined.</li>
+<li><code class="docutils literal notranslate"><span class="pre">--mode</span></code> — “train”, “train_eval” or “eval”.</li>
+<li><code class="docutils literal notranslate"><span class="pre">--continue_learning</span></code> — if this argument is specified, training will be resumed from the latest checkpoint.</li>
+</ul>
+</div>
+<div class="section" id="configuration-file">
+<h2>Configuration file<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
+<p>Configuration file must contain <code class="docutils literal notranslate"><span class="pre">model</span></code>, which should be any class derived from <code class="xref py py-class docutils literal notranslate"><span class="pre">OpenChemModel</span></code> and <code class="docutils literal notranslate"><span class="pre">dictionary</span></code> <code class="docutils literal notranslate"><span class="pre">model_params</span></code>.</p>
+<p>Below is description of common parameters for all models that are not related to model architechture:</p>
+<ul class="simple">
+<li>task — <code class="docutils literal notranslate"><span class="pre">string</span></code>, specifies the task to be solved by the model. Could be <code class="docutils literal notranslate"><span class="pre">classification</span></code>, <code class="docutils literal notranslate"><span class="pre">regression</span></code> or <code class="docutils literal notranslate"><span class="pre">multitask</span></code>.</li>
+<li>train_data_layer — pytorch dataset for training data. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code>. OpenChem currently provides utilities for creating SMILES, Graph and MoleculeProtein datasets.</li>
+<li>val_data_layer — pytorch dataset for validation data. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> of <code class="docutils literal notranslate"><span class="pre">--mode=train</span></code>.</li>
+<li>print_every — <code class="docutils literal notranslate"><span class="pre">int</span></code>, how often logs will be printed.</li>
+<li>save_every — <code class="docutils literal notranslate"><span class="pre">int</span></code>, how often model will be saved to checkpoints.</li>
+<li>logdir — <code class="docutils literal notranslate"><span class="pre">string</span></code>, path to folder where model checkpoints and tensorboard log will be saved.</li>
+<li>use_clip_grad — <code class="docutils literal notranslate"><span class="pre">bool</span></code>, whether to use gradient clipping.</li>
+<li>max_grad_norm — <code class="docutils literal notranslate"><span class="pre">float</span></code>, maximum norm of parameters, if gradient clipping is used.</li>
+<li>batch_size — <code class="docutils literal notranslate"><span class="pre">int</span></code>, batch size.</li>
+<li>num_epochs — <code class="docutils literal notranslate"><span class="pre">int</span></code>, number of epochs for training. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code>.</li>
+<li>eval_metrics — user defined function, metrics for evaluation. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=train</span></code>. Python scikit learn package contains majority of the evaluation metrics you would probably like to use.</li>
+<li>criterion — pytorch loss, model loss.</li>
+<li>optimizer — pytorch optimizer, optimizer for training the model. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code></li>
+</ul>
+<p>Other parameters are specific to model architecture. Check out <a class="reference internal" href="tutorials/blocks.html#api-docs"><span class="std std-ref">API documentation</span></a> and other tutorials.</p>
+</div>
+<div class="section" id="launching-jobs">
+<h2>Launching jobs<a class="headerlink" href="#launching-jobs" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example of job, that will be run on a node with 4 GPUs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">launch</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">4</span> <span class="n">run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;./my_config.py&quot;</span> <span class="o">--</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;train&quot;</span>
+</pre></div>
+</div>
+<p>If you want to use only specific GPUs and not all, you can use flag <code class="docutils literal notranslate"><span class="pre">CUDA_VISIBLE_DEVICES</span></code> and set <code class="docutils literal notranslate"><span class="pre">--nproc_per_node</span></code> to the number of GPUs you want to use.</p>
+<p>For example, here is how to run a job on two GPUs with <code class="docutils literal notranslate"><span class="pre">ids</span></code> 0 and 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span> <span class="n">python</span> <span class="n">launch</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">2</span> <span class="n">run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;./my_config.py&quot;</span> <span class="o">--</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;train&quot;</span>
+</pre></div>
+</div>
+<p>If you don’t want to run model in distributed mode, but instead want just run a single process on one GPU, you can use flag <code class="docutils literal notranslate"><span class="pre">CUDA_VISIBLE_DEVICES</span></code> and set <code class="docutils literal notranslate"><span class="pre">--nproc_per_node=1</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">0</span> <span class="n">python</span> <span class="n">launch</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">1</span> <span class="n">run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;./my_config.py&quot;</span> <span class="o">--</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;train&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorials/blocks.html" class="btn btn-neutral float-right" title="Tutorials and Recipes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation_instructions.html" class="btn btn-neutral" title="Installation instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Mariya Popova.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #99badd;
+    }
+  </style>
+
+
+</body>
+</html>

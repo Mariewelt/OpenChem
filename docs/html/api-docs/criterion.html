@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>criterion &mdash; OpenChem 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="optimizer" href="optimizer.html" />
+    <link rel="prev" title="data" href="data.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="blocks.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="models.html">models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#module-models.openchem_model">openchem_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#module-models.Smiles2Label">Smiles2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#module-models.Graph2Label">Graph2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#vanilla-model">vanilla_model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules.encoders.html">encoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.openchem_encoder">openchem_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.rnn_encoder">rnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.cnn_encoder">cnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#gcnn-encoder">gcnn_encoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="modules.embeddings.html">embeddings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="modules.mlp.html">mlp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="layers.html#module-layers.conv_bn_relu">conv_bn_relu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="layers.html#module-layers.gcn">gcn</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-data-layer">smiles_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-protein-data-layer">smiles_protein_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#vanilla-data-layer">vanilla_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-enumerator">smiles_enumerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">criterion</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html">optimizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimizer.html#module-optimizer.openchem_optimizer">openchem_optimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimizer.html#module-optimizer.openchem_lr_scheduler">openchem_lr_scheduler</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#graph">graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenChem</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="blocks.html">API documentation</a> &raquo;</li>
+        
+      <li>criterion</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api-docs/criterion.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-openchem.criterion">
+<span id="criterion"></span><h1>criterion<a class="headerlink" href="#module-openchem.criterion" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-openchem.criterion.multitask_loss">
+<span id="multitask-loss"></span><h2>multitask_loss<a class="headerlink" href="#module-openchem.criterion.multitask_loss" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="openchem.criterion.multitask_loss.MultitaskLoss">
+<em class="property">class </em><code class="descclassname">openchem.criterion.multitask_loss.</code><code class="descname">MultitaskLoss</code><span class="sig-paren">(</span><em>ignore_index</em>, <em>n_tasks</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/criterion/multitask_loss.html#MultitaskLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.criterion.multitask_loss.MultitaskLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.loss._WeightedLoss</span></code></p>
+<p>Creates a criterion that calculated binary cross-entropy loss over
+<cite>n_tasks</cite> tasks given input tensors <cite>input</cite> and <cite>target</cite>. Returns loss
+averaged across number of samples in every task and across <cite>n_tasks</cite>.
+It is useful when training a classification model with <cite>n_tasks</cite>
+separate binary classes.</p>
+<p>The loss can be described as:</p>
+<dl class="docutils">
+<dt>..math::</dt>
+<dd>text{loss}(y, t) = -frac{1}{n_tasks}sum_{i=1}^{n_tasks}frac{1}{N_i}
+sum_{j=1}^{N_i} left(t[i, j]log(1-y[i, j])
++ (1-t[i, j])log(1-y[i, j])right).</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ignore_index</strong> (<em>int</em>) – specifies a target value that is ignored
+and does not contribute to the gradient. For every task losses are
+averaged only across non-ignored targets.</li>
+<li><strong>n_tasks</strong> (<em>int</em>) – specifies number of tasks.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Shape:</dt>
+<dd><dl class="first docutils">
+<dt>-Input: :math: <cite>(N, n_tasks)</cite>. Values should be in <span class="math notranslate nohighlight">\([0, 1]\)</span> range,</dt>
+<dd>corresponding to probability of class :math:‘1’.</dd>
+<dt>-Target: :math: <cite>(N, n_tasks)</cite>. Values should be binary: either</dt>
+<dd><span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span>, corresponding to class labels.</dd>
+</dl>
+<p class="last">-Output: scalar.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="openchem.criterion.multitask_loss.MultitaskLoss.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>input</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/criterion/multitask_loss.html#MultitaskLoss.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.criterion.multitask_loss.MultitaskLoss.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="optimizer.html" class="btn btn-neutral float-right" title="optimizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="data.html" class="btn btn-neutral" title="data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Mariya Popova.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #99badd;
+    }
+  </style>
+
+
+</body>
+</html>
