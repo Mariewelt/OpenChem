@@ -1,7 +1,7 @@
 criterion
-======
+==========
 
-.. automodule:: criterion
+.. automodule:: openchem.criterion
     :members:
     :undoc-members:
     :show-inheritance:
@@ -9,7 +9,7 @@ criterion
 multitask_loss
 -------------------
 
-.. automodule:: criterion.multitask_loss
+.. automodule:: openchem.criterion.multitask_loss
     :members:
     :undoc-members:
     :show-inheritance:

@@ -78,12 +78,41 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../api-docs/blocks.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/models.html">models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#vanilla-model">vanilla_model</a></li>
 </ul>
 </li>
@@ -98,7 +127,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/modules.embeddings.html">embeddings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/modules.mlp.html">mlp</a></li>
@@ -119,7 +148,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/criterion.html">criterion</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/criterion.html#module-criterion.multitask_loss">multitask_loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/optimizer.html">optimizer</a><ul>
@@ -128,9 +157,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/utils.html">utils</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#id1">utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#graph">graph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -199,25 +228,19 @@
             
   <h1>Source code for models.Smiles2Label</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">openchem.models.openchem_model</span> <span class="k">import</span> <span class="n">OpenChemModel</span>
-<span class="kn">from</span> <span class="nn">openchem.optimizer.openchem_optimizer</span> <span class="k">import</span> <span class="n">OpenChemOptimizer</span>
-<span class="kn">from</span> <span class="nn">openchem.optimizer.openchem_lr_scheduler</span> <span class="k">import</span> <span class="n">OpenChemLRScheduler</span>
+<span class="kn">from</span> <span class="nn">openchem.layers.stack_augmentation</span> <span class="k">import</span> <span class="n">StackAugmentation</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
 
-<div class="viewcode-block" id="Smiles2Label"><a class="viewcode-back" href="../../api-docs/models.html#models.Smiles2Label.Smiles2Label">[docs]</a><span class="k">class</span> <span class="nc">Smiles2Label</span><span class="p">(</span><span class="n">OpenChemModel</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a model that predicts one or multiple labels given string of</span>
-<span class="sd">    characters as input. Embeddings for input sequences are extracted with</span>
-<span class="sd">    Embedding layer, followed by encoder (could be RNN or CNN encoder).</span>
-<span class="sd">    Last layer of the model is multi-layer perceptron.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        params (dict): dictionary describing model architecture.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GenerativeRNN"><a class="viewcode-back" href="../../api-docs/models.html#models.Smiles2Label.GenerativeRNN">[docs]</a><span class="k">class</span> <span class="nc">GenerativeRNN</span><span class="p">(</span><span class="n">OpenChemModel</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Smiles2Label</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GenerativeRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_stack</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;has_stack&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_stack</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Stack</span> <span class="o">=</span> <span class="n">StackAugmentation</span><span class="p">(</span><span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">,</span>
+                                           <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;stack_params&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;embedding&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embed_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;embedding_params&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embed_params</span><span class="p">)</span>
@@ -227,34 +250,48 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;mlp&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mlp_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;mlp_params&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">MLP</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mlp_params</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">OpenChemOptimizer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">],</span>
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer_params&#39;</span><span class="p">]],</span>
-                                           <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">OpenChemLRScheduler</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;lr_scheduler&#39;</span><span class="p">],</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;lr_scheduler_params&#39;</span><span class="p">]</span>
-                                              <span class="p">],</span>
-                                             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Smiles2Label.forward"><a class="viewcode-back" href="../../api-docs/models.html#models.Smiles2Label.Smiles2Label.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inp</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="GenerativeRNN.forward"><a class="viewcode-back" href="../../api-docs/models.html#models.Smiles2Label.GenerativeRNN.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inp_seq</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generator forward function.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">eval</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-        <span class="n">embedded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Encoder</span><span class="p">(</span><span class="n">embedded</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MLP</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">output</span></div>
-
-<div class="viewcode-block" id="Smiles2Label.cast_inputs"><a class="viewcode-back" href="../../api-docs/models.html#models.Smiles2Label.Smiles2Label.cast_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">cast_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
-        <span class="n">batch_mols</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;tokenized_smiles&#39;</span><span class="p">],</span>
-                                  <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
-        <span class="n">batch_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
-            <span class="n">batch_labels</span> <span class="o">=</span> <span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">inp_seq</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">seq_len</span> <span class="o">=</span> <span class="n">inp_seq</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MLP</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                             <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">:</span>
-            <span class="n">batch_mols</span> <span class="o">=</span> <span class="n">batch_mols</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-            <span class="n">batch_labels</span> <span class="o">=</span> <span class="n">batch_labels</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">batch_mols</span><span class="p">,</span> <span class="n">batch_labels</span></div></div>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Encoder</span><span class="o">.</span><span class="n">init_hidden</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_stack</span><span class="p">:</span>
+            <span class="n">stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Stack</span><span class="o">.</span><span class="n">init_stack</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">seq_len</span><span class="p">):</span>
+            <span class="n">inp_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">inp_seq</span><span class="p">[:,</span> <span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_stack</span><span class="p">:</span>
+                <span class="n">stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Stack</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">stack</span><span class="p">)</span>
+                <span class="n">stack_top</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">inp_token</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">inp_token</span><span class="p">,</span> <span class="n">stack_top</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Encoder</span><span class="p">(</span><span class="n">inp_token</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[:,</span> <span class="n">c</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MLP</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="n">n_classes</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenerativeRNN.cast_inputs"><a class="viewcode-back" href="../../api-docs/models.html#models.Smiles2Label.GenerativeRNN.cast_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">cast_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+        <span class="n">sample_seq</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;tokenized_smiles&#39;</span><span class="p">]</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span>
+        <span class="n">max_len</span> <span class="o">=</span> <span class="n">lengths</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+        <span class="n">sample_seq</span> <span class="o">=</span> <span class="n">sample_seq</span><span class="p">[:,</span> <span class="p">:</span><span class="n">max_len</span><span class="p">]</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">sample_seq</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">sample_seq</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">seq</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

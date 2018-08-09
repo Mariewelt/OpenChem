@@ -78,12 +78,41 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api-docs/blocks.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api-docs/models.html">models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api-docs/models.html#vanilla-model">vanilla_model</a></li>
 </ul>
 </li>
@@ -98,7 +127,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api-docs/modules.embeddings.html">embeddings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api-docs/modules.mlp.html">mlp</a></li>
@@ -119,7 +148,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api-docs/criterion.html">criterion</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/criterion.html#module-criterion.multitask_loss">multitask_loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api-docs/optimizer.html">optimizer</a><ul>
@@ -128,9 +157,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api-docs/utils.html">utils</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/utils.html#id1">utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api-docs/utils.html#graph">graph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/utils.html#module-utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -211,7 +240,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_embeddings&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;embedding_dim&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">padding_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;padding_idx&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;padding_idx&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">padding_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;padding_idx&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">padding_idx</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">num_embeddings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_embeddings</span><span class="p">,</span>
                                       <span class="n">embedding_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span><span class="p">,</span>
                                       <span class="n">padding_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">padding_idx</span><span class="p">)</span>
@@ -222,15 +254,16 @@
 <div class="viewcode-block" id="OpenChemEmbedding.get_optional_params"><a class="viewcode-back" href="../../../api-docs/modules.embeddings.html#modules.embeddings.openchem_embedding.OpenChemEmbedding.get_optional_params">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_optional_params</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;padding_idx&#39;</span><span class="p">:</span> <span class="nb">int</span>
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="OpenChemEmbedding.get_required_params"><a class="viewcode-back" href="../../../api-docs/modules.embeddings.html#modules.embeddings.openchem_embedding.OpenChemEmbedding.get_required_params">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_required_params</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;num_embeddings&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="s1">&#39;embedding_dim&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="s1">&#39;padding_idx&#39;</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="s1">&#39;embedding_dim&#39;</span><span class="p">:</span> <span class="nb">int</span>
         <span class="p">}</span></div></div>
+
 </pre></div>
 
            </div>
