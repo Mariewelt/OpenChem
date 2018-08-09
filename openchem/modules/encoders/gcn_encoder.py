@@ -1,5 +1,4 @@
-# TODO: encoding of molecular graph into vector
-
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -16,12 +15,15 @@ class GraphCNNEncoder(OpenChemEncoder):
                      self.get_optional_params())
         self.n_layers = params['n_layers']
         self.hidden_size = params['hidden_size']
-        self.dropout = params['dropout']
+        if 'dropout' in params.keys():
+            self.dropout = params['dropout']
+        else:
+            self.dropout = 0
         assert len(self.hidden_size) == self.n_layers
-        #self.hidden_size += [self.encoder_dim]
         self.hidden_size = [self.input_size] + self.hidden_size
         self.graph_convolutions = nn.ModuleList()
         self.graph_pooling = GraphPooling()
+        self.dropout_layer = nn.Dropout(p=self.dropout)
         self.dense = nn.Linear(in_features=self.hidden_size[-1],
                                       out_features=self.encoder_dim)
         for i in range(1, self.n_layers+1):
@@ -48,9 +50,8 @@ class GraphCNNEncoder(OpenChemEncoder):
         adj = inp[1]
         for i in range(self.n_layers):
             x = self.graph_convolutions[i](x, adj)
-            #if i < self.n_layers - 1:
-            #    x = F.dropout(x, self.dropout)
-            x = F.tanh(x)
+            #x = self.dropout_layer(x)
+            x = torch.tanh(x)
             n = adj.size(1)
             d = x.size()[-1]
             adj_new = adj.unsqueeze(3)
@@ -58,8 +59,7 @@ class GraphCNNEncoder(OpenChemEncoder):
             x_new = x.repeat(1, n, 1).view(-1, n, n, d)
             res = x_new*adj_new
             x = res.max(dim=2)[0]
-            #x = torch.bmm(adj, x)
             #x = self.graph_pooling()
-        x = F.tanh(self.dense(x))
-        x = F.tanh(x.sum(dim=1))
+        x = torch.tanh(self.dense(x))
+        x = torch.tanh(x.sum(dim=1))
         return x
