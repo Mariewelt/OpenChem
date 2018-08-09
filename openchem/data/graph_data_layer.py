@@ -35,6 +35,7 @@ class GraphDataset(Dataset):
             self.node_feature_matrix.append(
                 graph.get_node_feature_matrix(node_attributes, max_size))
             self.adj_matrix.append(graph.adj_matrix)
+        self.num_features = self.node_feature_matrix[0].shape[1]
 
     def __len__(self):
         return len(self.target)
