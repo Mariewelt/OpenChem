@@ -46,10 +46,10 @@ class SmilesDataset(Dataset):
                                                        self.target)
         if pad:
             clean_smiles, self.length = pad_sequences(clean_smiles)
-        self.tokens, self.token2idx, self.num_tokens = get_tokens(clean_smiles,
+        tokens, self.token2idx, self.num_tokens = get_tokens(clean_smiles,
                                                                 tokens)
         if tokenize:
-            clean_smiles = seq2tensor(clean_smiles, self.tokens, flip)
+            clean_smiles, self.tokens = seq2tensor(clean_smiles, tokens, flip)
         self.data = clean_smiles
 
     def __len__(self):
