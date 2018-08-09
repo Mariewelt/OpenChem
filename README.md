@@ -4,7 +4,7 @@
 
 # OpenChem
 
-OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](https://pytorch.org) backend. The goal of OpenChem is to make Deep Learning models an easy-to-use tool for Computational Chemistry Researchers.
+OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](https://pytorch.org) backend. The goal of OpenChem is to make Deep Learning models an easy-to-use tool for Computational Chemistry and Drug Design Researchers. 
 
 # Main features
 
@@ -31,6 +31,8 @@ OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](h
 * Convolutional neural network encoders
 * Graph convolution neural network encoders
 * Multi-layer perceptrons
+
+We are working on populating OpenChem with more models and other building blocks.
 
 # Installation
 
