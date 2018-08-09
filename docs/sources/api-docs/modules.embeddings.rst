@@ -1,5 +1,5 @@
 embeddings
-======
+===========
 
 .. automodule:: modules.embeddings
     :members:
@@ -23,7 +23,7 @@ basic_embedding
     :show-inheritance:
 
 positional_embedding
--------------------
+---------------------
 
 .. automodule:: modules.embeddings.positional_embedding
     :members:
