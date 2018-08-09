@@ -5,24 +5,31 @@
    :maxdepth: 2
 
    Introduction <self>
+   installation_instructions
+   how_to_run_tutorial
+   tutorials/blocks
    api-docs/blocks
+
 
 
 OpenChem
 ===========
 
-OpenChem is a toolkit for experimentation with machine learning models for Computational Chemistry.
+OpenChem is a deep learning toolkit for Computational Chemistry with PyTorch_ backend.
+
+.. _PyTorch: https://pytorch.org/docs/stable/index.html
 
 **Main features**
 
-* Built-in support for distributed training.
+* Modular design with unified API, so that modulescan be easily combined with each other.
 
-* Modular design for easy experimentation with various architectures.
+* OpenChem is easy-to-use: new models are built with only configuration file.
 
-* Implemented modalities: Smiles2Label, Graph2Label and MoleculeProtein2Label.
+* Fast training with multi-gpu support.
 
-* Ease of use with configuration file.
+* Utilities for data preprocessing.
 
-OpenChem is implemented using PyTorch backend.
+* Tensorboard support.
+
 
 :ref:`API documentation <api-docs>`.
