@@ -1,15 +1,7 @@
 utils
 ======
 
-.. automodule:: utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-utils
----------------------
-
-.. automodule:: utils.utils
+.. automodule:: openchem.utils
     :members:
     :undoc-members:
     :show-inheritance:
@@ -17,7 +9,15 @@ utils
 graph
 -------------------
 
-.. automodule:: utils.graph
+.. automodule:: openchem.utils.graph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+utils
+---------------------
+
+.. automodule:: openchem.utils.utils
     :members:
     :undoc-members:
     :show-inheritance:
@@ -25,7 +25,8 @@ graph
 logger
 ---------------------
 
-.. automodule:: utils.logger
+.. automodule:: openchem.utils.logger
     :members:
     :undoc-members:
     :show-inheritance:
+
