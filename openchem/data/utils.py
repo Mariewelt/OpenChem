@@ -29,10 +29,14 @@ def seq2tensor(seqs, tokens, flip=True):
     tensor = np.zeros((len(seqs), len(seqs[0])))
     for i in range(len(seqs)):
         for j in range(len(seqs[i])):
-            tensor[i, j] = tokens.index(seqs[i][j])
+            if seqs[i][j] in tokens:
+                tensor[i, j] = tokens.index(seqs[i][j])
+            else:
+                tokens = tokens + seqs[i][j]
+                tensor[i, j] = tokens.index(seqs[i][j])
     if flip:
         tensor = np.flip(tensor, axis=1).copy()
-    return tensor
+    return tensor, tokens
 
 
 def pad_sequences(seqs, max_length=None, pad_symbol=' '):
@@ -191,7 +195,7 @@ def get_tokens(smiles, tokens=None):
     return tokens, token2idx, num_tokens
 
 
-def augment_smiles(smiles, labels, n_augment=2):
+def augment_smiles(smiles, labels, n_augment=5):
     smiles_augmentation = SmilesEnumerator()
     augmented_smiles = []
     augmented_labels = []
@@ -227,3 +231,14 @@ def read_smiles_property_file(path, cols_to_read, delimiter=',',
         data[i] = data_full[start_position:, col]
 
     return data
+
+
+def save_smiles_property_file(path, smiles, labels, delimiter=','):
+    f = open(path, 'w')
+    n_targets = labels.shape[1]
+    for i in range(len(smiles)):
+        f.writelines(smiles[i])
+        for j in range(n_targets):
+            f.writelines(delimiter + str(labels[i, j]))
+        f.writelines('\n')
+    f.close()
