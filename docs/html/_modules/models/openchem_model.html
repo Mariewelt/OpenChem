@@ -78,12 +78,41 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../api-docs/blocks.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/models.html">models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#vanilla-model">vanilla_model</a></li>
 </ul>
 </li>
@@ -98,7 +127,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/modules.embeddings.html">embeddings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/modules.mlp.html">mlp</a></li>
@@ -119,7 +148,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/criterion.html">criterion</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/criterion.html#module-criterion.multitask_loss">multitask_loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/optimizer.html">optimizer</a><ul>
@@ -128,9 +157,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/utils.html">utils</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#id1">utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#graph">graph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -220,6 +249,7 @@
 <span class="sd">    :func:&#39;cast&#39; inputs must be overridden for every class, that inherits from</span>
 <span class="sd">    OpenChemModel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">OpenChemModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">check_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_params</span><span class="p">(),</span>
@@ -229,10 +259,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;eval_metrics&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;task&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;criterion&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;lr_scheduler&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;logdir&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">world_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;world_size&#39;</span><span class="p">]</span>
 
@@ -248,20 +274,17 @@
 
 <div class="viewcode-block" id="OpenChemModel.get_required_params"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.get_required_params">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_required_params</span><span class="p">():</span>
-        <span class="k">return</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;task&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="s1">&#39;num_epochs&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="s1">&#39;train_data_layer&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;val_data_layer&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s1">&#39;criterion&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s1">&#39;optimizer_params&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="OpenChemModel.get_optional_params"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.get_optional_params">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_optional_params</span><span class="p">():</span>
-        <span class="k">return</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;use_cuda&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
             <span class="s1">&#39;use_clip_grad&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
             <span class="s1">&#39;max_grad_norm&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -287,9 +310,8 @@
 <div class="viewcode-block" id="OpenChemModel.save_model"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.save_model">[docs]</a>    <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">path</span><span class="p">)</span></div></div>
 
-        
-<div class="viewcode-block" id="build_training"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.build_training">[docs]</a><span class="k">def</span> <span class="nf">build_training</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
+<div class="viewcode-block" id="build_training"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.build_training">[docs]</a><span class="k">def</span> <span class="nf">build_training</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">OpenChemOptimizer</span><span class="p">([</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">],</span>
                                    <span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer_params&#39;</span><span class="p">]],</span>
                                   <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
@@ -302,7 +324,7 @@
         <span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
     <span class="c1"># train_loader = params[&#39;train_loader&#39;]</span>
     <span class="c1"># val_loader = params[&#39;val_loader&#39;]</span>
-    <span class="k">return</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_scheduler</span> <span class="c1">#, train_loader, val_loader</span></div>
+    <span class="k">return</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_scheduler</span>  <span class="c1"># , train_loader, val_loader</span></div>
 
 
 <div class="viewcode-block" id="train_step"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.train_step">[docs]</a><span class="k">def</span> <span class="nf">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">inp</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
@@ -314,7 +336,7 @@
     <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">use_clip_grad</span><span class="p">:</span>
         <span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">max_grad_norm</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">data</span></div>
+    <span class="k">return</span> <span class="n">loss</span></div>
 
 
 <div class="viewcode-block" id="print_logs"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.print_logs">[docs]</a><span class="k">def</span> <span class="nf">print_logs</span><span class="p">(</span><span class="n">world_size</span><span class="p">):</span>
@@ -379,15 +401,16 @@
                     <span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">logger</span><span class="o">.</span><span class="n">histo_summary</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-                                         <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                                             <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                         <span class="n">logger</span><span class="o">.</span><span class="n">histo_summary</span><span class="p">(</span><span class="n">tag</span> <span class="o">+</span> <span class="s1">&#39;/grad&#39;</span><span class="p">,</span>
-                                         <span class="n">value</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-                                         <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                                             <span class="n">value</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                                             <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">except</span><span class="p">:</span>
                         <span class="k">pass</span>
 
         <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">save_every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">print_logs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">world_size</span><span class="p">):</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">logdir</span> <span class="o">+</span> <span class="s1">&#39;/checkpoint/epoch_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+                       <span class="n">logdir</span> <span class="o">+</span> <span class="s1">&#39;/checkpoint/epoch_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
 
         <span class="n">loss_total</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">n_batches</span> <span class="o">=</span> <span class="mi">0</span>

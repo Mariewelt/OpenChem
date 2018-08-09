@@ -79,12 +79,41 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api-docs/blocks.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/models.html">models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#vanilla-model">vanilla_model</a></li>
 </ul>
 </li>
@@ -99,7 +128,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api-docs/modules.embeddings.html">embeddings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/modules.mlp.html">mlp</a></li>
@@ -120,7 +149,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/criterion.html">criterion</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/criterion.html#module-criterion.multitask_loss">multitask_loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/optimizer.html">optimizer</a><ul>
@@ -129,9 +158,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/utils.html">utils</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#id1">utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#graph">graph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#module-utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -218,7 +247,6 @@
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
- | <a href="#U"><strong>U</strong></a>
  | <a href="#Z"><strong>Z</strong></a>
  
 </div>
@@ -233,31 +261,25 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.calculate_metrics">calculate_metrics() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.calculate_metrics">calculate_metrics() (in module openchem.utils.utils)</a>
 </li>
       <li><a href="api-docs/models.html#models.Graph2Label.Graph2Label.cast_inputs">cast_inputs() (models.Graph2Label.Graph2Label method)</a>
 
       <ul>
-        <li><a href="api-docs/models.html#models.MoleculeProtein2Label.MoleculeProtein2Label.cast_inputs">(models.MoleculeProtein2Label.MoleculeProtein2Label method)</a>
-</li>
-        <li><a href="api-docs/models.html#models.Smiles2Label.Smiles2Label.cast_inputs">(models.Smiles2Label.Smiles2Label method)</a>
+        <li><a href="api-docs/models.html#models.Smiles2Label.GenerativeRNN.cast_inputs">(models.Smiles2Label.GenerativeRNN method)</a>
 </li>
         <li><a href="api-docs/models.html#models.openchem_model.OpenChemModel.cast_inputs">(models.openchem_model.OpenChemModel method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.check_params">check_params() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.check_params">check_params() (in module openchem.utils.utils)</a>
 </li>
       <li><a href="api-docs/modules.encoders.html#modules.encoders.cnn_encoder.CNNEncoder">CNNEncoder (class in modules.encoders.cnn_encoder)</a>
 </li>
       <li><a href="api-docs/layers.html#layers.conv_bn_relu.ConvBNReLU">ConvBNReLU (class in layers.conv_bn_relu)</a>
 </li>
-      <li><a href="api-docs/criterion.html#module-criterion">criterion (module)</a>
-</li>
-      <li><a href="api-docs/criterion.html#module-criterion.multitask_loss">criterion.multitask_loss (module)</a>
-</li>
-      <li><a href="api-docs/utils.html#utils.utils.cross_validation_split">cross_validation_split() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.cross_validation_split">cross_validation_split() (in module openchem.utils.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -269,7 +291,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.deco_print">deco_print() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.deco_print">deco_print() (in module openchem.utils.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -291,20 +313,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-docs/models.html#models.openchem_model.fit">fit() (in module models.openchem_model)</a>
 </li>
-      <li><a href="api-docs/utils.html#utils.utils.flatten_dict">flatten_dict() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.flatten_dict">flatten_dict() (in module openchem.utils.utils)</a>
 </li>
-      <li><a href="api-docs/criterion.html#criterion.multitask_loss.MultitaskLoss.forward">forward() (criterion.multitask_loss.MultitaskLoss method)</a>
+      <li><a href="api-docs/layers.html#layers.conv_bn_relu.ConvBNReLU.forward">forward() (layers.conv_bn_relu.ConvBNReLU method)</a>
 
       <ul>
-        <li><a href="api-docs/layers.html#layers.conv_bn_relu.ConvBNReLU.forward">(layers.conv_bn_relu.ConvBNReLU method)</a>
-</li>
         <li><a href="api-docs/layers.html#layers.gcn.GraphConvolution.forward">(layers.gcn.GraphConvolution method)</a>
 </li>
         <li><a href="api-docs/models.html#models.Graph2Label.Graph2Label.forward">(models.Graph2Label.Graph2Label method)</a>
 </li>
-        <li><a href="api-docs/models.html#models.MoleculeProtein2Label.MoleculeProtein2Label.forward">(models.MoleculeProtein2Label.MoleculeProtein2Label method)</a>
-</li>
-        <li><a href="api-docs/models.html#models.Smiles2Label.Smiles2Label.forward">(models.Smiles2Label.Smiles2Label method)</a>
+        <li><a href="api-docs/models.html#models.Smiles2Label.GenerativeRNN.forward">(models.Smiles2Label.GenerativeRNN method)</a>
 </li>
         <li><a href="api-docs/models.html#models.openchem_model.OpenChemModel.forward">(models.openchem_model.OpenChemModel method)</a>
 </li>
@@ -322,6 +340,8 @@
 </li>
         <li><a href="api-docs/modules.mlp.html#modules.mlp.openchem_mlp.OpenChemMLP.forward">(modules.mlp.openchem_mlp.OpenChemMLP method)</a>
 </li>
+        <li><a href="api-docs/criterion.html#openchem.criterion.multitask_loss.MultitaskLoss.forward">(openchem.criterion.multitask_loss.MultitaskLoss method)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -329,9 +349,11 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.get_incremental_state">get_incremental_state() (in module utils.utils)</a>
+      <li><a href="api-docs/models.html#models.Smiles2Label.GenerativeRNN">GenerativeRNN (class in models.Smiles2Label)</a>
 </li>
-      <li><a href="api-docs/utils.html#utils.utils.get_latest_checkpoint">get_latest_checkpoint() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.get_incremental_state">get_incremental_state() (in module openchem.utils.utils)</a>
+</li>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.get_latest_checkpoint">get_latest_checkpoint() (in module openchem.utils.utils)</a>
 </li>
       <li><a href="api-docs/optimizer.html#optimizer.openchem_optimizer.OpenChemOptimizer.get_lr">get_lr() (optimizer.openchem_optimizer.OpenChemOptimizer method)</a>
 </li>
@@ -375,7 +397,7 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.logger.Logger.histo_summary">histo_summary() (utils.logger.Logger method)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.logger.Logger.histo_summary">histo_summary() (openchem.utils.logger.Logger method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -383,7 +405,7 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.logger.Logger.image_summary">image_summary() (utils.logger.Logger method)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.logger.Logger.image_summary">image_summary() (openchem.utils.logger.Logger method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -411,7 +433,7 @@
 </li>
       <li><a href="api-docs/optimizer.html#optimizer.openchem_optimizer.OpenChemOptimizer.load_state_dict">load_state_dict() (optimizer.openchem_optimizer.OpenChemOptimizer method)</a>
 </li>
-      <li><a href="api-docs/utils.html#utils.logger.Logger">Logger (class in utils.logger)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.logger.Logger">Logger (class in openchem.utils.logger)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -419,15 +441,13 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.make_positions">make_positions() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.make_positions">make_positions() (in module openchem.utils.utils)</a>
 </li>
       <li><a href="api-docs/modules.embeddings.html#modules.embeddings.positional_embedding.PositionalEmbedding.max_positions">max_positions() (modules.embeddings.positional_embedding.PositionalEmbedding method)</a>
 </li>
       <li><a href="api-docs/models.html#module-models">models (module)</a>
 </li>
       <li><a href="api-docs/models.html#module-models.Graph2Label">models.Graph2Label (module)</a>
-</li>
-      <li><a href="api-docs/models.html#module-models.MoleculeProtein2Label">models.MoleculeProtein2Label (module)</a>
 </li>
       <li><a href="api-docs/models.html#module-models.openchem_model">models.openchem_model (module)</a>
 </li>
@@ -455,11 +475,9 @@
 </li>
       <li><a href="api-docs/modules.mlp.html#module-modules.mlp.openchem_mlp">modules.mlp.openchem_mlp (module)</a>
 </li>
-      <li><a href="api-docs/models.html#models.MoleculeProtein2Label.MoleculeProtein2Label">MoleculeProtein2Label (class in models.MoleculeProtein2Label)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.move_to_cuda">move_to_cuda() (in module openchem.utils.utils)</a>
 </li>
-      <li><a href="api-docs/utils.html#utils.utils.move_to_cuda">move_to_cuda() (in module utils.utils)</a>
-</li>
-      <li><a href="api-docs/criterion.html#criterion.multitask_loss.MultitaskLoss">MultitaskLoss (class in criterion.multitask_loss)</a>
+      <li><a href="api-docs/criterion.html#openchem.criterion.multitask_loss.MultitaskLoss">MultitaskLoss (class in openchem.criterion.multitask_loss)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -467,11 +485,11 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.nest_dict">nest_dict() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.nest_dict">nest_dict() (in module openchem.utils.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.nested_update">nested_update() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.nested_update">nested_update() (in module openchem.utils.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -479,18 +497,28 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-docs/criterion.html#module-openchem.criterion">openchem.criterion (module)</a>
+</li>
+      <li><a href="api-docs/criterion.html#module-openchem.criterion.multitask_loss">openchem.criterion.multitask_loss (module)</a>
+</li>
+      <li><a href="api-docs/utils.html#module-openchem.utils">openchem.utils (module)</a>
+</li>
+      <li><a href="api-docs/utils.html#module-openchem.utils.logger">openchem.utils.logger (module)</a>
+</li>
+      <li><a href="api-docs/utils.html#module-openchem.utils.utils">openchem.utils.utils (module)</a>
+</li>
       <li><a href="api-docs/modules.embeddings.html#modules.embeddings.openchem_embedding.OpenChemEmbedding">OpenChemEmbedding (class in modules.embeddings.openchem_embedding)</a>
 </li>
       <li><a href="api-docs/modules.encoders.html#modules.encoders.openchem_encoder.OpenChemEncoder">OpenChemEncoder (class in modules.encoders.openchem_encoder)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-docs/optimizer.html#optimizer.openchem_lr_scheduler.OpenChemLRScheduler">OpenChemLRScheduler (class in optimizer.openchem_lr_scheduler)</a>
 </li>
       <li><a href="api-docs/modules.mlp.html#modules.mlp.openchem_mlp.OpenChemMLP">OpenChemMLP (class in modules.mlp.openchem_mlp)</a>
 </li>
       <li><a href="api-docs/models.html#models.openchem_model.OpenChemModel">OpenChemModel (class in models.openchem_model)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-docs/optimizer.html#optimizer.openchem_optimizer.OpenChemOptimizer">OpenChemOptimizer (class in optimizer.openchem_optimizer)</a>
 </li>
       <li><a href="api-docs/optimizer.html#module-optimizer">optimizer (module)</a>
@@ -539,15 +567,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-docs/models.html#models.openchem_model.OpenChemModel.save_model">save_model() (models.openchem_model.OpenChemModel method)</a>
 </li>
-      <li><a href="api-docs/utils.html#utils.logger.Logger.scalar_summary">scalar_summary() (utils.logger.Logger method)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.logger.Logger.scalar_summary">scalar_summary() (openchem.utils.logger.Logger method)</a>
 </li>
       <li><a href="api-docs/optimizer.html#optimizer.openchem_lr_scheduler.OpenChemLRScheduler.scheduler">scheduler (optimizer.openchem_lr_scheduler.OpenChemLRScheduler attribute)</a>
 </li>
-      <li><a href="api-docs/optimizer.html#optimizer.openchem_optimizer.OpenChemOptimizer.set_lr">set_lr() (optimizer.openchem_optimizer.OpenChemOptimizer method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/models.html#models.Smiles2Label.Smiles2Label">Smiles2Label (class in models.Smiles2Label)</a>
+      <li><a href="api-docs/optimizer.html#optimizer.openchem_optimizer.OpenChemOptimizer.set_lr">set_lr() (optimizer.openchem_optimizer.OpenChemOptimizer method)</a>
 </li>
       <li><a href="api-docs/optimizer.html#optimizer.openchem_optimizer.OpenChemOptimizer.state_dict">state_dict() (optimizer.openchem_optimizer.OpenChemOptimizer method)</a>
 </li>
@@ -563,25 +589,11 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#utils.utils.time_since">time_since() (in module utils.utils)</a>
+      <li><a href="api-docs/utils.html#openchem.utils.utils.time_since">time_since() (in module openchem.utils.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-docs/models.html#models.openchem_model.train_step">train_step() (in module models.openchem_model)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#module-utils">utils (module)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api-docs/utils.html#module-utils.logger">utils.logger (module)</a>
-</li>
-      <li><a href="api-docs/utils.html#module-utils.utils">utils.utils (module)</a>
 </li>
   </ul></td>
 </tr></table>
