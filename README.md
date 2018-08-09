@@ -26,9 +26,7 @@ OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](h
 
 ## Modules:
 * Token embeddings
-* Positional embeddings
 * Recurrent neural network encoders
-* Convolutional neural network encoders
 * Graph convolution neural network encoders
 * Multi-layer perceptrons
 
