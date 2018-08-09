@@ -17,9 +17,6 @@ import pandas as pd
 import copy
 import pickle
 
-ref_data = pd.read_csv('/home/mpopova/Work/OpenChem/benchmark_datasets/atomic_data.csv',
-                       index_col=0)
-
 
 def get_atomic_attributes(atom):
     attr_dict = {}
@@ -49,15 +46,12 @@ node_attributes['atom_element'] = Attribute('node', 'atom_element',
                                             one_hot=True,
                                             values=list(range(11)))
 
-#train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-#                             './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv',
-#                             delimiter=',', cols_to_read=[0, 1])
-#test_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-#                             './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv',
-#                             delimiter=',', cols_to_read=[0, 1])
-
-train_dataset = pickle.load(open('/home/mpopova/Work/OpenChem/benchmark_datasets/logp_dataset/train.pkl', 'rb'))
-test_dataset = pickle.load(open('/home/mpopova/Work/OpenChem/benchmark_datasets/logp_dataset/test.pkl', 'rb'))
+train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
+                             './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv',
+                             delimiter=',', cols_to_read=[0, 1])
+test_dataset = GraphDataset(get_atomic_attributes, node_attributes,
+                             './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv',
+                             delimiter=',', cols_to_read=[0, 1])
 
 model = Graph2Label
 
@@ -67,7 +61,7 @@ model_params = {
     'use_clip_grad': False,
     'batch_size': 256,
     'num_epochs': 101,
-    'logdir': '/home/mpopova/Work/OpenChem/logs/gcnn_logs',
+    'logdir': '/home/user/Work/OpenChem/logs/logp_gcnn_logs',
     'print_every': 10,
     'save_every': 5,
     'train_data_layer': train_dataset,
