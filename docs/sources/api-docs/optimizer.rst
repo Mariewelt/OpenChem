@@ -1,5 +1,5 @@
 optimizer
-======
+==========
 
 .. automodule:: optimizer
     :members:

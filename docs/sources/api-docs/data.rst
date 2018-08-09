@@ -23,7 +23,7 @@ graph_data_layer
     :show-inheritance:
 
 smiles_protein_data_layer
--------------------
+--------------------------
 
 .. automodule:: data.smiles_protein_data_layer
     :members:

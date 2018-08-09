@@ -81,12 +81,41 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api-docs/blocks.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/models.html">models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/models.html#vanilla-model">vanilla_model</a></li>
 </ul>
 </li>
@@ -101,7 +130,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api-docs/modules.embeddings.html">embeddings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/modules.mlp.html">mlp</a></li>
@@ -122,7 +151,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/criterion.html">criterion</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/criterion.html#module-criterion.multitask_loss">multitask_loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/optimizer.html">optimizer</a><ul>
@@ -131,9 +160,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/utils.html">utils</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#id1">utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#graph">graph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#module-utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -202,29 +231,13 @@
    <h1>Python Module Index</h1>
 
    <div class="modindex-jumpbox">
-   <a href="#cap-c"><strong>c</strong></a> | 
    <a href="#cap-d"><strong>d</strong></a> | 
    <a href="#cap-l"><strong>l</strong></a> | 
    <a href="#cap-m"><strong>m</strong></a> | 
-   <a href="#cap-o"><strong>o</strong></a> | 
-   <a href="#cap-u"><strong>u</strong></a>
+   <a href="#cap-o"><strong>o</strong></a>
    </div>
 
    <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-c"><td></td><td>
-       <strong>c</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-       <td>
-       <a href="api-docs/criterion.html#module-criterion"><code class="xref">criterion</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="api-docs/criterion.html#module-criterion.multitask_loss"><code class="xref">criterion.multitask_loss</code></a></td><td>
-       <em></em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-d"><td></td><td>
        <strong>d</strong></td><td></td></tr>
@@ -238,16 +251,16 @@
        <strong>l</strong></td><td></td></tr>
      <tr>
        <td><img src="_static/minus.png" class="toggler"
-              id="toggle-2" style="display: none" alt="-" /></td>
+              id="toggle-1" style="display: none" alt="-" /></td>
        <td>
        <a href="api-docs/layers.html#module-layers"><code class="xref">layers</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-2">
+     <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/layers.html#module-layers.conv_bn_relu"><code class="xref">layers.conv_bn_relu</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-2">
+     <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/layers.html#module-layers.gcn"><code class="xref">layers.gcn</code></a></td><td>
@@ -257,77 +270,72 @@
        <strong>m</strong></td><td></td></tr>
      <tr>
        <td><img src="_static/minus.png" class="toggler"
-              id="toggle-3" style="display: none" alt="-" /></td>
+              id="toggle-2" style="display: none" alt="-" /></td>
        <td>
        <a href="api-docs/models.html#module-models"><code class="xref">models</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-3">
+     <tr class="cg-2">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/models.html#module-models.Graph2Label"><code class="xref">models.Graph2Label</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-3">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="api-docs/models.html#module-models.MoleculeProtein2Label"><code class="xref">models.MoleculeProtein2Label</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-3">
+     <tr class="cg-2">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/models.html#module-models.openchem_model"><code class="xref">models.openchem_model</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-3">
+     <tr class="cg-2">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/models.html#module-models.Smiles2Label"><code class="xref">models.Smiles2Label</code></a></td><td>
        <em></em></td></tr>
      <tr>
        <td><img src="_static/minus.png" class="toggler"
-              id="toggle-4" style="display: none" alt="-" /></td>
+              id="toggle-3" style="display: none" alt="-" /></td>
        <td>
        <a href="api-docs/modules.html#module-modules"><code class="xref">modules</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.embeddings.html#module-modules.embeddings"><code class="xref">modules.embeddings</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding"><code class="xref">modules.embeddings.basic_embedding</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding"><code class="xref">modules.embeddings.openchem_embedding</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding"><code class="xref">modules.embeddings.positional_embedding</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.encoders.html#module-modules.encoders"><code class="xref">modules.encoders</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.encoders.html#module-modules.encoders.cnn_encoder"><code class="xref">modules.encoders.cnn_encoder</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.encoders.html#module-modules.encoders.openchem_encoder"><code class="xref">modules.encoders.openchem_encoder</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.encoders.html#module-modules.encoders.rnn_encoder"><code class="xref">modules.encoders.rnn_encoder</code></a></td><td>
        <em></em></td></tr>
-     <tr class="cg-4">
+     <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/modules.mlp.html#module-modules.mlp.openchem_mlp"><code class="xref">modules.mlp.openchem_mlp</code></a></td><td>
@@ -335,6 +343,37 @@
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-o"><td></td><td>
        <strong>o</strong></td><td></td></tr>
+     <tr>
+       <td><img src="_static/minus.png" class="toggler"
+              id="toggle-4" style="display: none" alt="-" /></td>
+       <td>
+       <code class="xref">openchem</code></td><td>
+       <em></em></td></tr>
+     <tr class="cg-4">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="api-docs/criterion.html#module-openchem.criterion"><code class="xref">openchem.criterion</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-4">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="api-docs/criterion.html#module-openchem.criterion.multitask_loss"><code class="xref">openchem.criterion.multitask_loss</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-4">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="api-docs/utils.html#module-openchem.utils"><code class="xref">openchem.utils</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-4">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="api-docs/utils.html#module-openchem.utils.logger"><code class="xref">openchem.utils.logger</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-4">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="api-docs/utils.html#module-openchem.utils.utils"><code class="xref">openchem.utils.utils</code></a></td><td>
+       <em></em></td></tr>
      <tr>
        <td><img src="_static/minus.png" class="toggler"
               id="toggle-5" style="display: none" alt="-" /></td>
@@ -350,25 +389,6 @@
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="api-docs/optimizer.html#module-optimizer.openchem_optimizer"><code class="xref">optimizer.openchem_optimizer</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-u"><td></td><td>
-       <strong>u</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-6" style="display: none" alt="-" /></td>
-       <td>
-       <a href="api-docs/utils.html#module-utils"><code class="xref">utils</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-6">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="api-docs/utils.html#module-utils.logger"><code class="xref">utils.logger</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-6">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="api-docs/utils.html#module-utils.utils"><code class="xref">utils.utils</code></a></td><td>
        <em></em></td></tr>
    </table>
 
