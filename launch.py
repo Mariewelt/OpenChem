@@ -1,3 +1,5 @@
+# Adapted from https://github.com/pytorch/pytorch/blob/master/torch/distributed/launch.py
+
 r"""
 `torch.distributed.launch` is a module that spawns up multiple distributed
 training processes on each of the training nodes.
@@ -173,7 +175,6 @@ def parse_args():
 
 
 def main():
-    print("Running our custom launch.py")
 
     args = parse_args()
 
