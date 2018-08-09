@@ -1,10 +1,12 @@
-  <img align="middle" src="./docs/logo.png" alt="OpenChem" width="500px">
+<p align="center">
+  <img align="middle" src="./docs/logo.png" alt="OpenChem" width="400px" class="center">
+ </p>
 
 # OpenChem
 
-OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](https://pytorch.org) backend. Main goal of OpenChem is to make experimentation with deep learning models in Computational Chemistry easy and friendly for non-computer scientists.
+OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](https://pytorch.org) backend. The goal of OpenChem is to 
 
-## Main features
+# Main features
 
 * Modular design with unified API, modules can be easily combined with each other.
 * OpenChem is easy-to-use: new models are built with only configuration file.
@@ -12,44 +14,58 @@ OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](h
 * Utilities for data preprocessing.
 * Tensorboard support.
 
-## Supported models
+# Supported functionality
+## Tasks:
+* Classification (binary or multi-class)
+* Regression
+* Multi-task (such as N binary classification tasks)
 
-Currently OpenChem offers predictive models for variuos modalities:
+## Data types
+* Sequences of characters such as SMILES strings or amino-acid sequences
+* Molecular graphs. OpenChem takes care of converting SMILES strings into molecular graphs
 
-* Smiles2Label
-* Graph2Label
-* MoleculeProtein2Label
+## Modules:
+* Token embeddings
+* Positional embeddings
+* Recurrent neural network encoders
+* Convolutional neural network encoders
+* Graph convolution neural network encoders
+* Multi-layer perceptrons
 
-## Installation
+# Installation
 
-### General installation
+## Requirements
 In order to get started you need:
 * Modern NVIDIA GPU, [compute capability 3.5](https://developer.nvidia.com/cuda-gpus) or newer.
 * Python 3.6 (we recommend [Anaconda](https://www.continuum.io/downloads) distribution)
-* [CUDA](https://developer.nvidia.com/cuda-downloads)
-* [Pytorch 0.4.1](https://pytorch.org) (compatible with your CUDA version)
-* [Tensorflow 1.8.0](https://www.tensorflow.org/install/) with GPU support (compatible with your CUDA version)
+* [CUDA 9.0](https://developer.nvidia.com/cuda-downloads)
+* [Pytorch 0.4.1](https://pytorch.org)
+* [Tensorflow 1.8.0](https://www.tensorflow.org/install/) with GPU support (compatible with your CUDA version
 * [RDKit](https://www.rdkit.org/docs/Install.html)
-* [scikit-learn](http://scikit-learn.org/)
+* [Scikit-learn](http://scikit-learn.org/)
+* [Numpy](http://www.numpy.org/)
 
+## General installation
 
-2. Clone the repository to your local folder and install the requirements with:
-
+If you installed your Python with Anacoda you can run the following commands to get started:
 ```bash
 git clone https://github.com/Mariewelt/OpenChem.git
 cd Openchem
 conda install --yes --file requirements.txt
 conda install -c rdkit rdkit nox cairo
+conda install pytorch torchvision -c pytorch
+pip install tensorflow-gpu
 ```
-3. Install PyTorch 0.4.1 from 
+If your CUDA version is other than 9.0, check [Pytorch](https://pytorch.org) and [Tensorflow](https://www.tensorflow.org/install/) websites for different installation instructions. 
 
-### Installation with Docker
+## Installation with Docker
+Alternative way of installation is with Docker. We provide a Dockerfile, so you can run your models in a container that already has all the necessary packages installed. You will also need nvidia-docker in order to run models on GPU.
 
-## Acknowledgements
+# Acknowledgements
 
 OpenChem is sponsored by [the University of North Carolina at Chapel Hill](https://www.unc.edu/) and [NVIDIA Corp.](https://www.nvidia.com/en-us/) 
-<div align="middle">
+<p align="center">
   <img src="./docs/UNC_logo_RGB.png" alt="UNC" width="400px">
   <img src="./docs/NVLogo_2D_H.png" alt="NVIDIA" width="400px">
   <br>
-</div>
+</p>
