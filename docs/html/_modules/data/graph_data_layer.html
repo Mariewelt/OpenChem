@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>optimizer.openchem_lr_scheduler &mdash; OpenChem 0.1 documentation</title>
+  <title>data.graph_data_layer &mdash; OpenChem 0.1 documentation</title>
   
 
   
@@ -211,7 +211,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>optimizer.openchem_lr_scheduler</li>
+      <li>data.graph_data_layer</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -226,20 +226,55 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for optimizer.openchem_lr_scheduler</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="OpenChemLRScheduler"><a class="viewcode-back" href="../../api-docs/optimizer.html#optimizer.openchem_lr_scheduler.OpenChemLRScheduler">[docs]</a><span></span><span class="k">class</span> <span class="nc">OpenChemLRScheduler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <h1>Source code for data.graph_data_layer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># TODO: variable length batching</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">optimizer</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">scheduler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheduler</span>
 
-<div class="viewcode-block" id="OpenChemLRScheduler.step"><a class="viewcode-back" href="../../api-docs/optimizer.html#optimizer.openchem_lr_scheduler.OpenChemLRScheduler.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Performs a single scheduler step.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span></div></div>
+<span class="kn">from</span> <span class="nn">openchem.utils.graph</span> <span class="k">import</span> <span class="n">Graph</span>
+
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="k">import</span> <span class="n">Chem</span>
+
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="k">import</span> <span class="n">read_smiles_property_file</span><span class="p">,</span> <span class="n">sanitize_smiles</span>
+
+
+<div class="viewcode-block" id="GraphDataset"><a class="viewcode-back" href="../../api-docs/data.html#data.graph_data_layer.GraphDataset">[docs]</a><span class="k">class</span> <span class="nc">GraphDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_atomic_attributes</span><span class="p">,</span> <span class="n">node_attributes</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span>
+                 <span class="n">cols_to_read</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GraphDataset</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">data_set</span> <span class="o">=</span> <span class="n">read_smiles_property_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="p">,</span>
+                                                 <span class="n">delimiter</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data_set</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">data_set</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">clean_smiles</span><span class="p">,</span> <span class="n">clean_idx</span> <span class="o">=</span> <span class="n">sanitize_smiles</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">max_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">sm</span> <span class="ow">in</span> <span class="n">clean_smiles</span><span class="p">:</span>
+            <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">sm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_size</span><span class="p">:</span>
+                <span class="n">max_size</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="n">clean_idx</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graphs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_feature_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adj_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sm</span> <span class="ow">in</span> <span class="n">clean_smiles</span><span class="p">:</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">get_atomic_attributes</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_feature_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">get_node_feature_matrix</span><span class="p">(</span><span class="n">node_attributes</span><span class="p">,</span> <span class="n">max_size</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adj_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">adj_matrix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_feature_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;adj_matrix&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">adj_matrix</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">),</span>
+                  <span class="s1">&#39;node_feature_matrix&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_feature_matrix</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">),</span>
+                  <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">sample</span></div>
+
 </pre></div>
 
            </div>

@@ -112,7 +112,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#vanilla-model">vanilla_model</a></li>
 </ul>
 </li>
@@ -120,14 +120,14 @@
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/modules.encoders.html">encoders</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#module-modules.encoders.openchem_encoder">openchem_encoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#module-modules.encoders.rnn_encoder">rnn_encoder</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#module-modules.encoders.cnn_encoder">cnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#cnn-encoder">cnn_encoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#gcnn-encoder">gcnn_encoder</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/modules.embeddings.html">embeddings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/modules.mlp.html">mlp</a></li>
@@ -139,12 +139,12 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api-docs/data.html">data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#smiles-data-layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#smiles-protein-data-layer">smiles_protein_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#vanilla-data-layer">vanilla_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#smiles-enumerator">smiles_enumerator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#utils">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.utils">utils</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api-docs/criterion.html">criterion</a><ul>
@@ -157,7 +157,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api-docs/utils.html">utils</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#graph">graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#id1">utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
 </ul>
@@ -225,19 +225,25 @@
            <div itemprop="articleBody">
             
   <h1>All modules for which code is available</h1>
-<ul><li><a href="layers/conv_bn_relu.html">layers.conv_bn_relu</a></li>
+<ul><li><a href="data/graph_data_layer.html">data.graph_data_layer</a></li>
+<li><a href="data/smiles_data_layer.html">data.smiles_data_layer</a></li>
+<li><a href="data/smiles_enumerator.html">data.smiles_enumerator</a></li>
+<li><a href="data/smiles_protein_data_layer.html">data.smiles_protein_data_layer</a></li>
+<li><a href="data/utils.html">data.utils</a></li>
+<li><a href="data/vanilla_data_layer.html">data.vanilla_data_layer</a></li>
+<li><a href="layers/conv_bn_relu.html">layers.conv_bn_relu</a></li>
 <li><a href="layers/gcn.html">layers.gcn</a></li>
 <li><a href="models/Graph2Label.html">models.Graph2Label</a></li>
+<li><a href="models/MoleculeProtein2Label.html">models.MoleculeProtein2Label</a></li>
 <li><a href="models/Smiles2Label.html">models.Smiles2Label</a></li>
 <li><a href="models/openchem_model.html">models.openchem_model</a></li>
 <li><a href="modules/embeddings/basic_embedding.html">modules.embeddings.basic_embedding</a></li>
 <li><a href="modules/embeddings/openchem_embedding.html">modules.embeddings.openchem_embedding</a></li>
-<li><a href="modules/embeddings/positional_embedding.html">modules.embeddings.positional_embedding</a></li>
-<li><a href="modules/encoders/cnn_encoder.html">modules.encoders.cnn_encoder</a></li>
 <li><a href="modules/encoders/openchem_encoder.html">modules.encoders.openchem_encoder</a></li>
 <li><a href="modules/encoders/rnn_encoder.html">modules.encoders.rnn_encoder</a></li>
 <li><a href="modules/mlp/openchem_mlp.html">modules.mlp.openchem_mlp</a></li>
 <li><a href="openchem/criterion/multitask_loss.html">openchem.criterion.multitask_loss</a></li>
+<li><a href="openchem/utils/graph.html">openchem.utils.graph</a></li>
 <li><a href="openchem/utils/logger.html">openchem.utils.logger</a></li>
 <li><a href="openchem/utils/utils.html">openchem.utils.utils</a></li>
 <li><a href="optimizer/openchem_lr_scheduler.html">optimizer.openchem_lr_scheduler</a></li>

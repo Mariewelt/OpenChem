@@ -114,7 +114,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-models.openchem_model">openchem_model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-models.Smiles2Label">Smiles2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-models.Graph2Label">Graph2Label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#moleculeprotein2label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#vanilla-model">vanilla_model</a></li>
 </ul>
 </li>
@@ -122,14 +122,14 @@
 <li class="toctree-l3"><a class="reference internal" href="modules.encoders.html">encoders</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.openchem_encoder">openchem_encoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.rnn_encoder">rnn_encoder</a></li>
-<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.cnn_encoder">cnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#cnn-encoder">cnn_encoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#gcnn-encoder">gcnn_encoder</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="modules.embeddings.html">embeddings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
-<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#positional-embedding">positional_embedding</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="modules.mlp.html">mlp</a></li>
@@ -141,12 +141,12 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-data-layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-protein-data-layer">smiles_protein_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#vanilla-data-layer">vanilla_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-enumerator">smiles_enumerator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#utils">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.utils">utils</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="criterion.html">criterion</a><ul>
@@ -159,7 +159,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#graph">graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
 </ul>
@@ -324,18 +324,38 @@ gets the sum of ‘’tensor’’ from all of the processes.
 <div class="section" id="module-models.Smiles2Label">
 <span id="smiles2label"></span><h2>Smiles2Label<a class="headerlink" href="#module-models.Smiles2Label" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="models.Smiles2Label.GenerativeRNN">
-<em class="property">class </em><code class="descclassname">models.Smiles2Label.</code><code class="descname">GenerativeRNN</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#GenerativeRNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.GenerativeRNN" title="Permalink to this definition">¶</a></dt>
+<dt id="models.Smiles2Label.Smiles2Label">
+<em class="property">class </em><code class="descclassname">models.Smiles2Label.</code><code class="descname">Smiles2Label</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openchem.models.openchem_model.OpenChemModel</span></code></p>
+<p>Creates a model that predicts one or multiple labels given string of
+characters as input. Embeddings for input sequences are extracted with
+Embedding layer, followed by encoder (could be RNN or CNN encoder).
+Last layer of the model is multi-layer perceptron.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>dict</em>) – dictionary describing model architecture.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
-<dt id="models.Smiles2Label.GenerativeRNN.cast_inputs">
-<code class="descname">cast_inputs</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#GenerativeRNN.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.GenerativeRNN.cast_inputs" title="Permalink to this definition">¶</a></dt>
+<dt id="models.Smiles2Label.Smiles2Label.cast_inputs">
+<code class="descname">cast_inputs</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="models.Smiles2Label.GenerativeRNN.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp_seq</em>, <em>eval=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#GenerativeRNN.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.GenerativeRNN.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generator forward function.</p>
+<dt id="models.Smiles2Label.Smiles2Label.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>eval=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -384,8 +404,45 @@ registered hooks while the latter silently ignores them.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="moleculeprotein2label">
-<h2>MoleculeProtein2Label<a class="headerlink" href="#moleculeprotein2label" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-models.MoleculeProtein2Label">
+<span id="moleculeprotein2label"></span><h2>MoleculeProtein2Label<a class="headerlink" href="#module-models.MoleculeProtein2Label" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="models.MoleculeProtein2Label.MoleculeProtein2Label">
+<em class="property">class </em><code class="descclassname">models.MoleculeProtein2Label.</code><code class="descname">MoleculeProtein2Label</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openchem.models.openchem_model.OpenChemModel</span></code></p>
+<p>Creates a model that predicts one or multiple labels given two sequences as
+input. Embeddings for each input are extracted separately with Embedding
+layer, followed by encoder (could be RNN or CNN encoder) and then merged
+together. Last layer of the model is multi-layer perceptron.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>dict</em>) – dictionary describing model architecture.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="models.MoleculeProtein2Label.MoleculeProtein2Label.cast_inputs">
+<code class="descname">cast_inputs</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.MoleculeProtein2Label.MoleculeProtein2Label.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>eval=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="vanilla-model">
 <h2>vanilla_model<a class="headerlink" href="#vanilla-model" title="Permalink to this headline">¶</a></h2>

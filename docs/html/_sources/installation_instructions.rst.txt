@@ -12,6 +12,7 @@ In order to get started you need to clone the repository to your local folder an
     cd Openchem
     conda install --yes --file requirements.txt
     conda install -c rdkit rdkit nox cairo
+    conda install pytorch torchvision -c pytorch
     pip install tensorflow-gpu
 
 Installation with Docker

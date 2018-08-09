@@ -1,0 +1,540 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>data.utils &mdash; OpenChem 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api-docs/blocks.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api-docs/models.html">models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/models.html#vanilla-model">vanilla_model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api-docs/modules.html">modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/modules.encoders.html">encoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.encoders.html#module-modules.encoders.openchem_encoder">openchem_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.encoders.html#module-modules.encoders.rnn_encoder">rnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.encoders.html#cnn-encoder">cnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.encoders.html#gcnn-encoder">gcnn_encoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/modules.embeddings.html">embeddings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/modules.mlp.html">mlp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api-docs/layers.html">layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/layers.html#module-layers.conv_bn_relu">conv_bn_relu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/layers.html#module-layers.gcn">gcn</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api-docs/data.html">data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api-docs/criterion.html">criterion</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api-docs/optimizer.html">optimizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/optimizer.html#module-optimizer.openchem_optimizer">openchem_optimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/optimizer.html#module-optimizer.openchem_lr_scheduler">openchem_lr_scheduler</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api-docs/utils.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenChem</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>data.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for data.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># TODO: packed variable length sequence</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="k">import</span> <span class="n">Chem</span>
+
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">openchem.data.smiles_enumerator</span> <span class="k">import</span> <span class="n">SmilesEnumerator</span>
+
+
+<div class="viewcode-block" id="cut_padding"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.cut_padding">[docs]</a><span class="k">def</span> <span class="nf">cut_padding</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">):</span>
+    <span class="n">max_len</span> <span class="o">=</span> <span class="n">lengths</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">padding</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+        <span class="n">cut_samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span> <span class="p">:</span><span class="n">max_len</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">padding</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+        <span class="n">total_len</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cut_samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span> <span class="n">total_len</span><span class="o">-</span><span class="n">max_len</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid value for padding argument. Must be right&#39;</span>
+                         <span class="s1">&#39;or left&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cut_samples</span></div>
+
+
+<div class="viewcode-block" id="seq2tensor"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.seq2tensor">[docs]</a><span class="k">def</span> <span class="nf">seq2tensor</span><span class="p">(</span><span class="n">seqs</span><span class="p">,</span> <span class="n">tokens</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+            <span class="k">if</span> <span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+                <span class="n">tensor</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tokens</span> <span class="o">=</span> <span class="n">tokens</span> <span class="o">+</span> <span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">tensor</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">flip</span><span class="p">:</span>
+        <span class="n">tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">tokens</span></div>
+
+
+<div class="viewcode-block" id="pad_sequences"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.pad_sequences">[docs]</a><span class="k">def</span> <span class="nf">pad_sequences</span><span class="p">(</span><span class="n">seqs</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pad_symbol</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">max_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">seqs</span><span class="p">:</span>
+            <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_length</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">)):</span>
+        <span class="n">cur_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_len</span><span class="p">)</span>
+        <span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">pad_symbol</span><span class="o">*</span><span class="p">(</span><span class="n">max_length</span> <span class="o">-</span> <span class="n">cur_len</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">seqs</span><span class="p">,</span> <span class="n">lengths</span></div>
+
+
+<div class="viewcode-block" id="create_loader"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.create_loader">[docs]</a><span class="k">def</span> <span class="nf">create_loader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                  <span class="n">pin_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">data_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                             <span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+                             <span class="n">pin_memory</span><span class="o">=</span><span class="n">pin_memory</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="n">sampler</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data_loader</span></div>
+
+
+<div class="viewcode-block" id="sanitize_smiles"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.sanitize_smiles">[docs]</a><span class="k">def</span> <span class="nf">sanitize_smiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">canonize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes list of SMILES strings and returns list of their sanitized versions.</span>
+<span class="sd">    For definition of sanitized SMILES check</span>
+<span class="sd">    http://www.rdkit.org/docs/api/rdkit.Chem.rdmolops-module.html#SanitizeMol</span>
+<span class="sd">        Args:</span>
+<span class="sd">            smiles (list): list of SMILES strings</span>
+<span class="sd">            canonize (bool): parameter specifying whether to return</span>
+<span class="sd">            canonical SMILES or not.</span>
+<span class="sd">        Output:</span>
+<span class="sd">            new_smiles (list): list of SMILES and NaNs if SMILES string is</span>
+<span class="sd">            invalid or unsanitized.</span>
+<span class="sd">            If &#39;canonize = True&#39;, return list of canonical SMILES.</span>
+<span class="sd">        When &#39;canonize = True&#39; the function is analogous to:</span>
+<span class="sd">        canonize_smiles(smiles, sanitize=True).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_smiles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">smiles</span><span class="p">)):</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">canonize</span><span class="p">:</span>
+                <span class="n">new_smiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+                <span class="p">)</span>
+                <span class="n">idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_smiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sm</span><span class="p">)</span>
+                <span class="n">idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unsanitized SMILES string: &#39;</span> <span class="o">+</span> <span class="n">sm</span><span class="p">)</span>
+            <span class="n">new_smiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_smiles</span><span class="p">,</span> <span class="n">idx</span></div>
+
+
+<div class="viewcode-block" id="canonize_smiles"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.canonize_smiles">[docs]</a><span class="k">def</span> <span class="nf">canonize_smiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes list of SMILES strings and returns list of their canonical SMILES.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            smiles (list): list of SMILES strings</span>
+<span class="sd">            sanitize (bool): parameter specifying whether to sanitize</span>
+<span class="sd">            SMILES or not.</span>
+<span class="sd">            For definition of sanitized SMILES check</span>
+<span class="sd">            www.rdkit.org/docs/api/rdkit.Chem.rdmolops-module.html#SanitizeMol</span>
+<span class="sd">        Output:</span>
+<span class="sd">            new_smiles (list): list of canonical SMILES and NaNs</span>
+<span class="sd">            if SMILES string is invalid or unsanitized</span>
+<span class="sd">            (when &#39;sanitize = True&#39;)</span>
+<span class="sd">        When &#39;sanitize = True&#39; the function is analogous to:</span>
+<span class="sd">        sanitize_smiles(smiles, canonize=True).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_smiles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">sm</span> <span class="ow">in</span> <span class="n">smiles</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_smiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="n">sanitize</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">sm</span> <span class="o">+</span> <span class="s1">&#39; can not be canonized: i&#39;</span>
+                                <span class="s1">&#39;nvalid SMILES string!&#39;</span><span class="p">)</span>
+            <span class="n">new_smiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_smiles</span></div>
+
+
+<div class="viewcode-block" id="save_smi_to_file"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.save_smi_to_file">[docs]</a><span class="k">def</span> <span class="nf">save_smi_to_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">smiles</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes path to file and list of SMILES strings and writes SMILES</span>
+<span class="sd">    to the specified file.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): path to the file</span>
+<span class="sd">            smiles (list): list of SMILES strings</span>
+<span class="sd">            unique (bool): parameter specifying whether to write</span>
+<span class="sd">            only unique copies or not.</span>
+<span class="sd">        Output:</span>
+<span class="sd">            success (bool): defines whether operation</span>
+<span class="sd">            was successfully completed or not.</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">unique</span><span class="p">:</span>
+        <span class="n">smiles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">smiles</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">smiles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">smiles</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">([</span><span class="n">mol</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">])</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">closed</span></div>
+
+
+<div class="viewcode-block" id="read_smi_file"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.read_smi_file">[docs]</a><span class="k">def</span> <span class="nf">read_smi_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads SMILES from file. File must contain one SMILES string per line</span>
+<span class="sd">    with \n token in the end of the line.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): path to the file</span>
+<span class="sd">        unique (bool): return only unique SMILES</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        smiles (list): list of SMILES strings from specified file.</span>
+<span class="sd">        success (bool): defines whether operation</span>
+<span class="sd">        was successfully completed or not.</span>
+<span class="sd">    If &#39;unique=True&#39; this list contains only unique copies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">molecules</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">molecules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">unique</span><span class="p">:</span>
+        <span class="n">molecules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">molecules</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">molecules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">molecules</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">molecules</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">closed</span></div>
+
+
+<div class="viewcode-block" id="get_tokens"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.get_tokens">[docs]</a><span class="k">def</span> <span class="nf">get_tokens</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns list of unique tokens, token-2-index dictionary and</span>
+<span class="sd">    number of unique tokens from the list of SMILES</span>
+<span class="sd">    Args:</span>
+<span class="sd">        smiles (list): list of SMILES strings to tokenize.</span>
+<span class="sd">        tokens (string): string of tokens or None.</span>
+<span class="sd">        If none will be extracted from dataset.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        tokens (list): list of unique tokens/SMILES alphabet.</span>
+<span class="sd">        token2idx (dict): dictionary mapping token to its index.</span>
+<span class="sd">        num_tokens (int): number of unique tokens.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">smiles</span><span class="p">)))</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">tokens</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+    <span class="n">token2idx</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">token</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">token</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">))</span>
+    <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tokens</span><span class="p">,</span> <span class="n">token2idx</span><span class="p">,</span> <span class="n">num_tokens</span></div>
+
+
+<div class="viewcode-block" id="augment_smiles"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.augment_smiles">[docs]</a><span class="k">def</span> <span class="nf">augment_smiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">n_augment</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">smiles_augmentation</span> <span class="o">=</span> <span class="n">SmilesEnumerator</span><span class="p">()</span>
+    <span class="n">augmented_smiles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">augmented_labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">smiles</span><span class="p">)):</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_augment</span><span class="p">):</span>
+            <span class="n">augmented_smiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">smiles_augmentation</span><span class="o">.</span><span class="n">randomize_smiles</span><span class="p">(</span><span class="n">sm</span><span class="p">))</span>
+            <span class="n">augmented_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">augmented_smiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sm</span><span class="p">)</span>
+        <span class="n">augmented_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">augmented_smiles</span><span class="p">,</span> <span class="n">augmented_labels</span></div>
+
+
+<div class="viewcode-block" id="time_since"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.time_since">[docs]</a><span class="k">def</span> <span class="nf">time_since</span><span class="p">(</span><span class="n">since</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">since</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">-=</span> <span class="n">m</span> <span class="o">*</span> <span class="mi">60</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">m </span><span class="si">%d</span><span class="s1">s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_smiles_property_file"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.read_smiles_property_file">[docs]</a><span class="k">def</span> <span class="nf">read_smiles_property_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                              <span class="n">keep_header</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
+    <span class="n">data_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">reader</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">keep_header</span><span class="p">:</span>
+        <span class="n">start_position</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">start_position</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_full</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">start_position</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cols_to_read</span><span class="p">))]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cols_to_read</span><span class="p">)):</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">cols_to_read</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_full</span><span class="p">[</span><span class="n">start_position</span><span class="p">:,</span> <span class="n">col</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="save_smiles_property_file"><a class="viewcode-back" href="../../api-docs/data.html#data.utils.save_smiles_property_file">[docs]</a><span class="k">def</span> <span class="nf">save_smiles_property_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">smiles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">n_targets</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">smiles</span><span class="p">)):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">smiles</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_targets</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">delimiter</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Mariya Popova.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #99badd;
+    }
+  </style>
+
+
+</body>
+</html>
