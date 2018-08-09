@@ -27,7 +27,10 @@ class OpenChemModel(nn.Module):
         self.params = params
         self.use_cuda = self.params['use_cuda']
         self.batch_size = self.params['batch_size']
-        self.eval_metrics = self.params['eval_metrics']
+        if 'eval_metrics' in params.keys():
+            self.eval_metrics = self.params['eval_metrics']
+        else:
+            self.eval_metrics = None
         self.task = self.params['task']
         self.logdir = self.params['logdir']
         self.world_size = self.params['world_size']
@@ -38,7 +41,6 @@ class OpenChemModel(nn.Module):
             self.max_grad_norm = self.params['max_grad_norm']
         else:
             self.max_grad_norm = None
-        self.random_seed = self.params['random_seed']
         self.print_every = self.params['print_every']
         self.save_every = self.params['save_every']
 
@@ -48,8 +50,6 @@ class OpenChemModel(nn.Module):
             'task': str,
             'batch_size': int,
             'num_epochs': int,
-            'train_data_layer': None,
-            'val_data_layer': None,
         }
 
     @staticmethod
@@ -58,13 +58,12 @@ class OpenChemModel(nn.Module):
             'use_cuda': bool,
             'use_clip_grad': bool,
             'max_grad_norm': float,
-            'random_seed': int,
             'print_every': int,
             'save_every': int,
             'lr_scheduler': None,
             'lr_scheduler_params': dict,
             'eval_metrics': None,
-            'logdir': str
+            'logdir': str,
         }
 
     def forward(self, inp, eval=False):
@@ -86,9 +85,13 @@ def build_training(model, params):
     optimizer = OpenChemOptimizer([params['optimizer'],
                                    params['optimizer_params']],
                                   model.parameters())
-    lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'],
-                                        params['lr_scheduler_params']],
-                                       optimizer.optimizer)
+    
+    if 'lr_scheduler' in params.keys():
+        lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'],
+                                            params['lr_scheduler_params']],
+                                            optimizer.optimizer)
+    else:
+        lr_scheduler = None
     use_cuda = params['use_cuda']
     criterion = params['criterion']
     if use_cuda:
@@ -130,7 +133,8 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
     start = time.time()
     loss_total = 0
     n_batches = 0
-    scheduler = scheduler.scheduler
+    if scheduler is not None:
+        scheduler = scheduler.scheduler
     all_losses = []
     val_losses = []
 
@@ -184,7 +188,8 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
         loss_total = 0
         n_batches = 0
-        scheduler.step()
+        if scheduler is not None:
+            scheduler.step()
 
     return all_losses, val_losses
 
