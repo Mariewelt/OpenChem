@@ -1,9 +1,10 @@
-# modified from https://github.com/NVIDIA/OpenSeq2Seq/blob/master/run.py
+# adapted from https://github.com/NVIDIA/OpenSeq2Seq/blob/master/run.py
 
 import os
 import ast
 import copy
 import runpy
+import random
 import argparse
 
 from six import string_types
@@ -28,8 +29,7 @@ def main():
     parser.add_argument("--config_file", required=True,
                         help="Path to the configuration file")
     parser.add_argument("--mode", default='train',
-                        help="Could be \"train\", \"eval\", "
-                             "\"train_eval\" or \"infer\"")
+                        help="Could be \"train\", \"eval\", \"train_eval\"")
     parser.add_argument('--continue_learning', dest='continue_learning',
                         action='store_true',
                         help="whether to continue learning")
@@ -37,20 +37,23 @@ def main():
                         help='distributed backend')
     parser.add_argument('--seed', default=None, type=int,
                         help='seed for initializing training. ')
-    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
-                        help='number of data loading workers (default: 4)')
+    parser.add_argument('--workers', default=0, type=int, metavar='N',
+                        help='number of data loading workers (default: 0)')
+    parser.add_argument('--random_seed', default=0, type=int, metavar='N',
+                        help='random_seed (default: 0)')
     parser.add_argument("--local_rank", type=int)
 
     args, unknown = parser.parse_known_args()
 
-    if args.mode not in ['train', 'eval', 'train_eval', 'infer']:
+    if args.mode not in ['train', 'eval', 'train_eval']:
         raise ValueError("Mode has to be one of "
-                         "['train', 'eval', 'train_eval', 'infer']")
-    torch.manual_seed(1234)
-    torch.cuda.manual_seed_all(1234)
+                         "['train', 'eval', 'train_eval']")
     config_module = runpy.run_path(args.config_file)
 
     model_config = config_module.get('model_params', None)
+    random.seed(args.random_seed)
+    torch.manual_seed(args.random_seed)
+    torch.cuda.manual_seed_all(args.random_seed)
     model_config['use_cuda'] = args.use_cuda
     if model_config is None:
         raise ValueError('model_params dictionary has to be '
@@ -124,10 +127,10 @@ def main():
                     checkpoint = get_latest_checkpoint(ckpt_dir)
                     if checkpoint is None:
                         raise IOError(
-                                "There is no model checkpoint in the "
-                                "{} directory. Can't load model".format(
-                                    ckpt_dir
-                                )
+                            "There is no model checkpoint in the "
+                            "{} directory. Can't load model".format(
+                                ckpt_dir
+                            )
                         )
                 else:
                     raise IOError(
@@ -136,7 +139,7 @@ def main():
                         )
                     )
         except IOError:
-                raise
+            raise
     else:
         if args.continue_learning or args.mode == 'eval':
             checkpoint = get_latest_checkpoint(ckpt_dir)
@@ -188,6 +191,8 @@ def main():
 
     if args.mode == "train" or args.mode == "train_eval":
         train_dataset = copy.deepcopy(model_config['train_data_layer'])
+        if model_config['task'] == 'classification':
+            train_dataset.target = train_dataset.target.reshape(-1)
         if args.distributed:
             train_sampler = DistributedSampler(train_dataset)
         else:
@@ -201,8 +206,17 @@ def main():
     else:
         train_loader = None
 
+    if args.mode in ["eval", "train_eval"] and (
+            'val_data_layer' not in model_config.keys() or model_config[
+        'val_data_layer'] is None):
+        raise IOError(
+            "When model is run in 'eval' or 'train_eval' modes, "
+            "validation data layer must be specified")
+
     if args.mode in ["eval", "train_eval"]:
         val_dataset = copy.deepcopy(model_config['val_data_layer'])
+        if model_config['task'] == 'classification':
+            val_dataset.target = val_dataset.target.reshape(-1)
         val_loader = create_loader(val_dataset,
                                    batch_size=model_config['batch_size'],
                                    shuffle=False,
