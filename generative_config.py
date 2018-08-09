@@ -9,12 +9,14 @@ import torch.nn as nn
 from torch.optim import RMSprop, Adadelta
 from torch.optim.lr_scheduler import ExponentialLR
 import torch.nn.functional as F
+import pickle
 
-train_dataset = SmilesDataset('./benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv', #delimiter='\t',
-                              cols_to_read=[0], pad=True, tokenize=False, augment=False)
+train_dataset = SmilesDataset('./benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv', delimiter=',',
+                              cols_to_read=[0], pad=True, tokenize=True, augment=False)
+#train_dataset = pickle.load(open('./benchmark_datasets/chembl/chembl.pkl', 'rb')) 
+print('Dataset loaded')
 train_dataset.tokens += '<>'
 train_dataset.num_tokens = len(train_dataset.tokens)
-print(train_dataset.tokens)
 
 use_cuda = True
 
@@ -34,7 +36,7 @@ model_params = {
     'train_data_layer': train_dataset,
     'val_data_layer': None,
     'eval_metrics': None,
-    'criterion': nn.CrossEntropyLoss(),
+    'criterion': nn.CrossEntropyLoss(ignore_index=train_dataset.tokens.index(' ')),
     'optimizer': RMSprop,
     'optimizer_params': {
         'lr': 0.0001,
@@ -46,30 +48,30 @@ model_params = {
     'embedding': Embedding,
     'embedding_params': {
         'num_embeddings': train_dataset.num_tokens,
-        'embedding_dim': 100,
+        'embedding_dim': 128,
         'padding_idx': train_dataset.tokens.index(' ')
     },
     'encoder': RNNEncoder,
     'encoder_params': {
-        'input_size': 200,
+        'input_size': 128,
         'layer': "GRU",
-        'encoder_dim': 100,
+        'encoder_dim': 256,
         'n_layers': 1,
         'dropout': 0.0,
         'is_bidirectional': False
     },
-    'has_stack': True,
-    'stack_params': {
-        'in_features': 100,
-        'stack_width': 100,
-        'stack_depth': 200
-    },
+    'has_stack': False,
+    #'stack_params': {
+    #    'in_features': 100,
+    #    'stack_width': 100,
+    #    'stack_depth': 200
+    #},
     'mlp': OpenChemMLP,
     'mlp_params': {
-        'input_size': 100,
+        'input_size': 256,
         'n_layers': 2,
-        'hidden_size': [100, train_dataset.num_tokens],
+        'hidden_size': [128, train_dataset.num_tokens],
         'activation': F.relu,
-        'dropout': 0.5
+        'dropout': 0.8
     }
 }
