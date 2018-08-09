@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>utils &mdash; OpenChem 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="optimizer" href="optimizer.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="blocks.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="models.html">models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="models.html#module-models.openchem_model">openchem_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#module-models.Smiles2Label">Smiles2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#module-models.Graph2Label">Graph2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#moleculeprotein2label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#vanilla-model">vanilla_model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules.encoders.html">encoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.openchem_encoder">openchem_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.rnn_encoder">rnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#module-modules.encoders.cnn_encoder">cnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.encoders.html#gcnn-encoder">gcnn_encoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="modules.embeddings.html">embeddings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.embeddings.html#module-modules.embeddings.positional_embedding">positional_embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="modules.mlp.html">mlp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layers.html">layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="layers.html#module-layers.conv_bn_relu">conv_bn_relu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="layers.html#module-layers.gcn">gcn</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-data-layer">smiles_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-protein-data-layer">smiles_protein_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#vanilla-data-layer">vanilla_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#smiles-enumerator">smiles_enumerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="criterion.html">criterion</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html">optimizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimizer.html#module-optimizer.openchem_optimizer">openchem_optimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimizer.html#module-optimizer.openchem_lr_scheduler">openchem_lr_scheduler</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#graph">graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-openchem.utils.logger">logger</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenChem</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="blocks.html">API documentation</a> &raquo;</li>
+        
+      <li>utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api-docs/utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-openchem.utils">
+<span id="utils"></span><h1>utils<a class="headerlink" href="#module-openchem.utils" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="graph">
+<h2>graph<a class="headerlink" href="#graph" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="id1">
+<h2>utils<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-openchem.utils.utils"></span><dl class="function">
+<dt id="openchem.utils.utils.calculate_metrics">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">calculate_metrics</code><span class="sig-paren">(</span><em>predicted</em>, <em>ground_truth</em>, <em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#calculate_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.calculate_metrics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.check_params">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">check_params</code><span class="sig-paren">(</span><em>config</em>, <em>required_dict</em>, <em>optional_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#check_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.check_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.cross_validation_split">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">cross_validation_split</code><span class="sig-paren">(</span><em>data</em>, <em>targets</em>, <em>n_folds=5</em>, <em>split='random'</em>, <em>stratified=True</em>, <em>folds=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#cross_validation_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.cross_validation_split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.deco_print">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">deco_print</code><span class="sig-paren">(</span><em>line</em>, <em>offset=0</em>, <em>start='*** '</em>, <em>end='\n'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#deco_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.deco_print" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.flatten_dict">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">flatten_dict</code><span class="sig-paren">(</span><em>dct</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#flatten_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.flatten_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.get_incremental_state">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">get_incremental_state</code><span class="sig-paren">(</span><em>module</em>, <em>incremental_state</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#get_incremental_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.get_incremental_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper for getting incremental state for an nn.Module.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.get_latest_checkpoint">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">get_latest_checkpoint</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#get_latest_checkpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.get_latest_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.make_positions">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">make_positions</code><span class="sig-paren">(</span><em>tensor</em>, <em>padding_idx</em>, <em>left_pad</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#make_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.make_positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace non-padding symbols with their position numbers.
+Position numbers begin at padding_idx+1.
+Padding symbols are ignored, but it is necessary to specify whether padding
+is added on the left side (left_pad=True) or right side (left_pad=False).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.move_to_cuda">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">move_to_cuda</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#move_to_cuda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.move_to_cuda" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.nest_dict">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">nest_dict</code><span class="sig-paren">(</span><em>flat_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#nest_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.nest_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.nested_update">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">nested_update</code><span class="sig-paren">(</span><em>org_dict</em>, <em>upd_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#nested_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.nested_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="openchem.utils.utils.time_since">
+<code class="descclassname">openchem.utils.utils.</code><code class="descname">time_since</code><span class="sig-paren">(</span><em>since</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#time_since"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.time_since" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-openchem.utils.logger">
+<span id="logger"></span><h2>logger<a class="headerlink" href="#module-openchem.utils.logger" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="openchem.utils.logger.Logger">
+<em class="property">class </em><code class="descclassname">openchem.utils.logger.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>log_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="openchem.utils.logger.Logger.histo_summary">
+<code class="descname">histo_summary</code><span class="sig-paren">(</span><em>tag</em>, <em>values</em>, <em>step</em>, <em>bins=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger.histo_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger.histo_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a histogram of the tensor of values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openchem.utils.logger.Logger.image_summary">
+<code class="descname">image_summary</code><span class="sig-paren">(</span><em>tag</em>, <em>images</em>, <em>step</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger.image_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger.image_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a list of images.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="openchem.utils.logger.Logger.scalar_summary">
+<code class="descname">scalar_summary</code><span class="sig-paren">(</span><em>tag</em>, <em>value</em>, <em>step</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger.scalar_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger.scalar_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a scalar variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="optimizer.html" class="btn btn-neutral" title="optimizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Mariya Popova.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #99badd;
+    }
+  </style>
+
+
+</body>
+</html>
