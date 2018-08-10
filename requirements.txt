@@ -1,0 +1,7 @@
+numpy
+pyyaml
+scipy
+ipython
+mkl
+scikit-learn
+six
