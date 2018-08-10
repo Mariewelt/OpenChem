@@ -63,7 +63,7 @@ Alternative way of installation is with Docker. We provide a Dockerfile, so you 
 
 ## Documentation
 
-Checkout our documentation [here](https://openchem.readthedocs.io/).
+Checkout OpenChem documentation [here](https://openchem.readthedocs.io/).
 
 # Acknowledgements
 
