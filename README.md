@@ -14,6 +14,10 @@ OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](h
 * Utilities for data preprocessing.
 * Tensorboard support.
 
+## Documentation
+
+Check out OpenChem documentation [here](https://openchem.readthedocs.io/).
+
 # Supported functionality
 ## Tasks:
 * Classification (binary or multi-class)
@@ -60,10 +64,6 @@ If your CUDA version is other than 9.0, check [Pytorch](https://pytorch.org) and
 
 ## Installation with Docker
 Alternative way of installation is with Docker. We provide a Dockerfile, so you can run your models in a container that already has all the necessary packages installed. You will also need nvidia-docker in order to run models on GPU.
-
-## Documentation
-
-Checkout OpenChem documentation [here](https://openchem.readthedocs.io/).
 
 # Acknowledgements
 
