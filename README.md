@@ -40,7 +40,7 @@ In order to get started you need:
 * Python 3.6 (we recommend [Anaconda](https://www.continuum.io/downloads) distribution)
 * [CUDA 9.0](https://developer.nvidia.com/cuda-downloads)
 * [Pytorch 0.4.1](https://pytorch.org)
-* [Tensorflow 1.8.0](https://www.tensorflow.org/install/) with GPU support (compatible with your CUDA version
+* [Tensorflow 1.8.0](https://www.tensorflow.org/install/) with GPU support 
 * [RDKit](https://www.rdkit.org/docs/Install.html)
 * [Scikit-learn](http://scikit-learn.org/)
 * [Numpy](http://www.numpy.org/)
