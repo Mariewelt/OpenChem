@@ -61,6 +61,10 @@ If your CUDA version is other than 9.0, check [Pytorch](https://pytorch.org) and
 ## Installation with Docker
 Alternative way of installation is with Docker. We provide a Dockerfile, so you can run your models in a container that already has all the necessary packages installed. You will also need nvidia-docker in order to run models on GPU.
 
+## Documentation
+
+Checkout our documentation [here](https://openchem.readthedocs.io/).
+
 # Acknowledgements
 
 OpenChem is sponsored by [the University of North Carolina at Chapel Hill](https://www.unc.edu/) and [NVIDIA Corp.](https://www.nvidia.com/en-us/) 
