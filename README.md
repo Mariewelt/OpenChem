@@ -16,7 +16,7 @@ OpenChem is a deep learning toolkit for Computational Chemistry with [PyTorch](h
 
 # Documentation
 
-Check out OpenChem documentation [here](https://openchem.readthedocs.io/).
+Check out OpenChem documentation [here](https://mariewelt.github.io/OpenChem/).
 
 # Supported functionality
 ## Tasks:
