@@ -69,7 +69,7 @@ model_params = {
     'max_grad_norm': 10.0,
     'batch_size': 256,
     'num_epochs': 31,
-    'logdir': '/home/mpopova/Work/OpenChem/logs/rnn_log',
+    'logdir': './logs/tox21_rnn_log',
     'print_every': 5,
     'save_every': 5,
     'train_data_layer': train_dataset,
