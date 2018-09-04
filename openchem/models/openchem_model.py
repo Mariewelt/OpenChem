@@ -27,10 +27,7 @@ class OpenChemModel(nn.Module):
         self.params = params
         self.use_cuda = self.params['use_cuda']
         self.batch_size = self.params['batch_size']
-        if 'eval_metrics' in params.keys():
-            self.eval_metrics = self.params['eval_metrics']
-        else:
-            self.eval_metrics = None
+        self.eval_metrics = self.params['eval_metrics']
         self.task = self.params['task']
         self.logdir = self.params['logdir']
         self.world_size = self.params['world_size']
@@ -41,6 +38,7 @@ class OpenChemModel(nn.Module):
             self.max_grad_norm = self.params['max_grad_norm']
         else:
             self.max_grad_norm = None
+        self.random_seed = self.params['random_seed']
         self.print_every = self.params['print_every']
         self.save_every = self.params['save_every']
 
@@ -50,6 +48,8 @@ class OpenChemModel(nn.Module):
             'task': str,
             'batch_size': int,
             'num_epochs': int,
+            'train_data_layer': None,
+            'val_data_layer': None,
         }
 
     @staticmethod
@@ -58,12 +58,13 @@ class OpenChemModel(nn.Module):
             'use_cuda': bool,
             'use_clip_grad': bool,
             'max_grad_norm': float,
+            'random_seed': int,
             'print_every': int,
             'save_every': int,
             'lr_scheduler': None,
             'lr_scheduler_params': dict,
             'eval_metrics': None,
-            'logdir': str,
+            'logdir': str
         }
 
     def forward(self, inp, eval=False):
@@ -85,13 +86,9 @@ def build_training(model, params):
     optimizer = OpenChemOptimizer([params['optimizer'],
                                    params['optimizer_params']],
                                   model.parameters())
-    
-    if 'lr_scheduler' in params.keys():
-        lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'],
-                                            params['lr_scheduler_params']],
-                                            optimizer.optimizer)
-    else:
-        lr_scheduler = None
+    lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'],
+                                        params['lr_scheduler_params']],
+                                       optimizer.optimizer)
     use_cuda = params['use_cuda']
     criterion = params['criterion']
     if use_cuda:
@@ -107,8 +104,17 @@ def train_step(model, optimizer, criterion, inp, target):
     loss = criterion(output, target)
     loss.backward()
     optimizer.step()
-    if model.module.use_clip_grad:
-        clip_grad_norm_(model.parameters(), model.module.max_grad_norm)
+    has_module = False
+    if hasattr(model, 'module'):
+        has_module = True
+    if has_module:
+        use_clip_grad = model.module.use_clip_grad
+        max_grad_norm = model.module.max_grad_norm
+    else:
+        use_clip_grad = model.use_clip_grad
+        max_grad_norm = model.max_grad_norm
+    if use_clip_grad:
+        clip_grad_norm_(model.parameters(), max_grad_norm)
 
     return loss
 
@@ -133,18 +139,27 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
     start = time.time()
     loss_total = 0
     n_batches = 0
-    if scheduler is not None:
-        scheduler = scheduler.scheduler
+    scheduler = scheduler.scheduler
     all_losses = []
     val_losses = []
+    has_module = False
+    if hasattr(model, 'module'):
+        has_module = True
+    if has_module:
+        world_size = model.module.world_size
+    else:
+        world_size = model.world_size     
 
     for epoch in range(cur_epoch, n_epochs + cur_epoch):
         for i_batch, sample_batched in enumerate(train_loader):
-            batch_input, batch_target = model.module.cast_inputs(sample_batched)
+            if has_module:
+                batch_input, batch_target = model.module.cast_inputs(sample_batched)
+            else:
+                batch_input, batch_target = model.cast_inputs(sample_batched)
             loss = train_step(model, optimizer, criterion,
                               batch_input, batch_target)
-            if model.module.world_size > 1:
-                reduced_loss = reduce_tensor(loss, model.module.world_size)
+            if world_size > 1:
+                reduced_loss = reduce_tensor(loss, world_size)
             else:
                 reduced_loss = loss.clone()
             loss_total += reduced_loss.item()
@@ -153,7 +168,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
         all_losses.append(cur_loss)
 
         if epoch % print_every == 0:
-            if print_logs(model.module.world_size):
+            if print_logs(world_size):
                 print('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
                       'Loss: %.4f]' % (time_since(start), epoch,
                                        epoch / n_epochs * 100, cur_loss))
@@ -168,7 +183,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                 info = {'Train loss': cur_loss,
                         'LR': optimizer.param_groups[0]['lr']}
 
-            if print_logs(model.module.world_size):
+            if print_logs(world_size):
                 for tag, value in info.items():
                     logger.scalar_summary(tag, value, epoch + 1)
 
@@ -183,13 +198,12 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                     except:
                         pass
 
-        if epoch % save_every == 0 and print_logs(model.module.world_size):
+        if epoch % save_every == 0 and print_logs(world_size):
             torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
 
         loss_total = 0
         n_batches = 0
-        if scheduler is not None:
-            scheduler.step()
+        scheduler.step()
 
     return all_losses, val_losses
 
@@ -200,8 +214,22 @@ def evaluate(model, val_loader, criterion):
     start = time.time()
     prediction = []
     ground_truth = []
+    has_module = False
+    if hasattr(model, 'module'):
+        has_module = True
+    if has_module:
+        task = model.module.task
+        eval_metrics = model.module.eval_metrics
+        world_size = model.module.world_size
+    else:
+        task = model.task
+        eval_metrics = model.eval_metrics
+        world_size = model.world_size
     for i_batch, sample_batched in enumerate(val_loader):
-        batch_input, batch_target = model.module.cast_inputs(sample_batched)
+        if has_module:
+            batch_input, batch_target = model.module.cast_inputs(sample_batched)
+        else:
+            batch_input, batch_target = model.cast_inputs(sample_batched)
         predicted = model.forward(batch_input, eval=True)
         prediction += list(predicted.detach().cpu().numpy())
         ground_truth += list(batch_target.cpu().numpy())
@@ -210,11 +238,11 @@ def evaluate(model, val_loader, criterion):
         n_batches += 1
 
     cur_loss = loss_total / n_batches
-    if model.module.task == 'classification':
+    if task == 'classification':
         prediction = np.argmax(prediction, axis=1)
     metrics = calculate_metrics(prediction, ground_truth,
-                                model.module.eval_metrics)
-    if print_logs(model.module.world_size):
+                                eval_metrics)
+    if print_logs(world_size):
         print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
               (time_since(start), cur_loss, metrics))
     return cur_loss, metrics
