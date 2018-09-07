@@ -89,18 +89,29 @@ class Graph:
 
         return node_attr_adj_matrix
 
-    def get_edge_attr_adj_matrix(self, max_size):
-        edge_attr_adj_matrix = np.zeros((max_size, max_size, self.n_attr))
-
+    def get_edge_attr_adj_matrix(self, all_atr_dict, max_size):
+        fl = True
         for edge in self.edges:
-            attr_vector = np.array(edge.attributes_dict.items())
-            attr_vector = attr_vector.reshape(-1, self.n_attr)
             begin = edge.begin_atom_idx
             end = edge.end_atom_idx
-            edge_attr_adj_matrix[begin, end, :] = attr_vector
-
+            cur_features = []
+            for attr_name in edge.attributes_dict.keys():
+                cur_attr = all_atr_dict[attr_name]
+                if cur_attr.one_hot:
+                    cur_features += list(cur_attr.one_hot_dict[edge.
+                                         attributes_dict[cur_attr.name]])
+                else:
+                    cur_features += [edge.attributes_dict[cur_attr.name]]
+            cur_features = np.array(cur_features)
+            attr_len = len(cur_features)
+            if fl:
+                edge_attr_adj_matrix = np.zeros((max_size, max_size, attr_len))
+                fl = False
+            edge_attr_adj_matrix[begin, end, :] = cur_features
+        
         return edge_attr_adj_matrix
-
+   
+    
     def get_node_feature_matrix(self, all_atr_dict, max_size):
         features = []
         for node in self.nodes:

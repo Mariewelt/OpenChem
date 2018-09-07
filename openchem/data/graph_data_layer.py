@@ -13,8 +13,9 @@ from openchem.data.utils import read_smiles_property_file, sanitize_smiles
 
 class GraphDataset(Dataset):
     def __init__(self, get_atomic_attributes, node_attributes, filename,
-                 cols_to_read, delimiter=',', get_bond_attributes=None):
+                 cols_to_read, delimiter=',', get_bond_attributes=None, edge_attributes=None):
         super(GraphDataset, self).__init__()
+        assert (get_bond_attributes is None) == (edge_attributes is None)
         data_set = read_smiles_property_file(filename, cols_to_read,
                                              delimiter)
         data = data_set[0]
@@ -39,7 +40,7 @@ class GraphDataset(Dataset):
                 self.adj_matrix.append(graph.adj_matrix)
             else:
                 self.adj_matrix.append(
-                    graph.get_edge_attr_adj_matrix(max_size)
+                    graph.get_edge_attr_adj_matrix(edge_attributes, max_size)
                 )
         self.num_features = self.node_feature_matrix[0].shape[1]
 
