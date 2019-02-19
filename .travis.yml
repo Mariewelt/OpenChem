@@ -47,7 +47,7 @@ install:
 
 
 script:
-  - pytest -v --cov=openchem openchem.rst/tests/
+  - pytest -v --cov=openchem openchem/tests/
 
 notifications:
     email: false
