@@ -192,3 +192,53 @@ def test_molecule_protein2label_model_instantiation():
     }
     new_model = MoleculeProtein2Label(sample_config)
 
+def test_generative_model_instantiation():
+    sample_config = {
+        'world_size': 1, 
+        'use_cuda': True,
+        'task': 'multitask',
+        'random_seed': 5,
+        'use_clip_grad': False,
+        'batch_size': 64,
+        'num_epochs': 5,
+        'logdir': './logs/',
+        'print_every': 1,
+        'save_every': 5,
+        'train_data_layer': None,
+        'val_data_layer': None,
+        'eval_metrics': None,
+        'criterion': torch.nn.CrossEntropyLoss(),
+        'optimizer': torch.optim.Adam,
+        'optimizer_params': {
+            'lr': 0.001,
+        },
+        'lr_scheduler': torch.optim.lr_scheduler.ExponentialLR,
+        'lr_scheduler_params': {
+            'gamma': 0.99
+        },
+        'embedding': OpenChemEmbedding,
+        'embedding_params': {
+            'num_embeddings': 10,
+            'embedding_dim': 10,
+            'padding_idx': 0
+        },
+        'encoder': RNNEncoder,
+        'encoder_params': {
+            'input_size': 20,
+            'layer': "GRU",
+            'encoder_dim': 20,
+            'n_layers': 1,
+            'dropout': 0.0,
+            'is_bidirectional': False
+        },
+        'has_stack': False,
+        'mlp': OpenChemMLP,
+        'mlp_params': {
+            'input_size': 20,
+            'n_layers': 2,
+            'hidden_size': [20, 20],
+            'activation': torch.softmax,
+            'dropout': 0.0
+        }
+    }
+    new_model = GenerativeRNN(sample_config)
