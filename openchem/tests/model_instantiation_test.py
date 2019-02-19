@@ -1,5 +1,6 @@
 """
-Unit test and regression test for OpenChem models
+Unit tests for testing if an instance of every class in openchem.models
+can be created
 """
 
 import torch
@@ -194,7 +195,7 @@ def test_molecule_protein2label_model_instantiation():
 
 def test_generative_model_instantiation():
     sample_config = {
-        'world_size': 1, 
+        'world_size': 1,
         'use_cuda': True,
         'task': 'multitask',
         'random_seed': 5,
