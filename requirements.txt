@@ -5,3 +5,5 @@ ipython
 mkl
 scikit-learn
 six
+pytest
+pytest-cov
