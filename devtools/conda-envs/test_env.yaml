@@ -1,0 +1,24 @@
+name: test
+channels:
+dependencies:
+    # Base depends
+  - python
+  - pip
+  - conda
+
+    # Testing
+  - pytest
+  - pytest-cov
+
+    # Other dependencies
+  - numpy
+  - pytorch
+  - torchvision
+  - rdkit
+  - nox
+  - cairo
+
+    # Pip-only installs
+  - pip:
+    - codecov
+    - tensorflow-gpu
