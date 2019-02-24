@@ -111,7 +111,6 @@ class Graph:
         
         return edge_attr_adj_matrix
    
-    
     def get_node_feature_matrix(self, all_atr_dict, max_size):
         features = []
         for node in self.nodes:

@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from torch import nn
 from openchem.modules.encoders.openchem_encoder import OpenChemEncoder
 
@@ -35,17 +36,20 @@ class RNNEncoder(OpenChemEncoder):
             self.rnn = nn.LSTM(self.input_size, self.encoder_dim,
                                self.n_layers,
                                bidirectional=self.bidirectional,
-                               dropout=self.dropout)
+                               dropout=self.dropout,
+                               bias=True)
         elif self.layer == 'GRU':
             self.rnn = nn.GRU(self.input_size, self.encoder_dim,
                               self.n_layers,
                               bidirectional=self.bidirectional,
-                              dropout=self.dropout)
+                              dropout=self.dropout,
+                              bias=True)
         else:
             self.layer = nn.RNN(self.input_size, self.encoder_dim,
                                 self.n_layers,
                                 bidirectional=self.bidirectional,
-                                dropout=self.dropout)
+                                dropout=self.dropout,
+                                bias=True)
 
     @staticmethod
     def get_required_params():
@@ -71,15 +75,25 @@ class RNNEncoder(OpenChemEncoder):
                Initialized automatically if None
         return: embedded
         """
-        inp = inp.permute(1, 0, 2)
-        batch_size = inp.size()[1]
+        input_tensor = inp[0]
+        input_tensor = input_tensor.permute(1, 0, 2)
+        input_length = inp[1]
+        batch_size = input_tensor.size()[1]
         if previous_hidden is None:
             previous_hidden = self.init_hidden(batch_size)
             if self.layer == 'LSTM':
                 cell = self.init_cell(batch_size)
                 previous_hidden = (previous_hidden, cell)
-        output, _ = self.rnn(inp, previous_hidden)
-        embedded = output[-1, :, :].squeeze(0)
+        output, _ = self.rnn(input_tensor, previous_hidden)
+        index_tensor = input_length.cpu().numpy() - 1
+        index_tensor = np.array([index_tensor]).astype('int')
+        index_tensor = np.repeat(np.array([index_tensor]), 
+                                 repeats=output.size()[2], 
+                                 axis=0)
+        index_tensor = index_tensor.swapaxes(0, 1)
+        index_tensor = index_tensor.swapaxes(1, 2)
+        index_tensor = torch.LongTensor(index_tensor).cuda()
+        embedded = torch.gather(output, dim=0, index=index_tensor).squeeze(0)
         return embedded, previous_hidden
 
     def init_hidden(self, batch_size):
