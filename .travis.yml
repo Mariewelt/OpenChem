@@ -1,0 +1,56 @@
+language: python
+
+# Run jobs on container-based infrastructure, can be overridden per job
+
+matrix:
+  include:
+    # Extra includes for OSX since python language is not available by default on OSX
+    - os: osx
+      language: generic
+      env: PYTHON_VER=3.6
+    - os: osx
+      language: generic
+      env: PYTHON_VER=3.7
+
+
+    - os: linux
+      language: generic  # No need to set Python version since its conda
+      env: PYTHON_VER=3.6
+    - os: linux
+      language: generic
+      env: PYTHON_VER=3.7
+
+
+before_install:
+    # Additional info about the build
+  - uname -a
+  - df -h
+  - ulimit -a
+
+    # Install the Python environment
+  - source devtools/travis-ci/before_install.sh
+  - python -V
+
+install:
+
+    # Create test environment for package
+  - python devtools/scripts/create_conda_env.py -n=test -p=$PYTHON_VER devtools/conda-envs/test_env.yaml
+    # Activate the test environment
+  - conda activate test
+    # Install the dependencies
+  - conda install --yes --file requirements.txt
+  - conda install -c rdkit rdkit nox cairo
+  - conda install pytorch torchvision -c pytorch
+  - pip install tensorflow-gpu
+    # Build and install package
+  - python setup.py develop --no-deps
+
+
+script:
+  - pytest -v --cov=openchem openchem/tests/
+
+notifications:
+    email: false
+
+after_success:
+  - codecov

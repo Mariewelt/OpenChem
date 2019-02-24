@@ -94,8 +94,6 @@ class RNNEncoder(OpenChemEncoder):
         index_tensor = index_tensor.swapaxes(1, 2)
         index_tensor = torch.LongTensor(index_tensor).cuda()
         embedded = torch.gather(output, dim=0, index=index_tensor).squeeze(0)
-        #print(embedded.size())
-        #embedded = output[-1, :, :].squeeze(0)
         return embedded, previous_hidden
 
     def init_hidden(self, batch_size):

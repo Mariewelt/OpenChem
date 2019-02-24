@@ -1,0 +1,27 @@
+package:
+  name: openchem.rst
+  version: "0.0.0"
+
+source:
+  path: ../..
+
+build:
+  number: 0
+
+requirements:
+  host:
+    - python
+    - setuptools
+
+  run:
+    - python
+
+test:
+  requires:
+    - pytest
+  imports:
+    - openchem.rst
+
+about:
+  home: add_url_here
+  license: BSD-3-Clause License

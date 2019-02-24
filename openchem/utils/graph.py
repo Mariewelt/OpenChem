@@ -63,6 +63,9 @@ class Graph:
                        cur_edge.begin_atom_idx] = 1.0
         self.adj_matrix = np.zeros((max_size, max_size))
         self.adj_matrix[:self.num_nodes, :self.num_nodes] = adj_matrix
+        if get_bond_attributes is not None and len(self.edges) > 0:
+            tmp = self.edges[0]
+            self.n_attr = len(tmp.attributes_dict.keys())
 
     def get_node_attr_adj_matrix(self, attr):
         node_attr_adj_matrix = np.zeros((self.num_nodes, self.num_nodes,
@@ -86,17 +89,28 @@ class Graph:
 
         return node_attr_adj_matrix
 
-    def get_edge_attr_adj_matrix(self, attr, max_size, max_values):
-        edge_attr_adj_matrix = np.zeros((max_values, max_size, max_size))
-
+    def get_edge_attr_adj_matrix(self, all_atr_dict, max_size):
+        fl = True
         for edge in self.edges:
-            attr_one_hot = attr.one_hot_dict[edge.attributes_dict[attr.name]]
             begin = edge.begin_atom_idx
             end = edge.end_atom_idx
-            edge_attr_adj_matrix[:attr.n_values, begin, end] = attr_one_hot
-
+            cur_features = []
+            for attr_name in edge.attributes_dict.keys():
+                cur_attr = all_atr_dict[attr_name]
+                if cur_attr.one_hot:
+                    cur_features += list(cur_attr.one_hot_dict[edge.
+                                         attributes_dict[cur_attr.name]])
+                else:
+                    cur_features += [edge.attributes_dict[cur_attr.name]]
+            cur_features = np.array(cur_features)
+            attr_len = len(cur_features)
+            if fl:
+                edge_attr_adj_matrix = np.zeros((max_size, max_size, attr_len))
+                fl = False
+            edge_attr_adj_matrix[begin, end, :] = cur_features
+        
         return edge_attr_adj_matrix
-
+   
     def get_node_feature_matrix(self, all_atr_dict, max_size):
         features = []
         for node in self.nodes:
