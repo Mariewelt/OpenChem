@@ -28,12 +28,16 @@ class SmilesDataset(Dataset):
 
     """
     def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
-                 pad=True, tokenize=True, augment=False, flip=True):
+                 pad=True, tokenize=True, augment=False, flip=True, sanitize=True):
         super(SmilesDataset, self).__init__()
         self.tokenize = tokenize
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
         smiles = data[0]
-        clean_smiles, clean_idx = sanitize_smiles(smiles)
+        if sanitize:
+            clean_smiles, clean_idx = sanitize_smiles(smiles)
+        else:
+            clean_smiles = smiles
+            clean_idx = list(range(len(smiles)))
         if len(data) > 1:
             target = np.array(data[1:], dtype='float')
             target = np.array(target)
