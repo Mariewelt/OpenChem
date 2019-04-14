@@ -152,6 +152,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
     for epoch in range(cur_epoch, n_epochs + cur_epoch):
         for i_batch, sample_batched in enumerate(train_loader):
+            print("{:d}/{:d}".format(i_batch, len(train_loader)))
             if has_module:
                 batch_input, batch_target = model.module.cast_inputs(sample_batched)
             else:
@@ -189,14 +190,19 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
                 for tag, value in model.named_parameters():
                     tag = tag.replace('.', '/')
-                    try:
-                        logger.histo_summary(tag, value.detach().cpu().numpy(),
-                                         epoch + 1)
-                        logger.histo_summary(tag + '/grad',
-                                         value.grad.detach().cpu().numpy(),
-                                         epoch + 1)
-                    except:
-                        pass
+                    if torch.std(value).item() < 1e-3:
+                        print("Warning: {} has zero variance ".format(tag) +
+                              "(i.e. constant vector)")
+                    else:
+                        log_value = value.detach().cpu().numpy()
+                        logger.histo_summary(
+                            tag, log_value, epoch + 1)
+                        if value.grad is None:
+                            print("Warning: {} grad is undefined".format(tag))
+                        else:
+                            log_value_grad = value.grad.detach().cpu().numpy()
+                            logger.histo_summary(
+                                tag + '/grad', log_value_grad, epoch + 1)
 
         if epoch % save_every == 0 and print_logs(world_size):
             torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
