@@ -152,7 +152,6 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
     for epoch in range(cur_epoch, n_epochs + cur_epoch):
         for i_batch, sample_batched in enumerate(train_loader):
-            print("{:d}/{:d}".format(i_batch, len(train_loader)))
             if has_module:
                 batch_input, batch_target = model.module.cast_inputs(sample_batched)
             else:
