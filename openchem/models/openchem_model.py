@@ -189,7 +189,8 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
                 for tag, value in model.named_parameters():
                     tag = tag.replace('.', '/')
-                    if torch.std(value).item() < 1e-3:
+                    if torch.std(value).item() < 1e-3 or \
+                            torch.isnan(torch.std(value)).item():
                         print("Warning: {} has zero variance ".format(tag) +
                               "(i.e. constant vector)")
                     else:

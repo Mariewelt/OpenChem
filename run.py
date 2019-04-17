@@ -41,7 +41,7 @@ def main():
                         help='number of data loading workers (default: 0)')
     parser.add_argument('--random_seed', default=0, type=int, metavar='N',
                         help='random_seed (default: 0)')
-    parser.add_argument("--local_rank", type=int)
+    parser.add_argument("--local_rank", type=int, default=0)
 
     args, unknown = parser.parse_known_args()
 
@@ -207,8 +207,8 @@ def main():
         train_loader = None
 
     if args.mode in ["eval", "train_eval"] and (
-            'val_data_layer' not in model_config.keys() or model_config[
-        'val_data_layer'] is None):
+            'val_data_layer' not in model_config.keys()
+            or model_config['val_data_layer'] is None):
         raise IOError(
             "When model is run in 'eval' or 'train_eval' modes, "
             "validation data layer must be specified")
