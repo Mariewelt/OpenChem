@@ -28,11 +28,15 @@ class OpenChemMLP(nn.Module):
         self.layers = nn.ModuleList([])
         self.bn = nn.ModuleList([])
         self.dropouts = nn.ModuleList([])
-        for i in range(self.n_layers):
+        for i in range(self.n_layers - 1):
             self.dropouts.append(nn.Dropout(self.dropout))
             self.bn.append(nn.BatchNorm1d(self.hidden_size[i]))
             self.layers.append(nn.Linear(in_features=self.input_size[i],
-                                      out_features=self.hidden_size[i]))
+                                         out_features=self.hidden_size[i]))
+        i = self.n_layers - 1
+        self.dropouts.append(nn.Dropout(self.dropout))
+        self.layers.append(nn.Linear(in_features=self.input_size[i],
+                                     out_features=self.hidden_size[i]))
 
     @staticmethod
     def get_required_params():
