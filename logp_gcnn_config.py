@@ -57,7 +57,6 @@ model = Graph2Label
 
 model_params = {
     'task': 'regression',
-    'data_layer': GraphDataset,
     'use_clip_grad': False,
     'batch_size': 256,
     'num_epochs': 101,

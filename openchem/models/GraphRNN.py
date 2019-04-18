@@ -9,6 +9,7 @@ from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from torch.nn import functional as F
 
 from .openchem_model import OpenChemModel
+from openchem.data.graph_utils import decode_adj, SmilesFromGraphs
 
 
 class GraphRNNModel(OpenChemModel):
@@ -19,6 +20,8 @@ class GraphRNNModel(OpenChemModel):
         self.num_edge_classes = params["num_edge_classes"]
         self.max_num_nodes = params["max_num_nodes"]
         self.start_node_label = params["start_node_label"]
+        self.max_prev_nodes = params["max_prev_nodes"]
+        self.label2atom = params["label2atom"]
 
         if self.num_edge_classes > 2:
             EdgeEmbedding = params["EdgeEmbedding"]
@@ -75,20 +78,18 @@ class GraphRNNModel(OpenChemModel):
         device = torch.device("cuda")
 
         # TODO: where is this function called?
-        max_num_node = int(self.max_num_node)
+        max_num_nodes = int(self.max_num_nodes)
         y_pred_long = torch.zeros(
-            batch_size, max_num_node, self.max_prev_node
-        ).to(device=device)
+            batch_size, max_num_nodes, self.max_prev_nodes,
+            dtype=torch.long, device=device)
         c_pred_long = torch.zeros(
-            batch_size, max_num_node
-        ).to(device=device)
+            batch_size, max_num_nodes, dtype=torch.long, device=device)
         x_step = torch.ones(
-            batch_size, 1, self.max_prev_node
-        ).to(device=device)
+            batch_size, 1, self.max_prev_nodes, device=device)
         c_step = self.start_node_label * torch.ones(
             batch_size, 1, dtype=torch.long, device=device)
 
-        for i in range(max_num_node):
+        for i in range(max_num_nodes):
             if self.edge_emb is not None:
                 x_step = self.edge_emb(
                     x_step.to(dtype=torch.long)).view(batch_size, 1, -1)
@@ -102,20 +103,20 @@ class GraphRNNModel(OpenChemModel):
                 [h.permute(1, 0, 2), self.edge_rnn.hidden[1:]],
                 dim=0
             )
-            x_step = torch.zeros(batch_size, 1, self.max_prev_node,
+            x_step = torch.zeros(batch_size, 1, self.max_prev_nodes,
                                  device=device)
             output_x_step = torch.ones(batch_size, 1, 1, device=device)
             if self.node_mlp is not None:
-                vert_pred = self.node_mlp(h)
-                # [test_batch_size x 1 x num_classes]
-                vert_pred = F.softmax(vert_pred, dim=2)
+                vert_pred = self.node_mlp(h.view(batch_size, -1))
+                # [test_batch_size x num_classes]
+                vert_pred = F.softmax(vert_pred, dim=1)
                 # [test_batch_size x 1]
                 c_step = torch.multinomial(
                     vert_pred.view(-1, self.num_node_classes), 1)
                 c_pred_long[:, i:i + 1] = c_step
-            for j in range(min(self.max_prev_node, i + 1)):
+            for j in range(min(self.max_prev_nodes, i + 1)):
                 output_y_pred_step = self.edge_rnn(output_x_step)
-                if self.num_edge_classes == 1:
+                if self.num_edge_classes == 2:
                     output_y_pred_step = F.sigmoid(output_y_pred_step)
                     output_x_step = torch.bernoulli(output_y_pred_step)
                 else:
@@ -128,8 +129,23 @@ class GraphRNNModel(OpenChemModel):
 
             y_pred_long[:, i:i + 1, :] = x_step
 
-        return y_pred_long.to(dtype=torch.long), \
-            c_pred_long.to(dtype=torch.long)
+        smiles = []
+        for i in range(batch_size):
+            adj_pred = decode_adj(y_pred_long[i].to('cpu').numpy())
+            num_nodes = len(adj_pred)
+
+            start_c = self.start_node_label
+            start_atom = self.label2atom[start_c]
+            node_list = [start_atom, ]
+            for inode in range(num_nodes - 1):
+                c = c_pred_long[i, inode].item()
+                atom = self.label2atom[c]
+                node_list.append(atom)
+
+            sstring = SmilesFromGraphs(node_list, adj_pred)
+            smiles.append(sstring)
+
+        return smiles
 
     def forward_train(self, inp):
         device = torch.device("cuda")

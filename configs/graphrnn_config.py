@@ -10,7 +10,6 @@ from openchem.modules.mlp.openchem_mlp import OpenChemMLP
 from openchem.utils.utils import identity
 from openchem.modules.gru_plain import GRUPlain
 
-
 max_prev_nodes = 12
 # this in Carbon original id in the Periodic Table
 original_start_node_label = 6
@@ -45,6 +44,10 @@ edge_relabel_map = {
 #     35.: 1,
 #     53.: 1,
 # }
+atom2number = {'H': 1, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9,
+               'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'As': 33, 'Se': 34,
+               'Br': 35, 'I': 53}
+number2atom = {i: v for v, i in atom2number.items()}
 
 
 def get_atomic_attributes(atom):
@@ -73,6 +76,8 @@ node_relabel_map = train_dataset.node_relabel_map
 inverse_node_relabel_map = train_dataset.inverse_node_relabel_map
 max_num_nodes = train_dataset.max_num_nodes
 start_node_label = train_dataset.start_node_label
+label2atom = [number2atom[int(v)] for i, v
+              in sorted(inverse_node_relabel_map.items())]
 
 edge_embedding_dim = 128
 
@@ -131,6 +136,8 @@ model_params = {
     'num_edge_classes': num_edge_classes,
     'max_num_nodes': max_num_nodes,
     'start_node_label': start_node_label,
+    'max_prev_nodes': max_prev_nodes,
+    'label2atom': label2atom,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(

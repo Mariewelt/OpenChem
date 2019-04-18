@@ -152,6 +152,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
     for epoch in range(cur_epoch, n_epochs + cur_epoch):
         for i_batch, sample_batched in enumerate(train_loader):
+
             if has_module:
                 batch_input, batch_target = model.module.cast_inputs(sample_batched)
             else:
@@ -246,6 +247,7 @@ def evaluate(model, val_loader, criterion):
     cur_loss = loss_total / n_batches
     if task == 'classification':
         prediction = np.argmax(prediction, axis=1)
+
     metrics = calculate_metrics(prediction, ground_truth,
                                 eval_metrics)
     if print_logs(world_size):

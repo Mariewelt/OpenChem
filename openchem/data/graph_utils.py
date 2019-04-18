@@ -60,6 +60,27 @@ def encode_adj(adj, max_prev_node=10, is_full = False):
     return adj_output
 
 
+def decode_adj(adj_output):
+    '''
+        recover to adj from adj_output
+        note: here adj_output have shape (n-1)*m
+    '''
+    max_prev_node = adj_output.shape[1]
+    adj = np.zeros((adj_output.shape[0], adj_output.shape[0]))
+    for i in range(adj_output.shape[0]):
+        input_start = max(0, i - max_prev_node + 1)
+        input_end = i + 1
+        output_start = max_prev_node + max(0, i - max_prev_node + 1) - (i + 1)
+        output_end = max_prev_node
+        adj[i, input_start:input_end] = adj_output[i,::-1][output_start:output_end] # reverse order
+    adj_full = np.zeros((adj_output.shape[0]+1, adj_output.shape[0]+1))
+    n = adj_full.shape[0]
+    adj_full[1:n, 0:n-1] = np.tril(adj, 0)
+    adj_full = adj_full + adj_full.T
+
+    return adj_full
+
+
 def SmilesFromGraphs(node_list, adjacency_matrix):
     """
     Converts molecular graph to SMILES string

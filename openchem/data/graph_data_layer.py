@@ -76,6 +76,8 @@ class BFSGraphDataset(GraphDataset):
                 [n.flatten() for n in self.node_feature_matrix],
                 axis=0
             )
+            # remove paddings
+            original_labels = original_labels[original_labels != 0]
             unique_labels = np.unique(original_labels)
             self.node_relabel_map = {
                 v: i for i, v in enumerate(unique_labels)
@@ -110,7 +112,8 @@ class BFSGraphDataset(GraphDataset):
 
         node_feature_matrix = self.node_feature_matrix[index]
         labels = np.array(
-            [self.node_relabel_map[v] for v in node_feature_matrix.flatten()])
+            [self.node_relabel_map[v] if v != 0 else 0
+             for v in node_feature_matrix.flatten()])
 
         # here zeros are padded for small graph
         x = np.zeros((self.max_num_nodes, self.max_prev_nodes), dtype="float32")

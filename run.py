@@ -45,7 +45,7 @@ def main():
 
     args, unknown = parser.parse_known_args()
 
-    if args.mode not in ['train', 'eval', 'train_eval']:
+    if args.mode not in ['train', 'eval', 'train_eval', 'infer']:
         raise ValueError("Mode has to be one of "
                          "['train', 'eval', 'train_eval']")
     config_module = runpy.run_path(args.config_file)
@@ -239,7 +239,7 @@ def main():
                                         )
     else:
         model = DataParallel(model)
-    if args.continue_learning or args.mode == 'eval':
+    if args.continue_learning or args.mode in ['eval', 'infer']:
         print("=> loading model  pre-trained model")
         weights = torch.load(checkpoint)
         model.load_state_dict(weights)
@@ -254,6 +254,15 @@ def main():
             model_config, eval=True, val_loader=val_loader)
     elif args.mode == "eval":
         evaluate(model, val_loader, criterion)
+    elif args.mode == "infer":
+        model.eval()
+        with torch.no_grad():
+            smiles = model.forward(None)
+
+        path = os.path.join(logdir, "debug_smiles.txt")
+        with open(path, "w") as f:
+            for s in smiles:
+                f.write(s + "\n")
 
 
 if __name__ == '__main__':
