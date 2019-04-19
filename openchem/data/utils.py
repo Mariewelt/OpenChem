@@ -202,7 +202,7 @@ def get_tokens(smiles, tokens=None):
     """
     if tokens is None:
         tokens = list(set(''.join(smiles)))
-        tokens = np.sort(tokens)[::-1]
+        tokens = sorted(tokens)
         tokens = ''.join(tokens)
     token2idx = dict((token, i) for i, token in enumerate(tokens))
     num_tokens = len(tokens)
@@ -256,3 +256,23 @@ def save_smiles_property_file(path, smiles, labels, delimiter=','):
             f.writelines(delimiter + str(labels[i, j]))
         f.writelines('\n')
     f.close()
+
+
+def process_smiles(smiles, target=None, augment=False, pad=True,
+                   tokenize=True, tokens=None, flip=False):
+    clean_smiles, clean_idx = sanitize_smiles(smiles)
+    if target is not None:
+        target = target[clean_idx]
+
+    length = None
+    if augment and target is not None:
+        clean_smiles, target = augment_smiles(clean_smiles,
+                                              target)
+    if pad:
+        clean_smiles, length = pad_sequences(clean_smiles)
+    tokens, token2idx, num_tokens = get_tokens(clean_smiles,
+                                               tokens)
+    if tokenize:
+        clean_smiles, tokens = seq2tensor(clean_smiles, tokens, flip)
+
+    return clean_smiles, target, length, tokens, token2idx, num_tokens

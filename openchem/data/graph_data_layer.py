@@ -21,7 +21,7 @@ class GraphDataset(Dataset):
                  **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
-        data_set = read_smiles_property_file(filename, cols_to_read,
+        data = read_smiles_property_file(filename, cols_to_read,
                                              delimiter)
         data = data_set[0]
         target = data_set[1:]
