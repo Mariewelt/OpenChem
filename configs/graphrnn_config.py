@@ -13,21 +13,23 @@ from openchem.modules.gru_plain import GRUPlain
 max_prev_nodes = 12
 # this in Carbon original id in the Periodic Table
 original_start_node_label = 6
-# edge_relabel_map = {
-#     0.: 0,
-#     1.: 1,
-#     1.5: 2,
-#     2.: 3,
-#     3.: 4
-# }
-# TODO: watch out for broken inverse_relabel_map in this case
+
 edge_relabel_map = {
     0.: 0,
     1.: 1,
-    1.5: 1,
-    2.: 1,
-    3.: 1
+    1.5: 2,
+    2.: 3,
+    3.: 4
 }
+
+# edge_relabel_map = {
+#     0.: 0,
+#     1.: 1,
+#     1.5: 1,
+#     2.: 1,
+#     3.: 1
+# }
+
 # node_relabel_map = {
 #     0.: 0,
 #     5.: 1,
@@ -56,13 +58,26 @@ def get_atomic_attributes(atom):
     return attr_dict
 
 
+def get_edge_attributes(bond):
+    attr_dict = dict()
+    attr_dict['bond_type'] = bond.GetBondTypeAsDouble()
+    # attr_dict['is_aromatic'] = bond.GetIsAromatic()
+    return attr_dict
+
+
 node_attributes = dict(
     atom_element=Attribute('node', 'atom_element', one_hot=False),
+)
+
+edge_attributes = dict(
+    bond_type=Attribute('edge', 'bond_type', one_hot=False)
 )
 
 train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
     './benchmark_datasets/logp_dataset/logP_labels.csv',
+    get_bond_attributes=get_edge_attributes,
+    edge_attributes=edge_attributes,
     delimiter=',', cols_to_read=[1, 2],
     random_order=True, max_prev_nodes=max_prev_nodes,
     original_start_node_label=original_start_node_label,
@@ -80,8 +95,10 @@ max_num_nodes = train_dataset.max_num_nodes
 start_node_label = train_dataset.start_node_label
 label2atom = [number2atom[int(v)] for i, v
               in sorted(inverse_node_relabel_map.items())]
+edge2type = [t for e, t
+             in sorted(train_dataset.inverse_edge_relabel_map.items())]
 
-edge_embedding_dim = 128
+edge_embedding_dim = 32
 
 if num_edge_classes > 2:
     node_rnn_input_size = edge_embedding_dim * max_prev_nodes
@@ -119,7 +136,7 @@ model_params = {
     # ],
     
     'task': 'graph_generation',
-    'use_cuda': True,
+    'use_cuda': False,
     'random_seed': 5,
     'use_clip_grad': False,
     'batch_size': 32,
@@ -131,7 +148,6 @@ model_params = {
     'train_data_layer': train_dataset,
     'criterion': DummyCriterion(),
 
-    # TODO: update these
     'eval_metrics': None,
     'val_data_layer': None,
 
@@ -151,6 +167,7 @@ model_params = {
     'start_node_label': start_node_label,
     'max_prev_nodes': max_prev_nodes,
     'label2atom': label2atom,
+    'edge2type': edge2type,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(
@@ -173,7 +190,6 @@ model_params = {
         init="xavier_uniform"
     ),
 
-    # TODO: reconsider these params
     'NodeRNN': GRUPlain,
     'node_rnn_params': dict(
         input_size=node_rnn_input_size,
@@ -187,7 +203,7 @@ model_params = {
 
     'EdgeRNN': GRUPlain,
     'edge_rnn_params': dict(
-        input_size=1,
+        input_size=edge_embedding_dim if num_edge_classes > 2 else 1,
         embedding_size=8,
         hidden_size=16,
         num_layers=4,

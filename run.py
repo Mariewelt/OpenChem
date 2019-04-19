@@ -232,7 +232,8 @@ def main():
     # create model
     model = model_object(params=model_config)
 
-    model = model.cuda()
+    if args.use_cuda:
+        model = model.cuda()
 
     if args.distributed:
         model = DistributedDataParallel(model, device_ids=[args.local_rank],

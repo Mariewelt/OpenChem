@@ -25,6 +25,7 @@ class GraphRNNModel(OpenChemModel):
         self.start_node_label = params["start_node_label"]
         self.max_prev_nodes = params["max_prev_nodes"]
         self.label2atom = params["label2atom"]
+        self.edge2type = params["edge2type"]
 
         if self.num_edge_classes > 2:
             EdgeEmbedding = params["EdgeEmbedding"]
@@ -60,12 +61,15 @@ class GraphRNNModel(OpenChemModel):
 
     def cast_inputs(self, batch):
 
+        device = torch.device('cpu')
+
         batch_input = dict(
-            x=torch.tensor(batch["x"], dtype=torch.float),
-            y=torch.tensor(batch["y"], dtype=torch.float),
-            c_in=torch.tensor(batch["c_in"], dtype=torch.long),
-            c_out=torch.tensor(batch["c_out"], dtype=torch.long),
-            num_nodes=torch.tensor(batch["num_nodes"], dtype=torch.long),
+            x=torch.tensor(batch["x"], dtype=torch.float, device=device),
+            y=torch.tensor(batch["y"], dtype=torch.long, device=device),
+            c_in=torch.tensor(batch["c_in"], dtype=torch.long, device=device),
+            c_out=torch.tensor(batch["c_out"], dtype=torch.long, device=device),
+            num_nodes=torch.tensor(batch["num_nodes"], dtype=torch.long,
+                                   device=device),
         )
         batch_target = None
 
@@ -112,7 +116,8 @@ class GraphRNNModel(OpenChemModel):
             )
             x_step = torch.zeros(batch_size, 1, self.max_prev_nodes,
                                  device=device)
-            output_x_step = torch.ones(batch_size, 1, 1, device=device)
+            output_x_step = torch.ones(batch_size, 1, 1,
+                                       device=device, dtype=torch.long)
             if self.node_mlp is not None:
                 vert_pred = self.node_mlp(h.view(batch_size, -1))
                 # [test_batch_size x num_classes]
@@ -122,6 +127,9 @@ class GraphRNNModel(OpenChemModel):
                     vert_pred.view(-1, self.num_node_classes), 1)
                 c_pred_long[:, i:i + 1] = c_step
             for j in range(min(self.max_prev_nodes, i + 1)):
+                if self.edge_emb is not None:
+                    output_x_step = self.edge_emb(output_x_step).view(
+                        batch_size, 1, -1)
                 output_y_pred_step = self.edge_rnn(output_x_step)
                 if self.num_edge_classes == 2:
                     output_y_pred_step = torch.sigmoid(output_y_pred_step)
@@ -164,7 +172,14 @@ class GraphRNNModel(OpenChemModel):
             adj = nx.adj_matrix(G)
             adj = np.array(adj.todense()).astype(int)
 
-            sstring = SmilesFromGraphs(node_list, adj)
+            if self.num_edge_classes > 2:
+                adj_out = np.zeros(adj.shape)
+                for e, t in enumerate(self.edge2type):
+                    adj_out[adj == e] = t
+            else:
+                adj_out = adj
+
+            sstring = SmilesFromGraphs(node_list, adj_out)
             smiles.append(sstring)
 
         return smiles
@@ -207,9 +222,17 @@ class GraphRNNModel(OpenChemModel):
         c_out = c_out.index_select(0, idx)
         y_reshape = y_reshape.view(y_reshape.size(0), y_reshape.size(1), 1)
 
-        output_x = torch.cat(
-            (torch.ones(y_reshape.size(0), 1, 1, device=device),
-             y_reshape[:, 0:-1, 0:1]), dim=1)
+        if self.num_edge_classes == 2:
+            output_x = torch.cat(
+                (torch.ones(y_reshape.size(0), 1, 1, device=device),
+                 y_reshape[:, 0:-1, 0:1].to(dtype=torch.float)), dim=1)
+        else:
+            output_x = torch.cat(
+                (torch.ones(y_reshape.size(0), 1, 1,
+                            device=device, dtype=torch.long),
+                 y_reshape[:, 0:-1, 0:1]), dim=1)
+            output_x = self.edge_emb(output_x).squeeze()
+
         output_y = y_reshape
         # batch size for output module: sum(y_len)
         output_y_len = []
@@ -261,21 +284,33 @@ class GraphRNNModel(OpenChemModel):
             node_pred = self.node_mlp(h)
 
         y_pred = self.edge_rnn(output_x, pack=True, input_len=output_y_len)
-        if self.num_edge_classes == 2:
-            y_pred = torch.sigmoid(y_pred)
+        # if self.num_edge_classes == 2:
+        #     y_pred = torch.sigmoid(y_pred)
 
         # clean
-        y_pred = pack_padded_sequence(y_pred, output_y_len, batch_first=True)
-        y_pred = pad_packed_sequence(y_pred, batch_first=True)[0]
-        output_y = pack_padded_sequence(output_y, output_y_len,
-                                        batch_first=True)
-        output_y = pad_packed_sequence(output_y, batch_first=True)[0]
+        weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)
+        weights = pack_padded_sequence(weights, output_y_len, batch_first=True)
+        weights = pad_packed_sequence(weights, batch_first=True)[0]
+        # y_pred = pack_padded_sequence(y_pred, output_y_len, batch_first=True)
+        # y_pred = pad_packed_sequence(y_pred, batch_first=True)[0]
+        # output_y = pack_padded_sequence(output_y, output_y_len,
+        #                                 batch_first=True)
+        # output_y = pad_packed_sequence(output_y, batch_first=True)[0]
+
         # use cross entropy loss
         if self.num_edge_classes == 2:
-            loss_edges = F.binary_cross_entropy(y_pred, output_y)
+            # loss_edges = F.binary_cross_entropy(
+            #     y_pred, output_y.to(torch.float))
+            loss_edges = F.binary_cross_entropy_with_logits(
+                y_pred, output_y.to(torch.float), reduction='none')
+            n = weights.sum().clamp(min=1.)
+            loss_edges = (loss_edges * weights).sum() / n
         else:
-            loss_edges = F.cross_entropy(y_pred.view(-1, self.num_edge_classes),
-                                         output_y.view(-1))
+            loss_edges = F.cross_entropy(
+                y_pred.reshape(-1, self.num_edge_classes),
+                output_y.reshape(-1), reduction='none') / self.num_edge_classes
+            n = weights.sum().clamp(min=1.)
+            loss_edges = (loss_edges * weights.reshape(-1)).sum() / n
         if self.node_mlp is not None:
             loss_vertices = F.cross_entropy(node_pred, c_out)
             loss_vertices = loss_vertices / self.num_node_classes
