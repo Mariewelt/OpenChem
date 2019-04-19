@@ -16,22 +16,24 @@ from .graph_utils import bfs_seq, encode_adj
 class GraphDataset(Dataset):
     def __init__(self, get_atomic_attributes, node_attributes, filename,
                  cols_to_read, delimiter=',', get_bond_attributes=None,
-                 edge_attributes=None, **kwargs):
+                 edge_attributes=None,
+                 restrict_min_atoms = -1, restrict_max_atoms = -1,
+                 **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
         data_set = read_smiles_property_file(filename, cols_to_read,
                                              delimiter)
         data = data_set[0]
         target = data_set[1:]
-        clean_smiles, clean_idx = sanitize_smiles(data)
+        clean_smiles, clean_idx, num_atoms = sanitize_smiles(
+            data,
+            min_atoms=restrict_min_atoms,
+            max_atoms=restrict_max_atoms,
+            return_num_atoms=True
+        )
+        max_size = max(num_atoms)
+        self.num_atoms_all = num_atoms
         target = np.array(target).T
-        max_size = 0
-        self.num_atoms_all = []
-        for sm in clean_smiles:
-            mol = Chem.MolFromSmiles(sm)
-            num_atoms = mol.GetNumAtoms()
-            max_size = max(max_size, num_atoms)
-            self.num_atoms_all.append(num_atoms)
         self.target = target[clean_idx, :]
         self.graphs = []
         self.node_feature_matrix = []

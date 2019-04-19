@@ -125,7 +125,8 @@ def main():
             elif args.mode == 'eval' or args.mode == 'infer':
                 if os.path.isdir(logdir) and os.listdir(logdir) != []:
                     checkpoint = get_latest_checkpoint(ckpt_dir)
-                    if checkpoint is None:
+                    if checkpoint is None and \
+                            not "from_original" in model_config.keys():
                         raise IOError(
                             "There is no model checkpoint in the "
                             "{} directory. Can't load model".format(
@@ -239,7 +240,8 @@ def main():
                                         )
     else:
         model = DataParallel(model)
-    if args.continue_learning or args.mode in ['eval', 'infer']:
+    if args.continue_learning or args.mode in ['eval', 'infer'] \
+            and not "from_original" in model_config.keys():
         print("=> loading model  pre-trained model")
         weights = torch.load(checkpoint)
         model.load_state_dict(weights)
@@ -256,8 +258,10 @@ def main():
         evaluate(model, val_loader, criterion)
     elif args.mode == "infer":
         model.eval()
+        smiles = []
         with torch.no_grad():
-            smiles = model.forward(None)
+            for _ in range(30):
+                smiles.extend(model.forward(None))
 
         path = os.path.join(logdir, "debug_smiles.txt")
         with open(path, "w") as f:

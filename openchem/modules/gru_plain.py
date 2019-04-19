@@ -46,13 +46,13 @@ class GRUPlain(nn.Module):
                     param, gain=nn.init.calculate_gain('sigmoid'))
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                m.weight.data = init.xavier_uniform_(
-                    m.weight.data, gain=nn.init.calculate_gain('relu'))
+                init.xavier_uniform_(
+                    m.weight, gain=nn.init.calculate_gain('relu'))
 
     def init_hidden(self, batch_size):
         return torch.zeros(self.num_layers,
                            batch_size,
-                           self.hidden_size, requires_grad=True).cuda()
+                           self.hidden_size).cuda()
 
     def forward(self, input_raw, pack=False, input_len=None,
                 return_output_raw=False):

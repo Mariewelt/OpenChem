@@ -60,7 +60,9 @@ def create_loader(dataset, batch_size, shuffle=True, num_workers=1,
     return data_loader
 
 
-def sanitize_smiles(smiles, canonize=True):
+def sanitize_smiles(smiles, canonize=True,
+                    min_atoms=-1, max_atoms=-1,
+                    return_num_atoms=False):
     """
     Takes list of SMILES strings and returns list of their sanitized versions.
     For definition of sanitized SMILES check
@@ -78,21 +80,33 @@ def sanitize_smiles(smiles, canonize=True):
     """
     new_smiles = []
     idx = []
+    num_atoms = []
     for i in range(len(smiles)):
         sm = smiles[i]
         try:
+            mol = Chem.MolFromSmiles(sm, sanitize=False)
+            n = mol.GetNumAtoms()
+            if (n < min_atoms or n > max_atoms) \
+                    and min_atoms > -1 and max_atoms > -1:
+                continue
+
             if canonize:
                 new_smiles.append(
-                    Chem.MolToSmiles(Chem.MolFromSmiles(sm, sanitize=False))
+                    Chem.MolToSmiles(mol)
                 )
                 idx.append(i)
+                num_atoms.append(n)
             else:
                 new_smiles.append(sm)
                 idx.append(i)
+                num_atoms.append(n)
         except: 
             warnings.warn('Unsanitized SMILES string: ' + sm)
             new_smiles.append('')
-    return new_smiles, idx
+    if return_num_atoms:
+        return new_smiles, idx, num_atoms
+    else:
+        return new_smiles, idx
 
 
 def canonize_smiles(smiles, sanitize=True):

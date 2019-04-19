@@ -4,7 +4,10 @@ Extended GraphRNN model that supports edge and node class prediction
 """
 
 import numpy as np
+import networkx as nx
 import torch
+from collections import OrderedDict
+
 from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from torch.nn import functional as F
 
@@ -50,6 +53,10 @@ class GraphRNNModel(OpenChemModel):
         EdgeRNN = params["EdgeRNN"]
         edge_rnn_params = params["edge_rnn_params"]
         self.edge_rnn = EdgeRNN(**edge_rnn_params)
+
+        if "from_original" in params.keys():
+            paths = params["from_original"]
+            self.load_from_original_checkpoint(paths)
 
     def cast_inputs(self, batch):
 
@@ -117,7 +124,7 @@ class GraphRNNModel(OpenChemModel):
             for j in range(min(self.max_prev_nodes, i + 1)):
                 output_y_pred_step = self.edge_rnn(output_x_step)
                 if self.num_edge_classes == 2:
-                    output_y_pred_step = F.sigmoid(output_y_pred_step)
+                    output_y_pred_step = torch.sigmoid(output_y_pred_step)
                     output_x_step = torch.bernoulli(output_y_pred_step)
                 else:
                     output_y_pred_step = F.softmax(output_y_pred_step, dim=-1)
@@ -131,8 +138,13 @@ class GraphRNNModel(OpenChemModel):
 
         smiles = []
         for i in range(batch_size):
-            adj_pred = decode_adj(y_pred_long[i].to('cpu').numpy())
-            num_nodes = len(adj_pred)
+            adj = decode_adj(y_pred_long[i].to('cpu').numpy())
+            adj = adj[~np.all(adj == 0, axis=1)]
+            adj = adj[:, ~np.all(adj == 0, axis=0)]
+
+            G = nx.from_numpy_matrix(adj)
+
+            num_nodes = len(adj)
 
             start_c = self.start_node_label
             start_atom = self.label2atom[start_c]
@@ -142,7 +154,17 @@ class GraphRNNModel(OpenChemModel):
                 atom = self.label2atom[c]
                 node_list.append(atom)
 
-            sstring = SmilesFromGraphs(node_list, adj_pred)
+            for inode, label in enumerate(node_list):
+                G.add_node(inode, label=label)
+
+            G = max(nx.connected_component_subgraphs(G), key=len)
+            G = nx.convert_node_labels_to_integers(G)
+
+            node_list = nx.get_node_attributes(G, 'label')
+            adj = nx.adj_matrix(G)
+            adj = np.array(adj.todense()).astype(int)
+
+            sstring = SmilesFromGraphs(node_list, adj)
             smiles.append(sstring)
 
         return smiles
@@ -240,7 +262,7 @@ class GraphRNNModel(OpenChemModel):
 
         y_pred = self.edge_rnn(output_x, pack=True, input_len=output_y_len)
         if self.num_edge_classes == 2:
-            y_pred = F.sigmoid(y_pred)
+            y_pred = torch.sigmoid(y_pred)
 
         # clean
         y_pred = pack_padded_sequence(y_pred, output_y_len, batch_first=True)
@@ -262,3 +284,37 @@ class GraphRNNModel(OpenChemModel):
             loss = loss_edges
 
         return loss
+
+    def load_from_original_checkpoint(self, paths):
+        prefix_mapping = OrderedDict({
+            "lstm.": "node_rnn.",
+            "output.": "edge_rnn.",
+            "classes_emb.": "node_emb.embedding.",
+            "classes.deterministic_output.0": "node_mlp.layers.0",
+            "classes.deterministic_output.2": "node_mlp.layers.1"
+        })
+        params_old = OrderedDict()
+        for path in paths:
+            params = torch.load(path)
+            prefix = None
+            for p in ["lstm", "output", "classes", "classes_emb"]:
+                if p in path:
+                    prefix = p
+            assert prefix is not None
+            params = {prefix + "." + k: v for k, v in params.items()}
+            params_old.update(params)
+
+        params_new = OrderedDict()
+        for k, v in params_old.items():
+            kn = None
+            for po, pn in prefix_mapping.items():
+                if k.startswith(po):
+                    kn = pn + k[len(po):]
+            if kn is None:
+                raise AttributeError("Failed to map old key {}".format(k))
+            params_new[kn] = v
+        if len(params_new) != len(self.state_dict()):
+            raise AttributeError("Incomplete mapping of old to new keys")
+
+        self.load_state_dict(params_new)
+        print("Successfully  loaded snapshot from original codebase!")

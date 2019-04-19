@@ -6,7 +6,7 @@ from openchem.utils.graph import Attribute
 from openchem.data.graph_data_layer import BFSGraphDataset
 from openchem.models.GraphRNN import GraphRNNModel
 from openchem.modules.embeddings.basic_embedding import Embedding
-from openchem.modules.mlp.openchem_mlp import OpenChemMLP
+from openchem.modules.mlp.openchem_mlp import OpenChemMLPSimple
 from openchem.utils.utils import identity
 from openchem.modules.gru_plain import GRUPlain
 
@@ -68,6 +68,8 @@ train_dataset = BFSGraphDataset(
     original_start_node_label=original_start_node_label,
     edge_relabel_map=edge_relabel_map,
     # node_relabel_map=node_relabel_map,
+    restrict_min_atoms=10,
+    restrict_max_atoms=100
 )
 
 num_edge_classes = train_dataset.num_edge_classes
@@ -102,17 +104,28 @@ class DummyCriterion(object):
         return self
 
 
+original_model_path = "logs/graphrnn_original_checkpoints/" + \
+    "GraphRNN_RNN_my_molecules_big_4_128_{}_3000.dat"
+
+
 model = GraphRNNModel
 model_params = {
+    # uncomment this to load the model from original codebase snapshot
+    # "from_original": [
+    #     original_model_path.format("lstm"),
+    #     original_model_path.format("output"),
+    #     original_model_path.format("classes"),
+    #     original_model_path.format("classes_emb"),
+    # ],
+    
     'task': 'graph_generation',
     'use_cuda': True,
     'random_seed': 5,
-    'use_clip_grad': True,
-    'max_grad_norm': 10.0,
+    'use_clip_grad': False,
     'batch_size': 32,
-    'num_epochs': 3000,
-    ########################################
+    'num_epochs': 250,
     'logdir': './logs/graphrnn_log',
+    # 'logdir': './logs/debug',
     'print_every': 1,
     'save_every': 5,
     'train_data_layer': train_dataset,
@@ -128,7 +141,7 @@ model_params = {
         },
     'lr_scheduler': MultiStepLR,
     'lr_scheduler_params': {
-        'milestones': [400, 1000],
+        'milestones': [1, 3, 300, 400, 450],
         'gamma': 0.3
     },
 
@@ -151,12 +164,13 @@ model_params = {
         embedding_dim=node_embedding_dim
     ),
 
-    'NodeMLP': OpenChemMLP,
+    'NodeMLP': OpenChemMLPSimple,
     'node_mlp_params': dict(
         input_size=node_rnn_hidden_size,
         n_layers=2,
         hidden_size=[64, num_node_classes],
         activation=[nn.ReLU(inplace=True), identity],
+        init="xavier_uniform"
     ),
 
     # TODO: reconsider these params
