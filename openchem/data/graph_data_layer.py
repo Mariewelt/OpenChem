@@ -21,7 +21,7 @@ class GraphDataset(Dataset):
                  **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
-        data = read_smiles_property_file(filename, cols_to_read,
+        data_set = read_smiles_property_file(filename, cols_to_read,
                                              delimiter)
         data = data_set[0]
         target = data_set[1:]
@@ -43,6 +43,7 @@ class GraphDataset(Dataset):
                           get_bond_attributes)
             self.node_feature_matrix.append(
                 graph.get_node_feature_matrix(node_attributes, max_size))
+            # TODO: remove diagonal elements from adjacency matrix
             if get_bond_attributes is None:
                 self.adj_matrix.append(graph.adj_matrix)
             else:
@@ -126,7 +127,7 @@ class BFSGraphDataset(GraphDataset):
         # here zeros are padded for small graph
         y = np.zeros((self.max_num_nodes, self.max_prev_nodes), dtype="float32")
         c_in = np.zeros(self.max_num_nodes, dtype="int")
-        c_out = np.zeros(self.max_num_nodes, dtype="int")
+        c_out = -1 * np.ones(self.max_num_nodes, dtype="int")
         if self.random_order:
             order = np.random.permutation(num_nodes)
             adj = adj[np.ix_(order, order)]

@@ -312,7 +312,8 @@ class GraphRNNModel(OpenChemModel):
             n = weights.sum().clamp(min=1.)
             loss_edges = (loss_edges * weights.reshape(-1)).sum() / n
         if self.node_mlp is not None:
-            loss_vertices = F.cross_entropy(node_pred, c_out)
+            loss_vertices = F.cross_entropy(node_pred, c_out,
+                                            ignore_index=-1)
             loss_vertices = loss_vertices / self.num_node_classes
             loss = loss_edges + loss_vertices
         else:
