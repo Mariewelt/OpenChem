@@ -108,6 +108,7 @@ class Graph:
                 edge_attr_adj_matrix = np.zeros((max_size, max_size, attr_len))
                 fl = False
             edge_attr_adj_matrix[begin, end, :] = cur_features
+            edge_attr_adj_matrix[end, begin, :] = cur_features
         
         return edge_attr_adj_matrix
    
