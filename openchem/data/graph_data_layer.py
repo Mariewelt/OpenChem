@@ -99,8 +99,9 @@ class BFSGraphDataset(GraphDataset):
             raise NotImplementedError()
         else:
             self.edge_relabel_map = kwargs["edge_relabel_map"]
-        self.inverse_edge_relabel_map = {i: v for v, i in
-                                         self.edge_relabel_map.items()}
+        self.inverse_edge_relabel_map = {
+            i: v for v, i in
+            sorted(self.edge_relabel_map.items(), reverse=True)}
 
         self.num_node_classes = len(self.inverse_node_relabel_map)
         self.num_edge_classes = len(self.inverse_edge_relabel_map)
@@ -108,6 +109,7 @@ class BFSGraphDataset(GraphDataset):
     def __getitem__(self, index):
         num_nodes = self.num_atoms_all[index]
         adj_original = self.adj_matrix[index]
+        adj_original = adj_original.reshape(adj_original.shape[:2])
         adj = np.zeros_like(adj_original)
         for v, i in self.edge_relabel_map.items():
             adj[adj_original == v] = i
