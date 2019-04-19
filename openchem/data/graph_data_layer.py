@@ -5,8 +5,6 @@ import networkx as nx
 
 from openchem.utils.graph import Graph
 
-from rdkit import Chem
-
 from torch.utils.data import Dataset
 from openchem.data.utils import read_smiles_property_file, sanitize_smiles
 
@@ -31,34 +29,41 @@ class GraphDataset(Dataset):
             max_atoms=restrict_max_atoms,
             return_num_atoms=True
         )
-        max_size = max(num_atoms)
-        self.num_atoms_all = num_atoms
         target = np.array(target).T
+
         self.target = target[clean_idx, :]
-        self.graphs = []
-        self.node_feature_matrix = []
-        self.adj_matrix = []
-        for sm in clean_smiles:
-            graph = Graph(sm, max_size, get_atomic_attributes,
-                          get_bond_attributes)
-            self.node_feature_matrix.append(
-                graph.get_node_feature_matrix(node_attributes, max_size))
-            # TODO: remove diagonal elements from adjacency matrix
-            if get_bond_attributes is None:
-                self.adj_matrix.append(graph.adj_matrix)
-            else:
-                self.adj_matrix.append(
-                    graph.get_edge_attr_adj_matrix(edge_attributes, max_size)
-                )
-        self.num_features = self.node_feature_matrix[0].shape[1]
+        self.smiles = clean_smiles
+
+        self.max_size = max(num_atoms)
+        self.num_atoms_all = num_atoms
+
+        self.node_attributes = node_attributes
+        self.edge_attributes = edge_attributes
+        self.get_atomic_attributes = get_atomic_attributes
+        self.get_bond_attributes = get_bond_attributes
 
     def __len__(self):
         return len(self.target)
 
     def __getitem__(self, index):
-        sample = {'adj_matrix': self.adj_matrix[index].astype('float32'),
+        sm = self.smiles[index]
+
+        graph = Graph(
+            sm, self.max_size, self.get_atomic_attributes,
+            self.get_bond_attributes)
+        node_feature_matrix = graph.get_node_feature_matrix(
+            self.node_attributes, self.max_size)
+
+        # TODO: remove diagonal elements from adjacency matrix
+        if self.get_bond_attributes is None:
+            adj_matrix = graph.adj_matrix
+        else:
+            adj_matrix = graph.get_edge_attr_adj_matrix(
+                self.edge_attributes, self.max_size)
+
+        sample = {'adj_matrix': adj_matrix.astype('float32'),
                   'node_feature_matrix':
-                      self.node_feature_matrix[index].astype('float32'),
+                      node_feature_matrix.astype('float32'),
                   'labels': self.target[index].astype('float32')}
         return sample
 
@@ -75,15 +80,20 @@ class BFSGraphDataset(GraphDataset):
 
         if "node_relabel_map" not in kwargs:
             # define relabelling from Periodic Table numbers to {0, 1, ...}
-            original_labels = np.concatenate(
-                [n.flatten() for n in self.node_feature_matrix],
-                axis=0
-            )
-            # remove paddings
-            original_labels = original_labels[original_labels != 0]
-            unique_labels = np.unique(original_labels)
+            unique_labels = set()
+            for index in range(len(self)):
+                sample = super(BFSGraphDataset, self).__getitem__(index)
+                node_feature_matrix = sample['node_feature_matrix']
+                adj_matrix = sample['adj_matrix']
+
+                labels = set(node_feature_matrix.flatten().tolist())
+                unique_labels.update(labels)
+
+            # discard 0 padding
+            unique_labels.discard(0)
+
             self.node_relabel_map = {
-                v: i for i, v in enumerate(unique_labels)
+                v: i for i, v in enumerate(sorted(unique_labels))
             }
         else:
             self.node_relabel_map = kwargs["node_relabel_map"]
@@ -108,14 +118,16 @@ class BFSGraphDataset(GraphDataset):
         self.num_edge_classes = len(self.inverse_edge_relabel_map)
 
     def __getitem__(self, index):
+        sample = super(BFSGraphDataset, self).__getitem__(index)
+        adj_original = sample['adj_matrix']
+        node_feature_matrix = sample['node_feature_matrix']
         num_nodes = self.num_atoms_all[index]
-        adj_original = self.adj_matrix[index]
+
         adj_original = adj_original.reshape(adj_original.shape[:2])
         adj = np.zeros_like(adj_original)
         for v, i in self.edge_relabel_map.items():
             adj[adj_original == v] = i
 
-        node_feature_matrix = self.node_feature_matrix[index]
         labels = np.array(
             [self.node_relabel_map[v] if v != 0 else 0
              for v in node_feature_matrix.flatten()])

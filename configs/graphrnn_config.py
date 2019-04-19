@@ -75,10 +75,13 @@ edge_attributes = dict(
 
 train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
-    './benchmark_datasets/logp_dataset/logP_labels.csv',
+    # './benchmark_datasets/logp_dataset/logP_labels.csv',
+    # cols_to_read=[1, 2],
+    './benchmark_datasets/chembl_small/small_chembl.smi',
+    cols_to_read=[0, 1],
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
-    delimiter=',', cols_to_read=[1, 2],
+    delimiter=',',
     random_order=True, max_prev_nodes=max_prev_nodes,
     original_start_node_label=original_start_node_label,
     edge_relabel_map=edge_relabel_map,

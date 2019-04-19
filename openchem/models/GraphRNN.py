@@ -13,6 +13,7 @@ from torch.nn import functional as F
 
 from .openchem_model import OpenChemModel
 from openchem.data.graph_utils import decode_adj, SmilesFromGraphs
+from openchem.data.utils import sanitize_smiles
 
 
 class GraphRNNModel(OpenChemModel):
@@ -181,6 +182,8 @@ class GraphRNNModel(OpenChemModel):
 
             sstring = SmilesFromGraphs(node_list, adj_out)
             smiles.append(sstring)
+
+        smiles, _ = sanitize_smiles(smiles)
 
         return smiles
 
