@@ -159,6 +159,9 @@ class BFSGraphDataset(GraphDataset):
         adj = adj[np.ix_(order, order)]
         labels = labels[order]
 
+        ii, jj = np.where(adj)
+        max_prev_nodes_local = np.abs(ii - jj).max()
+
         # TODO: is copy needed here?
         adj_encoded = encode_adj(adj.copy(), max_prev_node=self.max_prev_nodes)
         # get x and y and adj
@@ -170,4 +173,5 @@ class BFSGraphDataset(GraphDataset):
         c_in[0:adj_encoded.shape[0] + 1] = labels
         c_out[0:adj_encoded.shape[0]] = labels[1:]
         return {'x': x, 'y': y, 'num_nodes': num_nodes,
-                'c_in': c_in, 'c_out': c_out}
+                'c_in': c_in, 'c_out': c_out,
+                'max_prev_nodes_local': max_prev_nodes_local}
