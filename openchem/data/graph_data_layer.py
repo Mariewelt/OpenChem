@@ -2,6 +2,7 @@
 
 import numpy as np
 import networkx as nx
+import pickle
 
 from openchem.utils.graph import Graph
 
@@ -19,23 +20,30 @@ class GraphDataset(Dataset):
                  **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
-        data_set = read_smiles_property_file(filename, cols_to_read,
-                                             delimiter)
-        data = data_set[0]
-        target = data_set[1:]
-        clean_smiles, clean_idx, num_atoms = sanitize_smiles(
-            data,
-            min_atoms=restrict_min_atoms,
-            max_atoms=restrict_max_atoms,
-            return_num_atoms=True
-        )
-        target = np.array(target).T
 
-        self.target = target[clean_idx, :]
-        self.smiles = clean_smiles
+        if "pickled" in kwargs:
+            data = pickle.load(open(kwargs["pickled"], "rb"))
+            self.num_atoms_all = data["num_atoms_all"]
+            self.target = data["target"]
+            self.smiles = data["smiles"]
+        else:
+            data_set = read_smiles_property_file(filename, cols_to_read,
+                                                 delimiter)
+            data = data_set[0]
+            target = data_set[1:]
+            clean_smiles, clean_idx, num_atoms = sanitize_smiles(
+                data,
+                min_atoms=restrict_min_atoms,
+                max_atoms=restrict_max_atoms,
+                return_num_atoms=True
+            )
+            target = np.asarray(target, dtype=np.float).T
 
-        self.max_size = max(num_atoms)
-        self.num_atoms_all = num_atoms
+            self.target = target[clean_idx, :]
+            self.smiles = clean_smiles
+            self.num_atoms_all = num_atoms
+
+        self.max_size = max(self.num_atoms_all)
 
         self.node_attributes = node_attributes
         self.edge_attributes = edge_attributes

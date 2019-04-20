@@ -79,6 +79,10 @@ train_dataset = BFSGraphDataset(
     # cols_to_read=[1, 2],
     './benchmark_datasets/chembl_small/small_chembl.smi',
     cols_to_read=[0, 1],
+    # 'benchmark_datasets/chembl_full/full_chembl.smi',
+    # cols_to_read=[0, 1],
+    # pickled='benchmark_datasets/chembl_full/' +
+    #         'full_chembl_graph_dataset_fields.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',

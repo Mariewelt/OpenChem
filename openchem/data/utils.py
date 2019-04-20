@@ -233,16 +233,14 @@ def time_since(since):
 def read_smiles_property_file(path, cols_to_read, delimiter=',',
                               keep_header=False):
     reader = csv.reader(open(path, 'r'), delimiter=delimiter)
-    data_full = np.array(list(reader))
+    data = list(reader)
     if keep_header:
         start_position = 0
     else:
         start_position = 1
-    assert len(data_full) > start_position
-    data = [[] for _ in range(len(cols_to_read))]
-    for i in range(len(cols_to_read)):
-        col = cols_to_read[i]
-        data[i] = data_full[start_position:, col]
+    assert len(data) > start_position
+    data = list(zip(*data))
+    data = [list(d) for c, d in enumerate(data) if c in cols_to_read]
 
     return data
 

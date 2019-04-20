@@ -184,6 +184,7 @@ class GraphRNNModel(OpenChemModel):
             smiles.append(sstring)
 
         smiles, _ = sanitize_smiles(smiles)
+        smiles = [s for s in smiles if len(s)]
 
         return smiles
 
