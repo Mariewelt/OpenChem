@@ -1,5 +1,6 @@
 # TODO: variable length batching
 
+import torch
 import numpy as np
 import networkx as nx
 import pickle
@@ -27,8 +28,6 @@ class GraphDataset(Dataset):
             self.num_atoms_all = data["num_atoms_all"]
             self.target = data["target"]
             self.smiles = data["smiles"]
-
-            print("===========================================", len(self))
         else:
             data_set = read_smiles_property_file(filename, cols_to_read,
                                                  delimiter)
@@ -143,14 +142,6 @@ class BFSGraphDataset(GraphDataset):
             [self.node_relabel_map[v] if v != 0 else 0
              for v in node_feature_matrix.flatten()])
 
-        # here zeros are padded for small graph
-        x = np.zeros((self.max_num_nodes, self.max_prev_nodes), dtype="float32")
-        # TODO: is 1 a correct number?
-        x[0, :] = 1  # the first input token is all ones
-        # here zeros are padded for small graph
-        y = np.zeros((self.max_num_nodes, self.max_prev_nodes), dtype="float32")
-        c_in = np.zeros(self.max_num_nodes, dtype="int")
-        c_out = -1 * np.ones(self.max_num_nodes, dtype="int")
         if self.random_order:
             order = np.random.permutation(num_nodes)
             adj = adj[np.ix_(order, order)]
@@ -175,21 +166,23 @@ class BFSGraphDataset(GraphDataset):
 
         # TODO: is copy needed here?
         adj_encoded = encode_adj(adj.copy(), max_prev_node=self.max_prev_nodes)
-        # get x and y and adj
-        # for small graph the rest are zero padded
-        y[0:adj_encoded.shape[0], :] = adj_encoded
-        x[1:adj_encoded.shape[0] + 1, :] = adj_encoded
-        # Important: first node must be fixed to specific label
-        #  when training with vertex labels
-        c_in[0:adj_encoded.shape[0] + 1] = labels
-        c_out[0:adj_encoded.shape[0]] = labels[1:]
 
-        set_nodes = set(self.inverse_node_relabel_map.keys())
-        set_edges = set(self.inverse_edge_relabel_map.keys())
-        assert set(np.unique(adj_encoded.astype('int')).tolist()).issubset(
-            set_edges), "Bad edge values set in sample {:d}".format(index)
-        assert set(np.unique(labels.astype('int')).tolist()).issubset(
-            set_nodes), "Bad node values set in sample {:d}".format(index)
+        adj_encoded = torch.tensor(adj_encoded, dtype=torch.float)
+        labels = torch.tensor(labels, dtype=torch.long)
+
+        x = torch.zeros((self.max_num_nodes, self.max_prev_nodes),
+                        dtype=torch.float)
+        # TODO: the first input token is all ones?
+        x[0, :] = 1.
+        y = torch.zeros((self.max_num_nodes, self.max_prev_nodes),
+                        dtype=torch.long)
+        c_in = torch.zeros(self.max_num_nodes, dtype=torch.long)
+        c_out = -1 * torch.ones(self.max_num_nodes, dtype=torch.long)
+
+        y[:num_nodes-1, :] = adj_encoded.to(dtype=torch.long)
+        x[1:num_nodes, :] = adj_encoded
+        c_in[:num_nodes] = labels
+        c_out[:num_nodes-1] = labels[1:]
 
         return {'x': x, 'y': y, 'num_nodes': num_nodes,
                 'c_in': c_in, 'c_out': c_out,

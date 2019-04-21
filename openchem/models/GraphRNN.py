@@ -65,12 +65,11 @@ class GraphRNNModel(OpenChemModel):
         device = torch.device('cpu')
 
         batch_input = dict(
-            x=torch.tensor(batch["x"], dtype=torch.float, device=device),
-            y=torch.tensor(batch["y"], dtype=torch.long, device=device),
-            c_in=torch.tensor(batch["c_in"], dtype=torch.long, device=device),
-            c_out=torch.tensor(batch["c_out"], dtype=torch.long, device=device),
-            num_nodes=torch.tensor(batch["num_nodes"], dtype=torch.long,
-                                   device=device),
+            x=batch["x"].to(device=device),
+            y=batch["y"].to(device=device),
+            c_in=batch["c_in"].to(device=device),
+            c_out=batch["c_out"].to(device=device),
+            num_nodes=batch["num_nodes"].to(device=device),
         )
         batch_target = None
 

@@ -89,12 +89,12 @@ train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
     # './benchmark_datasets/logp_dataset/logP_labels.csv',
     # cols_to_read=[1, 2],
-    './benchmark_datasets/chembl_small/small_chembl.smi',
-    cols_to_read=[0, 1],
-    # 'benchmark_datasets/chembl_full/full_chembl.smi',
+    # './benchmark_datasets/chembl_small/small_chembl.smi',
     # cols_to_read=[0, 1],
-    # pickled='benchmark_datasets/chembl_full/' +
-    #         'full_chembl_cleaned.pkl',
+    'benchmark_datasets/chembl_full/full_chembl.smi',
+    cols_to_read=[0, 1],
+    pickled='benchmark_datasets/chembl_full/' +
+            'full_chembl_cleaned.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',
