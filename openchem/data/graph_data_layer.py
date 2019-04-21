@@ -21,6 +21,8 @@ class GraphDataset(Dataset):
                  **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
+        self.restrict_min_atoms = restrict_min_atoms
+        self.restrict_max_atoms = restrict_max_atoms
 
         if "pickled" in kwargs:
             data = pickle.load(open(kwargs["pickled"], "rb"))
@@ -94,6 +96,13 @@ class BFSGraphDataset(GraphDataset):
         self.max_prev_nodes = kwargs["max_prev_nodes"]
         self.num_edge_classes = kwargs
         self.max_num_nodes = max(self.num_atoms_all)
+        assert self.max_num_nodes == self.restrict_max_atoms or \
+            self.restrict_max_atoms < 0, \
+            "restrict_max_atoms number is too high: " + \
+            "maximum number of nodes in molecules is {:d}".format(
+                self.max_num_nodes
+            )
+
         original_start_node_label = kwargs.get(
             "original_start_node_label", None)
 

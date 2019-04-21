@@ -85,6 +85,8 @@ edge_attributes = dict(
     bond_type=Attribute('edge', 'bond_type', one_hot=False)
 )
 
+restrict_min_atoms = 10
+restrict_max_atoms = 100
 train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
     # './benchmark_datasets/logp_dataset/logP_labels.csv',
@@ -102,8 +104,8 @@ train_dataset = BFSGraphDataset(
     original_start_node_label=original_start_node_label,
     edge_relabel_map=edge_relabel_map,
     node_relabel_map=node_relabel_map,
-    restrict_min_atoms=10,
-    restrict_max_atoms=100
+    restrict_min_atoms=restrict_min_atoms,
+    restrict_max_atoms=restrict_max_atoms
 )
 
 num_edge_classes = train_dataset.num_edge_classes
@@ -187,6 +189,8 @@ model_params = {
     'max_prev_nodes': max_prev_nodes,
     'label2atom': label2atom,
     'edge2type': edge2type,
+    "restrict_min_atoms": restrict_min_atoms,
+    "restrict_max_atoms": restrict_max_atoms,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(

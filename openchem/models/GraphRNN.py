@@ -27,6 +27,8 @@ class GraphRNNModel(OpenChemModel):
         self.max_prev_nodes = params["max_prev_nodes"]
         self.label2atom = params["label2atom"]
         self.edge2type = params["edge2type"]
+        self.restrict_min_atoms = params["restrict_min_atoms"]
+        self.restrict_max_atoms = params["restrict_max_atoms"]
 
         if self.num_edge_classes > 2:
             EdgeEmbedding = params["EdgeEmbedding"]
@@ -166,24 +168,27 @@ class GraphRNNModel(OpenChemModel):
             for inode, label in enumerate(node_list):
                 G.add_node(inode, label=label)
 
-            G = max(nx.connected_component_subgraphs(G), key=len)
-            G = nx.convert_node_labels_to_integers(G)
+            Gs = nx.connected_component_subgraphs(G)
+            for G in Gs:
+                G = nx.convert_node_labels_to_integers(G)
 
-            node_list = nx.get_node_attributes(G, 'label')
-            adj = nx.adj_matrix(G)
-            adj = np.array(adj.todense()).astype(int)
+                node_list = nx.get_node_attributes(G, 'label')
+                adj = nx.adj_matrix(G)
+                adj = np.array(adj.todense()).astype(int)
 
-            if self.num_edge_classes > 2:
-                adj_out = np.zeros(adj.shape)
-                for e, t in enumerate(self.edge2type):
-                    adj_out[adj == e] = t
-            else:
-                adj_out = adj
+                if self.num_edge_classes > 2:
+                    adj_out = np.zeros(adj.shape)
+                    for e, t in enumerate(self.edge2type):
+                        adj_out[adj == e] = t
+                else:
+                    adj_out = adj
 
-            sstring = SmilesFromGraphs(node_list, adj_out)
-            smiles.append(sstring)
+                sstring = SmilesFromGraphs(node_list, adj_out)
+                smiles.append(sstring)
 
-        smiles, _ = sanitize_smiles(smiles)
+        smiles, _ = sanitize_smiles(smiles,
+                                    min_atoms=self.restrict_min_atoms,
+                                    max_atoms=self.restrict_max_atoms)
         smiles = [s for s in smiles if len(s)]
 
         return smiles
