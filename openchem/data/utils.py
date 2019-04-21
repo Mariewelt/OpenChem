@@ -86,8 +86,8 @@ def sanitize_smiles(smiles, canonize=True,
         try:
             mol = Chem.MolFromSmiles(sm, sanitize=True)
             n = mol.GetNumAtoms()
-            if (n < min_atoms or n > max_atoms) \
-                    and min_atoms > -1 and max_atoms > -1:
+            if (n < min_atoms and min_atoms > -1) or \
+                    (n > max_atoms > -1):
                 continue
 
             if canonize:
