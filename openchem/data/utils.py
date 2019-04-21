@@ -239,8 +239,8 @@ def read_smiles_property_file(path, cols_to_read, delimiter=',',
     else:
         start_position = 1
     assert len(data) > start_position
-    data = list(zip(*data))
-    data = [list(d) for c, d in enumerate(data) if c in cols_to_read]
+    data = map(list, zip(*data))
+    data = [d for c, d in enumerate(data) if c in cols_to_read]
 
     return data
 

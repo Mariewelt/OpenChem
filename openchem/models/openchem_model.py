@@ -153,20 +153,43 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
     for epoch in range(cur_epoch, n_epochs + cur_epoch):
         for i_batch, sample_batched in enumerate(train_loader):
 
+            if ((i_batch % 1000) == 0) or (i_batch > (len(train_loader) - 30)):
+                print("Epoch={:d} | entered iteration={:d}/{:d}".format(
+                    epoch + 1, i_batch + 1,
+                    len(train_loader)
+                ))
+
             if has_module:
                 batch_input, batch_target = model.module.cast_inputs(sample_batched)
             else:
                 batch_input, batch_target = model.cast_inputs(sample_batched)
             loss = train_step(model, optimizer, criterion,
                               batch_input, batch_target)
+
+            if ((i_batch % 1000) == 0) or (i_batch > (len(train_loader) - 30)):
+                print("Epoch={:d} | done forward iteration={:d}/{:d} | loss={:.4f}".format(
+                    epoch + 1, i_batch + 1,
+                    len(train_loader), loss.item()
+                ))
+
             if world_size > 1:
                 reduced_loss = reduce_tensor(loss, world_size)
             else:
                 reduced_loss = loss.clone()
             loss_total += reduced_loss.item()
             n_batches += 1
+
+            if ((i_batch % 1000) == 0) or (i_batch > (len(train_loader) - 30)):
+                print("Epoch={:d} | done iteration={:d}/{:d} | loss={:.4f}".format(
+                    epoch + 1, i_batch + 1,
+                    len(train_loader), reduced_loss.item()
+                ))
+
+
+
         cur_loss = loss_total / n_batches
         all_losses.append(cur_loss)
+        print("Done with epoch")
 
         if epoch % print_every == 0:
             if print_logs(world_size):

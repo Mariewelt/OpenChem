@@ -16,16 +16,19 @@ class GraphDataset(Dataset):
     def __init__(self, get_atomic_attributes, node_attributes, filename,
                  cols_to_read, delimiter=',', get_bond_attributes=None,
                  edge_attributes=None,
-                 restrict_min_atoms = -1, restrict_max_atoms = -1,
+                 restrict_min_atoms=-1, restrict_max_atoms=-1,
                  **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
 
         if "pickled" in kwargs:
             data = pickle.load(open(kwargs["pickled"], "rb"))
+
             self.num_atoms_all = data["num_atoms_all"]
             self.target = data["target"]
             self.smiles = data["smiles"]
+
+            print("===========================================", len(self))
         else:
             data_set = read_smiles_property_file(filename, cols_to_read,
                                                  delimiter)
@@ -180,6 +183,14 @@ class BFSGraphDataset(GraphDataset):
         #  when training with vertex labels
         c_in[0:adj_encoded.shape[0] + 1] = labels
         c_out[0:adj_encoded.shape[0]] = labels[1:]
+
+        set_nodes = set(self.inverse_node_relabel_map.keys())
+        set_edges = set(self.inverse_edge_relabel_map.keys())
+        assert set(np.unique(adj_encoded.astype('int')).tolist()).issubset(
+            set_edges), "Bad edge values set in sample {:d}".format(index)
+        assert set(np.unique(labels.astype('int')).tolist()).issubset(
+            set_nodes), "Bad node values set in sample {:d}".format(index)
+
         return {'x': x, 'y': y, 'num_nodes': num_nodes,
                 'c_in': c_in, 'c_out': c_out,
                 'max_prev_nodes_local': max_prev_nodes_local}

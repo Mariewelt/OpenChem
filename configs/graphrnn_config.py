@@ -22,6 +22,18 @@ edge_relabel_map = {
     3.: 4
 }
 
+node_relabel_map = {
+    6.0: 0,
+    7.0: 1,
+    8.0: 2,
+    9.0: 3,
+    15.0: 4,
+    16.0: 5,
+    17.0: 6,
+    35.0: 7,
+    53.0: 8
+}
+
 # edge_relabel_map = {
 #     0.: 0,
 #     1.: 1,
@@ -82,14 +94,14 @@ train_dataset = BFSGraphDataset(
     # 'benchmark_datasets/chembl_full/full_chembl.smi',
     # cols_to_read=[0, 1],
     # pickled='benchmark_datasets/chembl_full/' +
-    #         'full_chembl_graph_dataset_fields.pkl',
+    #         'full_chembl_cleaned.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',
     random_order=True, max_prev_nodes=max_prev_nodes,
     original_start_node_label=original_start_node_label,
     edge_relabel_map=edge_relabel_map,
-    # node_relabel_map=node_relabel_map,
+    node_relabel_map=node_relabel_map,
     restrict_min_atoms=10,
     restrict_max_atoms=100
 )
@@ -143,11 +155,11 @@ model_params = {
     # ],
     
     'task': 'graph_generation',
-    'use_cuda': False,
-    'random_seed': 5,
+    'use_cuda': True,
+    'random_seed': 0,
     'use_clip_grad': False,
     'batch_size': 32,
-    'num_epochs': 250,
+    'num_epochs': 51,
     'logdir': './logs/graphrnn_log',
     # 'logdir': './logs/debug',
     'print_every': 1,
@@ -160,11 +172,11 @@ model_params = {
 
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.003,
+        'lr': 0.03,
         },
     'lr_scheduler': MultiStepLR,
     'lr_scheduler_params': {
-        'milestones': [1, 3, 300, 400, 450],
+        'milestones': [10, 30, 40, 45, 48],
         'gamma': 0.3
     },
 

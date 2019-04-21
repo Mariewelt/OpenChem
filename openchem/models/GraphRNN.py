@@ -110,7 +110,7 @@ class GraphRNNModel(OpenChemModel):
                 x_step = torch.cat([x_step, c_step], dim=2)
             h = self.node_rnn(x_step, return_output_raw=False)
             # output.hidden = h.permute(1,0,2)
-            self.edge_rnn.hidden = self.edge_rnn.init_hidden(h.size(0))
+            self.edge_rnn.hidden = self.edge_rnn.init_hidden(h.size(0), device)
             self.edge_rnn.hidden = torch.cat(
                 [h.permute(1, 0, 2), self.edge_rnn.hidden[1:]],
                 dim=0
@@ -203,7 +203,7 @@ class GraphRNNModel(OpenChemModel):
         c_out_unsorted = c_out_unsorted[:, 0:max_num_nodes]
 
         self.node_rnn.hidden = self.node_rnn.init_hidden(
-            batch_size=x_unsorted.size(0))
+            batch_size=x_unsorted.size(0), device=device)
 
         # sort input samples according to sequence lengths
         num_nodes, sort_index = torch.sort(
@@ -278,7 +278,7 @@ class GraphRNNModel(OpenChemModel):
         idx = torch.tensor(idx, dtype=torch.long, device=device)
         h = h.index_select(0, idx)
 
-        self.edge_rnn.hidden = self.edge_rnn.init_hidden(h.size(0))
+        self.edge_rnn.hidden = self.edge_rnn.init_hidden(h.size(0), device)
         self.edge_rnn.hidden = torch.cat(
             [h.unsqueeze(0), self.edge_rnn.hidden[1:]],
             dim=0

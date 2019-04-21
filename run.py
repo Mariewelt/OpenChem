@@ -41,7 +41,7 @@ def main():
                         help='number of data loading workers (default: 0)')
     parser.add_argument('--random_seed', default=0, type=int, metavar='N',
                         help='random_seed (default: 0)')
-    parser.add_argument("--local_rank", type=int, default=0)
+    parser.add_argument("--local_rank", type=int, default=-1)
 
     args, unknown = parser.parse_known_args()
 
@@ -233,7 +233,7 @@ def main():
     model = model_object(params=model_config)
 
     if args.use_cuda:
-        model = model.cuda()
+        model = model.to('cuda')
 
     if args.distributed:
         model = DistributedDataParallel(model, device_ids=[args.local_rank],

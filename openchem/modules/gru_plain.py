@@ -49,10 +49,10 @@ class GRUPlain(nn.Module):
                 init.xavier_uniform_(
                     m.weight, gain=nn.init.calculate_gain('relu'))
 
-    def init_hidden(self, batch_size):
+    def init_hidden(self, batch_size, device):
         return torch.zeros(self.num_layers,
                            batch_size,
-                           self.hidden_size).cuda()
+                           self.hidden_size, device=device)
 
     def forward(self, input_raw, pack=False, input_len=None,
                 return_output_raw=False):
