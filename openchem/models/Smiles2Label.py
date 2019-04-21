@@ -40,18 +40,21 @@ class Smiles2Label(OpenChemModel):
             self.eval()
         else:
             self.train()
-        embedded = self.Embedding(inp)
-        output, _ = self.Encoder(embedded)
+        input_tensor = inp[0]
+        input_length = inp[1]
+        embedded = self.Embedding(input_tensor)
+        output, _ = self.Encoder([embedded, input_length])
         output = self.MLP(output)
         return output
 
     def cast_inputs(self, sample):
-        batch_mols = torch.tensor(sample['tokenized_smiles'],
-                                  requires_grad=True).long()
+        batch_mols = torch.tensor(sample['tokenized_smiles']).long()
+        batch_length = torch.tensor(sample['length']).long()
         batch_labels = torch.tensor(sample['labels']).float()
         if self.task == 'classification':
             batch_labels = batch_labels.long()
         if self.use_cuda:
             batch_mols = batch_mols.cuda()
+            batch_length = batch_length.cuda()
             batch_labels = batch_labels.cuda()
-        return batch_mols, batch_labels
+        return (batch_mols, batch_length), batch_labels
