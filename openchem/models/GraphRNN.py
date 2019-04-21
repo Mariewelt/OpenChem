@@ -85,7 +85,7 @@ class GraphRNNModel(OpenChemModel):
         else:
             return self.forward_test()
 
-    def forward_test(self, batch_size=32):
+    def forward_test(self, batch_size=1024):
         device = torch.device("cuda")
 
         # TODO: where is this function called?
@@ -100,6 +100,7 @@ class GraphRNNModel(OpenChemModel):
         c_step = self.start_node_label * torch.ones(
             batch_size, 1, dtype=torch.long, device=device)
 
+        self.node_rnn.hidden = self.node_rnn.init_hidden(batch_size, device)
         for i in range(max_num_nodes):
             if self.edge_emb is not None:
                 x_step = self.edge_emb(
