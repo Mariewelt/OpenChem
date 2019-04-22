@@ -90,7 +90,7 @@ class GraphRNNModel(OpenChemModel):
     def forward_test(self, batch_size=1024):
         device = torch.device("cuda")
 
-        # TODO: where is this function called?
+        # TODO: handle float type for x_step in case of no node embedding
         max_num_nodes = int(self.max_num_nodes)
         y_pred_long = torch.zeros(
             batch_size, max_num_nodes, self.max_prev_nodes,
@@ -103,6 +103,9 @@ class GraphRNNModel(OpenChemModel):
             batch_size, 1, dtype=torch.long, device=device)
 
         self.node_rnn.hidden = self.node_rnn.init_hidden(batch_size, device)
+        # start generation from second vertex
+        prev_num = torch.ones(batch_size, device=device, dtype=torch.float)
+
         for i in range(max_num_nodes):
             if self.edge_emb is not None:
                 x_step = self.edge_emb(
@@ -118,7 +121,7 @@ class GraphRNNModel(OpenChemModel):
                 dim=0
             )
             x_step = torch.zeros(batch_size, 1, self.max_prev_nodes,
-                                 device=device)
+                                 device=device, dtype=torch.long)
             output_x_step = torch.ones(batch_size, 1, 1,
                                        device=device, dtype=torch.long)
             if self.node_mlp is not None:
@@ -142,10 +145,26 @@ class GraphRNNModel(OpenChemModel):
                     output_x_step = torch.multinomial(
                         output_y_pred_step.view(-1, self.num_edge_classes),
                         num_samples=1).view(-1, 1, 1)
-                x_step[:, :, j:j + 1] = output_x_step
+                valid_edge = (j < prev_num).to(dtype=x_step.dtype)
+                x_step[:, :, j:j + 1] = output_x_step * valid_edge.view(-1, 1, 1)
                 # edge rnn keeps the state from current state
 
             y_pred_long[:, i:i + 1, :] = x_step
+
+            # all zeros in x_step mean that the state is terminal
+            # zero out corresponding hidden states
+            not_terminal = (x_step.sum(dim=-1) > 0).to(
+                dtype=torch.float).view(-1)
+            self.node_rnn.hidden *= not_terminal.view(1, -1, 1)
+
+            prev_num = (prev_num * not_terminal) + 1
+
+            terminal = (1 - not_terminal).to(dtype=torch.uint8)
+            n_terminal = terminal.sum().item()
+            x_step[terminal] = torch.ones(n_terminal, 1, self.max_prev_nodes,
+                                          device=device, dtype=torch.long)
+            c_step[terminal] = self.start_node_label * torch.ones(
+                n_terminal, 1, dtype=torch.long, device=device)
 
         smiles = []
         for i in range(batch_size):
@@ -186,9 +205,11 @@ class GraphRNNModel(OpenChemModel):
                 sstring = SmilesFromGraphs(node_list, adj_out)
                 smiles.append(sstring)
 
-        smiles, _ = sanitize_smiles(smiles,
-                                    min_atoms=self.restrict_min_atoms,
-                                    max_atoms=self.restrict_max_atoms)
+        smiles, idx = sanitize_smiles(smiles,
+                                      min_atoms=self.restrict_min_atoms,
+                                      max_atoms=self.restrict_max_atoms)
+        print("Number of valid = {:d}".format(len(idx)))
+        print("Number of invalid = {:d}".format(len(smiles) - len(idx)))
         smiles = [s for s in smiles if len(s)]
 
         return smiles
