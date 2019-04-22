@@ -81,7 +81,22 @@ def decode_adj(adj_output):
     return adj_full
 
 
-def SmilesFromGraphs(node_list, adjacency_matrix):
+def decode_adj_new(adj_output):
+    '''
+        recover to adj from adj_output
+        note: here adj_output have shape (n-1)*m
+    '''
+    num_nodes = adj_output.shape[0] + 1
+    adj_full = np.zeros((num_nodes, num_nodes), dtype=adj_output.dtype)
+
+    for i, d in enumerate(adj_output.T):
+        a = np.diag(d, k=i+1)[i:, i:]
+        adj_full = adj_full + a + a.T
+
+    return adj_full
+
+
+def SmilesFromGraphs(node_list, adjacency_matrix, remap=None):
     """
     Converts molecular graph to SMILES string
     :param node_list:
@@ -99,17 +114,13 @@ def SmilesFromGraphs(node_list, adjacency_matrix):
         node_to_idx[i] = molIdx
 
     # add bonds between adjacent atoms
-    for ix, row in enumerate(adjacency_matrix):
-        for iy, bond in enumerate(row):
-
-            # only traverse half the matrix
-            if iy <= ix:
-                continue
-
+    xx, yy = np.where(np.triu(adjacency_matrix, k=1))
+    vv = adjacency_matrix[xx, yy]
+    for ix, iy, bond in zip(xx, yy, vv):
             # add relevant bond type (there are many more of these)
-            if bond == 0.:
-                continue
-            elif bond == 1.:
+            if remap is not None:
+                bond = remap[bond]
+            if bond == 1.:
                 bond_type = Chem.rdchem.BondType.SINGLE
                 mol.AddBond(node_to_idx[ix], node_to_idx[iy], bond_type)
             elif bond == 1.5:
@@ -121,6 +132,8 @@ def SmilesFromGraphs(node_list, adjacency_matrix):
             elif bond == 3.:
                 bond_type = Chem.rdchem.BondType.TRIPLE
                 mol.AddBond(node_to_idx[ix], node_to_idx[iy], bond_type)
+            else:
+                raise ValueError("Invalid bond type in matrix")
 
     # Convert RWMol to Mol object
     mol = mol.GetMol()

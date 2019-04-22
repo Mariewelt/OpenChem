@@ -12,7 +12,7 @@ from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from torch.nn import functional as F
 
 from .openchem_model import OpenChemModel
-from openchem.data.graph_utils import decode_adj, SmilesFromGraphs
+from openchem.data.graph_utils import decode_adj, SmilesFromGraphs, decode_adj_new
 from openchem.data.utils import sanitize_smiles
 
 
@@ -166,50 +166,34 @@ class GraphRNNModel(OpenChemModel):
             c_step[terminal] = self.start_node_label * torch.ones(
                 n_terminal, 1, dtype=torch.long, device=device)
 
+        y_pred_long = y_pred_long.to('cpu').numpy()
+        c_pred_long = c_pred_long.to('cpu').numpy()
         smiles = []
         for i in range(batch_size):
-            adj = decode_adj(y_pred_long[i].to('cpu').numpy())
-            adj = adj[~np.all(adj == 0, axis=1)]
-            adj = adj[:, ~np.all(adj == 0, axis=0)]
+            adj_encoded_full = y_pred_long[i]
+            # these are vertices with no connections to previous
+            #  i.e. last vertex for current sample, and first vertex for
+            #  next sample
+            anchors = np.where(np.all(adj_encoded_full == 0, axis=1))[0]
+            cur = 0
+            for nxt in anchors:
+                # slice adjacency matrix into connected components
+                adj_encoded = adj_encoded_full[cur:nxt, :]
+                start_c = self.start_node_label
+                atoms = [self.label2atom[start_c], ]
+                atoms += [self.label2atom[c] for c in c_pred_long[i, cur:nxt]]
 
-            G = nx.from_numpy_matrix(adj)
+                cur = nxt + 1
 
-            num_nodes = len(adj)
+                adj = decode_adj_new(adj_encoded)
 
-            start_c = self.start_node_label
-            start_atom = self.label2atom[start_c]
-            node_list = [start_atom, ]
-            for inode in range(num_nodes - 1):
-                c = c_pred_long[i, inode].item()
-                atom = self.label2atom[c]
-                node_list.append(atom)
-
-            for inode, label in enumerate(node_list):
-                G.add_node(inode, label=label)
-
-            Gs = nx.connected_component_subgraphs(G)
-            for G in Gs:
-                G = nx.convert_node_labels_to_integers(G)
-
-                node_list = nx.get_node_attributes(G, 'label')
-                adj = nx.adj_matrix(G)
-                adj = np.array(adj.todense()).astype(int)
-
-                if self.num_edge_classes > 2:
-                    adj_out = np.zeros(adj.shape)
-                    for e, t in enumerate(self.edge2type):
-                        adj_out[adj == e] = t
-                else:
-                    adj_out = adj
-
-                sstring = SmilesFromGraphs(node_list, adj_out)
+                remap = self.edge2type if self.num_edge_classes > 2 else None
+                sstring = SmilesFromGraphs(atoms, adj, remap=remap)
                 smiles.append(sstring)
 
         smiles, idx = sanitize_smiles(smiles,
                                       min_atoms=self.restrict_min_atoms,
                                       max_atoms=self.restrict_max_atoms)
-        print("Number of valid = {:d}".format(len(idx)))
-        print("Number of invalid = {:d}".format(len(smiles) - len(idx)))
         smiles = [s for s in smiles if len(s)]
 
         return smiles

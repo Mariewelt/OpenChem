@@ -261,7 +261,8 @@ def main():
         model.eval()
         smiles = []
         with torch.no_grad():
-            smiles.extend(model.forward(None))
+            for _ in range(10):
+                smiles.extend(model.forward(None))
 
         path = os.path.join(logdir, "debug_smiles.txt")
         with open(path, "w") as f:
