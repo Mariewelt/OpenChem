@@ -8,8 +8,47 @@ import warnings
 
 from rdkit import Chem
 
+import torch
 from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
 from openchem.data.smiles_enumerator import SmilesEnumerator
+
+from rdkit import rdBase
+rdBase.DisableLog('rdApp.error')
+
+class DummyDataset(Dataset):
+    def __init__(self):
+        super(DummyDataset, self).__init__()
+
+    def __len__(self):
+        return 1
+
+    def __getitem__(self, index):
+        return {'x': torch.zeros(1), 'y': torch.zeros(1),
+                'num_nodes': torch.zeros(1),
+                'c_in': torch.zeros(1), 'c_out': torch.zeros(1),
+                'max_prev_nodes_local': torch.zeros(1)
+                }
+
+
+class DummyDataLoader(object):
+    def __init__(self, batch_size):
+        self.batch_size = 32#batch_size
+        self.current = 0
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        return self.batch_size
+
+    def __next__(self):
+        if self.current < self.batch_size:
+            self.current += 1
+            return None
+        else:
+            self.current = 0
+            raise StopIteration
 
 
 def cut_padding(samples, lengths, padding='left'):
@@ -57,6 +96,7 @@ def create_loader(dataset, batch_size, shuffle=True, num_workers=1,
     data_loader = DataLoader(dataset=dataset, batch_size=batch_size,
                              shuffle=shuffle, num_workers=num_workers,
                              pin_memory=pin_memory, sampler=sampler)
+
     return data_loader
 
 
@@ -100,9 +140,12 @@ def sanitize_smiles(smiles, canonize=True,
                 new_smiles.append(sm)
                 idx.append(i)
                 num_atoms.append(n)
-        except: 
-            warnings.warn('Unsanitized SMILES string: ' + sm)
+        except:
             new_smiles.append('')
+    if len(idx) != len(smiles):
+        invalid_rate = 1.0 - len(idx)/len(smiles)
+        warnings.warn('Proportion of unsanitized smiles is %.3f '
+                      % (invalid_rate))
     if return_num_atoms:
         return new_smiles, idx, num_atoms
     else:
@@ -126,15 +169,21 @@ def canonize_smiles(smiles, sanitize=True):
         sanitize_smiles(smiles, canonize=True).
     """
     new_smiles = []
-    for sm in smiles:
+    idx = []
+    for i in range(len(smiles)):
+        sm = smiles[i]
         try:
             new_smiles.append(
                 Chem.MolToSmiles(Chem.MolFromSmiles(sm, sanitize=sanitize))
             )
-        except: 
-            warnings.warn(sm + ' can not be canonized: i'
-                                'nvalid SMILES string!')
+            idx.append(i)
+        except:
             new_smiles.append('')
+
+        if len(idx) != len(smiles):
+            invalid_rate = 1.0 - len(idx) / len(smiles)
+            warnings.warn('Proportion of unsanitized smiles is %.3f '
+                          % (invalid_rate))
     return new_smiles
 
 

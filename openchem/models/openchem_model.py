@@ -151,6 +151,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
         world_size = model.world_size     
 
     for epoch in range(cur_epoch, n_epochs + cur_epoch):
+        model.train()
         for i_batch, sample_batched in enumerate(train_loader):
 
             if has_module:
@@ -216,6 +217,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
 
 def evaluate(model, val_loader, criterion):
+    model.eval()
     loss_total = 0
     n_batches = 0
     start = time.time()
@@ -238,10 +240,14 @@ def evaluate(model, val_loader, criterion):
         else:
             batch_input, batch_target = model.cast_inputs(sample_batched)
         predicted = model.forward(batch_input, eval=True)
-        prediction += list(predicted.detach().cpu().numpy())
-        ground_truth += list(batch_target.cpu().numpy())
+        if hasattr(predicted, 'detach'):
+            predicted = predicted.detach().cpu().numpy()
+        if hasattr(batch_target, 'cpu'):
+            batch_target = batch_target.cpu().numpy()
+        prediction += list(predicted)
+        ground_truth += list(batch_target)
         loss = criterion(predicted, batch_target)
-        loss_total += loss.item()
+        loss_total += loss
         n_batches += 1
 
     cur_loss = loss_total / n_batches

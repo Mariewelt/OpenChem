@@ -73,7 +73,7 @@ class GraphRNNModel(OpenChemModel):
             c_out=batch["c_out"].to(device=device),
             num_nodes=batch["num_nodes"].to(device=device),
         )
-        batch_target = None
+        batch_target = [None]
 
         return batch_input, batch_target
 

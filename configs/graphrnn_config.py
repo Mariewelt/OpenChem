@@ -9,6 +9,30 @@ from openchem.modules.embeddings.basic_embedding import Embedding
 from openchem.modules.mlp.openchem_mlp import OpenChemMLPSimple
 from openchem.utils.utils import identity
 from openchem.modules.gru_plain import GRUPlain
+from openchem.utils.sa_score import sascorer
+from rdkit import Chem
+import numpy as np
+from openchem.data.utils import DummyDataset
+
+def get_sa_score(target, smiles):
+    scores = []
+    if len(smiles) > 0:
+        for sm in smiles:
+            try:
+                if sm != '':
+                    mol = Chem.MolFromSmiles(sm)
+                    scores.append(sascorer.calculateScore(mol))
+            except:
+                pass
+        mean_score = np.nanmean(scores)
+        if np.isnan(mean_score):
+            return -1.0
+        else:
+            return mean_score
+    else:
+        return -1.0
+
+
 
 max_prev_nodes = 12
 # this in Carbon original id in the Periodic Table
@@ -93,10 +117,10 @@ train_dataset = BFSGraphDataset(
     # cols_to_read=[1, 2],
     # './benchmark_datasets/chembl_small/small_chembl.smi',
     # cols_to_read=[0, 1],
-    'benchmark_datasets/chembl_full/full_chembl.smi',
+    'benchmark_datasets/chembl_small/small_chembl.smi',
     cols_to_read=[0, 1],
-    pickled='benchmark_datasets/chembl_full/' +
-            'full_chembl_cleaned.pkl',
+    #pickled='benchmark_datasets/chembl_full/' +
+    #        'full_chembl_cleaned.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',
@@ -107,6 +131,8 @@ train_dataset = BFSGraphDataset(
     restrict_min_atoms=restrict_min_atoms,
     restrict_max_atoms=restrict_max_atoms
 )
+
+val_dataset = DummyDataset()
 
 num_edge_classes = train_dataset.num_edge_classes
 num_node_classes = train_dataset.num_node_classes
@@ -136,7 +162,10 @@ node_rnn_hidden_size = 16
 
 class DummyCriterion(object):
     def __call__(self, inp, out):
-        return inp
+        if isinstance(inp, list):
+            return 0.0
+        else:
+            return inp
 
     def cuda(self):
         return self
@@ -169,8 +198,8 @@ model_params = {
     'train_data_layer': train_dataset,
     'criterion': DummyCriterion(),
 
-    'eval_metrics': None,
-    'val_data_layer': None,
+    'eval_metrics': get_sa_score,
+    'val_data_layer': val_dataset,
 
     'optimizer': Adam,
     'optimizer_params': {
