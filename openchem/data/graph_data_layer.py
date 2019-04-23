@@ -31,14 +31,14 @@ class GraphDataset(Dataset):
             mn, mx = restrict_min_atoms, restrict_max_atoms
             indices = [i for i, n in enumerate(data["num_atoms_all"])
                        if (n >= mn or mn < 0) and (n <= mx or mx < 0)]
-            data = {key: [value[i] for i in indices]
+            data = {key: value[indices]
+                    if isinstance(value, np.ndarray)
+                    else [value[i] for i in indices]
                     for key, value in data.items()}
 
             self.num_atoms_all = data["num_atoms_all"]
             self.target = data["target"]
             self.smiles = data["smiles"]
-
-            self.target = np.asarray(self.target)
         else:
             data_set = read_smiles_property_file(filename, cols_to_read,
                                                  delimiter)

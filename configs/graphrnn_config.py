@@ -14,6 +14,7 @@ from rdkit import Chem
 import numpy as np
 from openchem.data.utils import DummyDataset
 
+
 def get_sa_score(target, smiles):
     scores = []
     if len(smiles) > 0:
@@ -31,7 +32,6 @@ def get_sa_score(target, smiles):
             return mean_score
     else:
         return -1.0
-
 
 
 max_prev_nodes = 12
@@ -115,11 +115,11 @@ train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
     # './benchmark_datasets/logp_dataset/logP_labels.csv',
     # cols_to_read=[1, 2],
-    # './benchmark_datasets/chembl_small/small_chembl.smi',
-    # cols_to_read=[0, 1],
-    'benchmark_datasets/chembl_small/small_chembl.smi',
+    './benchmark_datasets/chembl_small/small_chembl.smi',
     cols_to_read=[0, 1],
-    #pickled='benchmark_datasets/chembl_full/' +
+    # 'benchmark_datasets/chembl_full/full_chembl.smi',
+    # cols_to_read=[0, 1],
+    # pickled='benchmark_datasets/chembl_full/' +
     #        'full_chembl_cleaned.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
@@ -127,7 +127,7 @@ train_dataset = BFSGraphDataset(
     random_order=True, max_prev_nodes=max_prev_nodes,
     original_start_node_label=original_start_node_label,
     edge_relabel_map=edge_relabel_map,
-    node_relabel_map=node_relabel_map,
+    # node_relabel_map=node_relabel_map,
     restrict_min_atoms=restrict_min_atoms,
     restrict_max_atoms=restrict_max_atoms
 )
@@ -196,7 +196,12 @@ model_params = {
     'print_every': 1,
     'save_every': 5,
     'train_data_layer': train_dataset,
+    # use these for pretraining
     'criterion': DummyCriterion(),
+    'use_external_criterion': False,
+    # use these for RL optimization
+    # 'criterion': RLCriterion(),
+    # 'use_external_criterion': True,
 
     'eval_metrics': get_sa_score,
     'val_data_layer': val_dataset,

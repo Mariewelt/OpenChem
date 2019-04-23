@@ -20,6 +20,7 @@ from openchem.models.openchem_model import build_training, fit, evaluate
 from openchem.data.utils import create_loader
 from openchem.utils.utils import get_latest_checkpoint, deco_print
 from openchem.utils.utils import flatten_dict, nested_update, nest_dict
+from openchem.utils import comm
 
 
 def main():
@@ -33,6 +34,10 @@ def main():
     parser.add_argument('--continue_learning', dest='continue_learning',
                         action='store_true',
                         help="whether to continue learning")
+    parser.add_argument("--force_checkpoint", dest="force_checkpoint",
+                        default="",
+                        help="Full path to a pretrained snapshot "
+                             "(e.g. useful for knowledge transfer or)")
     parser.add_argument('--dist-backend', default='nccl', type=str,
                         help='distributed backend')
     parser.add_argument('--seed', default=None, type=int,
@@ -78,74 +83,39 @@ def main():
 
     # checking that everything is correct with log directory
     logdir = model_config['logdir']
-    ckpt_dir = logdir + '/checkpoint/'
+    ckpt_dir = os.path.join(logdir, 'checkpoint')
 
-    if args.local_rank == 0 or args.local_rank == -1:
-        try:
-            try:
-                os.stat(logdir)
-            except:
-                os.mkdir(logdir)
-                print('Directory created')
-            # check if folder checkpoint within log directory exists,
-            # create if it doesn't
-            try:
-                os.stat(ckpt_dir)
-            except:
-                os.mkdir(logdir + '/checkpoint')
-                print("Directory created")
-                ckpt_dir = logdir + '/checkpoint/'
-            if args.mode == 'train' or args.mode == 'train_eval':
-                if os.path.isfile(logdir):
-                    raise IOError(
-                        "There is a file with the same name as \"logdir\" "
-                        "parameter. You should change the log directory path "
-                        "or delete the file to continue.")
-
-                # check if 'logdir' directory exists and non-empty
-                if os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
-                    if not args.continue_learning:
-                        raise IOError(
-                            "Log directory is not empty. If you want to "
-                            "continue learning, you should provide "
-                            "\"--continue_learning\" flag")
-                    checkpoint = get_latest_checkpoint(ckpt_dir)
-                    if checkpoint is None:
-                        raise IOError(
-                            "There is no model checkpoint in the "
-                            "{} directory. Can't load model".format(ckpt_dir)
-                        )
-                else:
-                    if args.continue_learning:
-                        raise IOError(
-                            "The log directory is empty or does not exist. "
-                            "You should probably not provide "
-                            "\"--continue_learning\" flag?")
-                    checkpoint = None
-            elif args.mode == 'eval' or args.mode == 'infer':
-                if os.path.isdir(logdir) and os.listdir(logdir) != []:
-                    checkpoint = get_latest_checkpoint(ckpt_dir)
-                    if checkpoint is None and \
-                            not "from_original" in model_config.keys():
-                        raise IOError(
-                            "There is no model checkpoint in the "
-                            "{} directory. Can't load model".format(
-                                ckpt_dir
-                            )
-                        )
-                else:
-                    raise IOError(
-                        "{} does not exist or is empty, can't restore".format(
-                            ckpt_dir
-                        )
-                    )
-        except IOError:
-            raise
+    if args.force_checkpoint:
+        checkpoint = args.force_checkpoint
+        assert os.path.isfile(checkpoint), "{} is not a file".format(checkpoint)
+    elif args.mode in ['eval', 'infer'] or args.continue_learning:
+        checkpoint = get_latest_checkpoint(ckpt_dir)
+        if checkpoint is None:
+            raise IOError(
+                "Failed to find model checkpoint under "
+                "{}. Can't load the model".format(ckpt_dir)
+            )
     else:
-        if args.continue_learning or args.mode == 'eval':
-            checkpoint = get_latest_checkpoint(ckpt_dir)
-        else:
-            checkpoint = None
+        checkpoint = None
+
+    if not os.path.exists(logdir):
+        comm.mkdir(logdir)
+        print('Directory {} created'.format(logdir))
+    elif os.path.isfile(logdir):
+        raise IOError(
+            "There is a file with the same name as \"logdir\" "
+            "parameter. You should change the log directory path "
+            "or delete the file to continue.")
+
+    if not os.path.exists(ckpt_dir):
+        comm.mkdir(ckpt_dir)
+        print('Directory {} created'.format(ckpt_dir))
+    elif os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
+        if not args.continue_learning:
+            raise IOError(
+                "Log directory is not empty. If you want to "
+                "continue learning, you should provide "
+                "\"--continue_learning\" flag")
 
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
@@ -161,19 +131,12 @@ def main():
             nested_update(eval_config,
                           copy.deepcopy(config_module['eval_params']))
 
-    if args.mode == 'train' or args.mode == 'train_eval':
-        if not args.continue_learning:
-            if args.distributed:
-                deco_print("Starting training from scratch process " +
-                           str(args.local_rank))
-            else:
-                deco_print("Starting training from scratch")
-        else:
-            deco_print(
-                "Restored checkpoint from {}. Resuming training".format(
-                    checkpoint),
-            )
-    elif args.mode == 'eval' or args.mode == 'infer':
+    if checkpoint is None:
+        deco_print("Starting training from scratch")
+    elif args.continue_learning:
+        deco_print("Restored checkpoint from {}. Resuming training".format(
+                checkpoint))
+    else:
         deco_print("Loading model from {}".format(checkpoint))
 
     if args.distributed:
@@ -241,8 +204,8 @@ def main():
                                         )
     else:
         model = DataParallel(model)
-    if args.continue_learning or args.mode in ['eval', 'infer'] \
-            and not "from_original" in model_config.keys():
+
+    if checkpoint is not None:
         print("=> loading model  pre-trained model")
         weights = torch.load(checkpoint)
         model.load_state_dict(weights)

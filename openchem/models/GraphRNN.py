@@ -4,7 +4,6 @@ Extended GraphRNN model that supports edge and node class prediction
 """
 
 import numpy as np
-import networkx as nx
 import torch
 from collections import OrderedDict
 
@@ -12,7 +11,7 @@ from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from torch.nn import functional as F
 
 from .openchem_model import OpenChemModel
-from openchem.data.graph_utils import decode_adj, SmilesFromGraphs, decode_adj_new
+from openchem.data.graph_utils import SmilesFromGraphs, decode_adj_new
 from openchem.data.utils import sanitize_smiles
 
 
@@ -29,6 +28,7 @@ class GraphRNNModel(OpenChemModel):
         self.edge2type = params["edge2type"]
         self.restrict_min_atoms = params["restrict_min_atoms"]
         self.restrict_max_atoms = params["restrict_max_atoms"]
+        self.use_external_criterion = params["use_external_criterion"]
 
         if self.num_edge_classes > 2:
             EdgeEmbedding = params["EdgeEmbedding"]
@@ -58,10 +58,6 @@ class GraphRNNModel(OpenChemModel):
         edge_rnn_params = params["edge_rnn_params"]
         self.edge_rnn = EdgeRNN(**edge_rnn_params)
 
-        if "from_original" in params.keys():
-            paths = params["from_original"]
-            self.load_from_original_checkpoint(paths)
-
     def cast_inputs(self, batch):
 
         device = torch.device('cpu')
@@ -82,10 +78,20 @@ class GraphRNNModel(OpenChemModel):
     #     return {}
 
     def forward(self, inp, eval=False):
-        if self.training:
+        if self.use_external_criterion:
+            assert self.training, "Must be in training mode for external criterion"
+            # generate batch
+            # self.eval()
+            with torch.no_grad():
+                inp, smiles = self.forward_test()
+            # self.train()
+            logp, sizes, smiles = self.forward_train(inp, smiles)
+            return logp, sizes, smiles
+        elif self.training:
             return self.forward_train(inp)
         else:
-            return self.forward_test()
+            batch, smiles = self.forward_test()
+            return smiles
 
     def forward_test(self, batch_size=1024):
         device = torch.device("cuda")
@@ -169,6 +175,7 @@ class GraphRNNModel(OpenChemModel):
         y_pred_long = y_pred_long.to('cpu').numpy()
         c_pred_long = c_pred_long.to('cpu').numpy()
         smiles = []
+        adj_all, classes_all, len_all = [], [], []
         for i in range(batch_size):
             adj_encoded_full = y_pred_long[i]
             # these are vertices with no connections to previous
@@ -183,6 +190,10 @@ class GraphRNNModel(OpenChemModel):
                 atoms = [self.label2atom[start_c], ]
                 atoms += [self.label2atom[c] for c in c_pred_long[i, cur:nxt]]
 
+                adj_all.append(torch.from_numpy(adj_encoded))
+                classes_all.append(torch.from_numpy(c_pred_long[i, cur:nxt]))
+                len_all.append(nxt - cur + 1)
+
                 cur = nxt + 1
 
                 adj = decode_adj_new(adj_encoded)
@@ -194,11 +205,42 @@ class GraphRNNModel(OpenChemModel):
         smiles, idx = sanitize_smiles(smiles,
                                       min_atoms=self.restrict_min_atoms,
                                       max_atoms=self.restrict_max_atoms)
-        smiles = [s for s in smiles if len(s)]
 
-        return smiles
+        smiles = [s for i, s in enumerate(smiles) if i in idx]
 
-    def forward_train(self, inp):
+        if self.use_external_criterion:
+            adj_all = [s for i, s in enumerate(adj_all) if i in idx]
+            classes_all = [s for i, s in enumerate(classes_all) if i in idx]
+            len_all = [s for i, s in enumerate(len_all) if i in idx]
+
+            max_len = max(len_all)
+            x = torch.zeros(len(smiles), max_len, self.max_prev_nodes,
+                            dtype=torch.long)
+            x[:, 0, :] = 1.
+            y = torch.zeros(len(smiles), max_len, self.max_prev_nodes,
+                            dtype=torch.long)
+            c_in = torch.zeros(len(smiles), self.max_num_nodes, dtype=torch.long)
+            c_in[:, 0] = self.start_node_label
+            c_out = -1 * torch.ones(
+                len(smiles), self.max_num_nodes, dtype=torch.long)
+            for i, (adj, classes, num_nodes) in enumerate(
+                    zip(adj_all, classes_all, len_all)):
+                y[i, :num_nodes - 1, :] = adj
+                x[i, 1:num_nodes, :] = adj
+                c_in[i, 1:num_nodes] = classes
+                c_out[i, :num_nodes - 1] = classes
+            num_nodes = torch.tensor(len_all)
+            batch = {"x": x.to(device),
+                     "y": y.to(device),
+                     "c_in": c_in.to(device),
+                     "c_out": c_out.to(device),
+                     "num_nodes": num_nodes.to(device)}
+        else:
+            batch = None
+
+        return batch, smiles
+
+    def forward_train(self, inp, smiles=None):
         device = torch.device("cuda")
 
         x_unsorted = inp["x"]
@@ -223,6 +265,8 @@ class GraphRNNModel(OpenChemModel):
         y = torch.index_select(y_unsorted, 0, sort_index)
         c_in = torch.index_select(c_in_unsorted, 0, sort_index)
         c_out = torch.index_select(c_out_unsorted, 0, sort_index)
+        if smiles is not None:
+            smiles = [smiles[i] for i in sort_index.to('cpu').numpy()]
 
         # input, output for output rnn module
         # a smart use of pytorch builtin function:
@@ -298,42 +342,60 @@ class GraphRNNModel(OpenChemModel):
             node_pred = self.node_mlp(h)
 
         y_pred = self.edge_rnn(output_x, pack=True, input_len=output_y_len)
-        # if self.num_edge_classes == 2:
-        #     y_pred = torch.sigmoid(y_pred)
 
-        # clean
-        weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)
-        weights = pack_padded_sequence(weights, output_y_len, batch_first=True)
-        weights = pad_packed_sequence(weights, batch_first=True)[0]
-        # y_pred = pack_padded_sequence(y_pred, output_y_len, batch_first=True)
-        # y_pred = pad_packed_sequence(y_pred, batch_first=True)[0]
-        # output_y = pack_padded_sequence(output_y, output_y_len,
-        #                                 batch_first=True)
-        # output_y = pad_packed_sequence(output_y, batch_first=True)[0]
+        if self.use_external_criterion:
+            node_pred = F.log_softmax(node_pred, dim=-1)
+            # valid edges are those that do not have all zeros in a row
+            valid = torch.ones_like(y_pred)
+            valid = pack_padded_sequence(valid, output_y_len, batch_first=True)
+            valid = pad_packed_sequence(valid, batch_first=True)[0]
+            y_pred = F.log_softmax(y_pred, dim=-1) * valid
 
-        # use cross entropy loss
-        if self.num_edge_classes == 2:
-            # loss_edges = F.binary_cross_entropy(
-            #     y_pred, output_y.to(torch.float))
-            loss_edges = F.binary_cross_entropy_with_logits(
-                y_pred, output_y.to(torch.float), reduction='none')
-            n = weights.sum().clamp(min=1.)
-            loss_edges = (loss_edges * weights).sum() / n
+            valid = (c_out >= 0).to(node_pred.dtype)
+            node_pred = node_pred.gather(
+                1, c_out.view(-1, 1).clamp(min=0)).view(-1) * valid
+            y_pred = y_pred.gather(2, output_y).squeeze(2)
+
+            sum_y_pred = y_pred.sum(dim=1)
+
+            idx = [i for i in range(sum_y_pred.size(0) - 1, -1, -1)]
+            idx = torch.tensor(idx, dtype=torch.long, device=device)
+            sum_y_pred = sum_y_pred.index_select(0, idx)
+
+            return node_pred + sum_y_pred, num_nodes, smiles
         else:
-            loss_edges = F.cross_entropy(
-                y_pred.reshape(-1, self.num_edge_classes),
-                output_y.reshape(-1), reduction='none') / self.num_edge_classes
-            n = weights.sum().clamp(min=1.)
-            loss_edges = (loss_edges * weights.reshape(-1)).sum() / n
-        if self.node_mlp is not None:
-            loss_vertices = F.cross_entropy(node_pred, c_out,
-                                            ignore_index=-1)
-            loss_vertices = loss_vertices / self.num_node_classes
-            loss = loss_edges + loss_vertices
-        else:
-            loss = loss_edges
+            # internal criterion
+            weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)
+            weights = pack_padded_sequence(weights, output_y_len, batch_first=True)
+            weights = pad_packed_sequence(weights, batch_first=True)[0]
 
-        return loss
+            if self.num_edge_classes == 2:
+                # loss_edges = F.binary_cross_entropy(
+                #     y_pred, output_y.to(torch.float))
+                loss_edges = F.binary_cross_entropy_with_logits(
+                    y_pred, output_y.to(torch.float), reduction='none')
+                n = weights.sum().clamp(min=1.)
+                loss_edges = (loss_edges * weights).sum() / n
+            else:
+                loss_edges = F.cross_entropy(
+                    y_pred.reshape(-1, self.num_edge_classes),
+                    output_y.reshape(-1), reduction='none') / self.num_edge_classes
+                n = weights.sum().clamp(min=1.)
+                loss_edges = (loss_edges * weights.reshape(-1)).sum() / n
+            if self.node_mlp is not None:
+                loss_vertices = F.cross_entropy(node_pred, c_out,
+                                                ignore_index=-1)
+                loss_vertices = loss_vertices / self.num_node_classes
+                loss = loss_edges + loss_vertices
+            else:
+                loss = loss_edges
+
+            return loss
+
+    def load_model(self, path):
+        super(GraphRNNModel, self).load_model(path)
+        # TODO: load from original checkpoint if previous line fails
+        # self.load_from_original_checkpoint(path)
 
     def load_from_original_checkpoint(self, paths):
         prefix_mapping = OrderedDict({

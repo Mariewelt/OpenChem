@@ -128,9 +128,9 @@ def sanitize_smiles(smiles, canonize=True,
             n = mol.GetNumAtoms()
             if (n < min_atoms and min_atoms > -1) or \
                     (n > max_atoms > -1):
-                continue
-
-            if canonize:
+                new_smiles.append('')
+                num_atoms.append(0)
+            elif canonize:
                 new_smiles.append(
                     Chem.MolToSmiles(mol)
                 )
@@ -142,6 +142,7 @@ def sanitize_smiles(smiles, canonize=True,
                 num_atoms.append(n)
         except:
             new_smiles.append('')
+            num_atoms.append(0)
     if len(idx) != len(smiles):
         invalid_rate = 1.0 - len(idx)/len(smiles)
         warnings.warn('Proportion of unsanitized smiles is %.3f '
