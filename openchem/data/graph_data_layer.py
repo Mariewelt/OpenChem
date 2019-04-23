@@ -51,6 +51,8 @@ class GraphDataset(Dataset):
                 return_num_atoms=True
             )
             target = np.asarray(target, dtype=np.float).T
+            clean_smiles = [clean_smiles[i] for i in clean_idx]
+            num_atoms = [num_atoms[i] for i in clean_idx]
 
             self.target = target[clean_idx, :]
             self.smiles = clean_smiles

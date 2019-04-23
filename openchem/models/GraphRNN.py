@@ -202,11 +202,20 @@ class GraphRNNModel(OpenChemModel):
                 sstring = SmilesFromGraphs(atoms, adj, remap=remap)
                 smiles.append(sstring)
 
-        smiles, idx = sanitize_smiles(smiles,
-                                      min_atoms=self.restrict_min_atoms,
-                                      max_atoms=self.restrict_max_atoms)
+        # TODO: think how to avoid double sanitization
+        smiles, idx = sanitize_smiles(
+            smiles, min_atoms=self.restrict_min_atoms,
+            max_atoms=self.restrict_max_atoms,
+            allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors '
+        )
 
         smiles = [s for i, s in enumerate(smiles) if i in idx]
+
+        smiles, idx2 = sanitize_smiles(smiles,
+                                       min_atoms=self.restrict_min_atoms,
+                                       max_atoms=self.restrict_max_atoms)
+        idx = [idx[i] for i in idx2]
+        smiles = [s for i, s in enumerate(smiles) if i in idx2]
 
         if self.use_external_criterion:
             adj_all = [s for i, s in enumerate(adj_all) if i in idx]

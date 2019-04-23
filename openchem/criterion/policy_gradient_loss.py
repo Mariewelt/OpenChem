@@ -1,10 +1,8 @@
 import torch
-from torch.nn import functional as F
 from torch.nn.modules.loss import _Loss
 
 from torch.nn.utils.rnn import pack_padded_sequence
 
-import numpy as np
 
 class PolicyGradientLoss(_Loss):
     def __init__(self, reward_fn, critic, tokens, fn, gamma=1.0):
@@ -29,18 +27,17 @@ class PolicyGradientLoss(_Loss):
             rewards = self.reward_fn(trajectories, self.critic,
                                      self.tokens, device, self.fn)
         rewards = rewards.view(batch_size, 1)
-        discounts = torch.pow(gamma, torch.arange(len_trajectory,
-                                                  device=device,
-                                                  dtype=torch.float)
-                              )
+        discounts = torch.pow(
+            self.gamma,
+            torch.arange(len_trajectory, device=device, dtype=torch.float)
+        )
         discounts = discounts.view(1, len_trajectory)
         discounted_rewards = rewards * discounts
 
         discounted_rewards = pack_padded_sequence(discounted_rewards,
                                                   sizes,
-                                                  batch_first=True)
+                                                  batch_first=True).data
 
-        loss = discounted_rewards*log_policy
-        loss = loss.sum(dim=1)
-        loss = loss.mean(dim=0)
+        loss = - discounted_rewards * log_policy
+        loss = loss.mean()
         return loss

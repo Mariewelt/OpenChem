@@ -1,9 +1,10 @@
+import os
 import torch.distributed as dist
 
 
 def mkdir(path):
     if is_main_process():
-        mkdir(path)
+        os.mkdir(path)
     synchronize()
 
 

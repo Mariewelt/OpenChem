@@ -16,12 +16,14 @@ from openchem.data.smiles_enumerator import SmilesEnumerator
 from rdkit import rdBase
 rdBase.DisableLog('rdApp.error')
 
+
 class DummyDataset(Dataset):
-    def __init__(self):
+    def __init__(self, size=1):
         super(DummyDataset, self).__init__()
+        self.size = size
 
     def __len__(self):
-        return 1
+        return self.size
 
     def __getitem__(self, index):
         return {'x': torch.zeros(1), 'y': torch.zeros(1),
@@ -102,7 +104,8 @@ def create_loader(dataset, batch_size, shuffle=True, num_workers=1,
 
 def sanitize_smiles(smiles, canonize=True,
                     min_atoms=-1, max_atoms=-1,
-                    return_num_atoms=False):
+                    return_num_atoms=False,
+                    allowed_tokens=None):
     """
     Takes list of SMILES strings and returns list of their sanitized versions.
     For definition of sanitized SMILES check
@@ -123,8 +126,12 @@ def sanitize_smiles(smiles, canonize=True,
     num_atoms = []
     for i in range(len(smiles)):
         sm = smiles[i]
-        try:
-            mol = Chem.MolFromSmiles(sm, sanitize=True)
+        if allowed_tokens is not None:
+            has_bad_tokens = sum([(t not in allowed_tokens) for t in sm]) > 0
+        else:
+            has_bad_tokens = False
+        mol = Chem.MolFromSmiles(sm, sanitize=True)
+        if mol is not None and not has_bad_tokens:
             n = mol.GetNumAtoms()
             if (n < min_atoms and min_atoms > -1) or \
                     (n > max_atoms > -1):
@@ -140,13 +147,15 @@ def sanitize_smiles(smiles, canonize=True,
                 new_smiles.append(sm)
                 idx.append(i)
                 num_atoms.append(n)
-        except:
+        else:
             new_smiles.append('')
             num_atoms.append(0)
+
     if len(idx) != len(smiles):
         invalid_rate = 1.0 - len(idx)/len(smiles)
-        warnings.warn('Proportion of unsanitized smiles is %.3f '
-                      % (invalid_rate))
+        warnings.warn('{:d}/{:d} unsanitized smiles ({:.1f}%)'.format(
+            len(smiles) - len(idx), len(smiles), 100 * invalid_rate
+        ))
     if return_num_atoms:
         return new_smiles, idx, num_atoms
     else:
