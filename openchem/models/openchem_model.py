@@ -240,13 +240,13 @@ def evaluate(model, val_loader, criterion):
         else:
             batch_input, batch_target = model.cast_inputs(sample_batched)
         predicted = model.forward(batch_input, eval=True)
+        loss = criterion(predicted, batch_target)
         if hasattr(predicted, 'detach'):
             predicted = predicted.detach().cpu().numpy()
         if hasattr(batch_target, 'cpu'):
             batch_target = batch_target.cpu().numpy()
         prediction += list(predicted)
         ground_truth += list(batch_target)
-        loss = criterion(predicted, batch_target)
         loss_total += loss
         n_batches += 1
 
