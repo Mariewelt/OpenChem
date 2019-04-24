@@ -111,7 +111,7 @@ def main():
         comm.mkdir(ckpt_dir)
         print('Directory {} created'.format(ckpt_dir))
     elif os.path.isdir(ckpt_dir) and os.listdir(ckpt_dir) != []:
-        if not args.continue_learning:
+        if not args.continue_learning and args.mode not in ['eval', 'infer']:
             raise IOError(
                 "Log directory is not empty. If you want to "
                 "continue learning, you should provide "
@@ -231,6 +231,10 @@ def main():
         with open(path, "w") as f:
             for s in smiles:
                 f.write(s + "\n")
+
+        eval_metrics = model_config['eval_metrics']
+        score = eval_metrics(None, smiles)
+        print("SA score = {:.2f}".format(score))
 
 
 if __name__ == '__main__':

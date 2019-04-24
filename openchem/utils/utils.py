@@ -33,7 +33,7 @@ def move_to_cuda(sample):
 
 def get_latest_checkpoint(path):
     if os.path.isdir(path) and os.listdir(path) != []:
-        list_of_files = glob.glob(path + '*')
+        list_of_files = glob.glob(os.path.join(path, '*'))
         latest_file = max(list_of_files, key=os.path.getctime)
         return latest_file
     else:

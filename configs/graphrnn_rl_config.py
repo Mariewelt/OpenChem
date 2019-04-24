@@ -1,5 +1,5 @@
 from torch import nn
-from torch.optim import Adam
+from torch.optim import Adam, Adadelta, SGD
 from torch.optim.lr_scheduler import MultiStepLR
 
 from openchem.utils.graph import Attribute
@@ -211,12 +211,12 @@ model_params = {
     'use_cuda': True,
     'random_seed': 0,
     'use_clip_grad': False,
-    'batch_size': 32,
+    'batch_size': 100,
     'num_epochs': 51,
     'logdir': './logs/graphrnn_log',
     # 'logdir': './logs/debug',
     'print_every': 1,
-    'save_every': 5,
+    'save_every': 1,
     'train_data_layer': train_dataset,
     # use these for pretraining
     # 'criterion': DummyCriterion(),
