@@ -206,14 +206,16 @@ class GraphRNNModel(OpenChemModel):
         smiles, idx = sanitize_smiles(
             smiles, min_atoms=self.restrict_min_atoms,
             max_atoms=self.restrict_max_atoms,
-            allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors '
+            allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
+            logging="info"
         )
 
         smiles = [s for i, s in enumerate(smiles) if i in idx]
 
         smiles, idx2 = sanitize_smiles(smiles,
                                        min_atoms=self.restrict_min_atoms,
-                                       max_atoms=self.restrict_max_atoms)
+                                       max_atoms=self.restrict_max_atoms,
+                                       logging="info")
         idx = [idx[i] for i in idx2]
         smiles = [s for i, s in enumerate(smiles) if i in idx2]
 

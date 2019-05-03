@@ -105,7 +105,8 @@ def create_loader(dataset, batch_size, shuffle=True, num_workers=1,
 def sanitize_smiles(smiles, canonize=True,
                     min_atoms=-1, max_atoms=-1,
                     return_num_atoms=False,
-                    allowed_tokens=None):
+                    allowed_tokens=None,
+                    logging="warn"):
     """
     Takes list of SMILES strings and returns list of their sanitized versions.
     For definition of sanitized SMILES check
@@ -114,6 +115,11 @@ def sanitize_smiles(smiles, canonize=True,
             smiles (list): list of SMILES strings
             canonize (bool): parameter specifying whether to return
             canonical SMILES or not.
+            min_atoms (int): minimum allowed number of atoms
+            max_atoms (int): maxumum allowed number of atoms
+            return_num_atoms (bool): return additional array of atom numbers
+            allowed_tokens (iterable, optional): allowed tokens set
+            logging ("warn", "info", "none"): logging level
         Output:
             new_smiles (list): list of SMILES and NaNs if SMILES string is
             invalid or unsanitized.
@@ -121,6 +127,8 @@ def sanitize_smiles(smiles, canonize=True,
         When 'canonize = True' the function is analogous to:
         canonize_smiles(smiles, sanitize=True).
     """
+    assert logging in ["warn", "info", "none"]
+
     new_smiles = []
     idx = []
     num_atoms = []
@@ -151,11 +159,21 @@ def sanitize_smiles(smiles, canonize=True,
             new_smiles.append('')
             num_atoms.append(0)
 
-    if len(idx) != len(smiles):
-        invalid_rate = 1.0 - len(idx)/len(smiles)
+    smiles_set = set(new_smiles)
+    num_unique = len(smiles_set) - ('' in smiles_set)
+    valid_unique_rate = float(num_unique) / len(idx)
+    invalid_rate = 1.0 - len(idx) / len(smiles)
+    num_bad = len(smiles) - len(idx)
+
+    if len(idx) != len(smiles) and logging == "warn":
         warnings.warn('{:d}/{:d} unsanitized smiles ({:.1f}%)'.format(
-            len(smiles) - len(idx), len(smiles), 100 * invalid_rate
+            num_bad, len(smiles), 100 * invalid_rate
         ))
+    elif logging == "info":
+        print("Valid: {}/{} ({:.2f}%)".format(
+            len(idx), len(smiles), 100 * (1 - invalid_rate)))
+        print("Unique valid: {:.2f}%".format(100 * valid_unique_rate))
+
     if return_num_atoms:
         return new_smiles, idx, num_atoms
     else:
