@@ -35,8 +35,23 @@ model.load_state_dict(new_weights)
 
 tokens = params['tokens']
 
+# TODO: make sure this is consistent with relabel map
+# max_atom_bonds = {
+#     0: 4.5,     # C
+#     1: 5.,      # N
+#     2: 2.,      # O
+#     3: 1.,      # F
+#     4: 5.,     # P
+#     5: 6.,     # S
+#     6: 1.,     # Cl
+#     7: 1.,     # Br
+#     8: 1.,     # I
+# }
+max_atom_bonds = [4.5, 5., 2., 1., 5., 6., 1., 1., 1.]
+
 my_loss = PolicyGradientLoss(reward_fn=reward_fn, critic=model, tokens=tokens,
-                             fn=melt_t_max_fn, gamma=0.97)
+                             fn=melt_t_max_fn, gamma=0.97,
+                             max_atom_bonds=max_atom_bonds)
 
 
 def get_sa_score(target, smiles):

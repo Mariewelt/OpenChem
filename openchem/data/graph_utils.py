@@ -101,6 +101,7 @@ def SmilesFromGraphs(node_list, adjacency_matrix, remap=None):
     Converts molecular graph to SMILES string
     :param node_list:
     :param adjacency_matrix:
+    :param remap: edge inverse relabel map
     :return:
     """
     # create empty editable mol object

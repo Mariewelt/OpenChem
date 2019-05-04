@@ -85,8 +85,17 @@ class GraphRNNModel(OpenChemModel):
             with torch.no_grad():
                 inp, smiles = self.forward_test()
             # self.train()
-            logp, sizes, smiles = self.forward_train(inp, smiles)
-            return logp, sizes, smiles
+            logp, sizes, sort_index = self.forward_train(inp)
+            smiles = [smiles[i] for i in sort_index]
+            adj = [inp["adj"][i] for i in sort_index]
+            classes = [inp["classes"][i] for i in sort_index]
+            return {
+                "log_policy": logp,
+                "sizes": sizes,
+                "smiles": smiles,
+                "adj": adj,
+                "classes": classes,
+            }
         elif self.training:
             return self.forward_train(inp)
         else:
@@ -175,7 +184,7 @@ class GraphRNNModel(OpenChemModel):
         y_pred_long = y_pred_long.to('cpu').numpy()
         c_pred_long = c_pred_long.to('cpu').numpy()
         smiles = []
-        adj_all, classes_all, len_all = [], [], []
+        adj_all, adj_encoded_all, classes_all, len_all = [], [], [], []
         for i in range(batch_size):
             adj_encoded_full = y_pred_long[i]
             # these are vertices with no connections to previous
@@ -190,16 +199,21 @@ class GraphRNNModel(OpenChemModel):
                 atoms = [self.label2atom[start_c], ]
                 atoms += [self.label2atom[c] for c in c_pred_long[i, cur:nxt]]
 
-                adj_all.append(torch.from_numpy(adj_encoded))
+                adj_encoded_all.append(torch.from_numpy(adj_encoded))
                 classes_all.append(torch.from_numpy(c_pred_long[i, cur:nxt]))
                 len_all.append(nxt - cur + 1)
 
                 cur = nxt + 1
 
                 adj = decode_adj_new(adj_encoded)
+                if self.num_edge_classes > 2:
+                    adj = adj.astype("float32")
+                    for bond_label, bond_type in enumerate(self.edge2type):
+                        adj[adj == bond_label] = bond_type
+                adj_all.append(adj)
 
-                remap = self.edge2type if self.num_edge_classes > 2 else None
-                sstring = SmilesFromGraphs(atoms, adj, remap=remap)
+                # remap = self.edge2type if self.num_edge_classes > 2 else None
+                sstring = SmilesFromGraphs(atoms, adj)  # remap=remap)
                 smiles.append(sstring)
 
         # TODO: think how to avoid double sanitization
@@ -215,12 +229,13 @@ class GraphRNNModel(OpenChemModel):
         smiles, idx2 = sanitize_smiles(smiles,
                                        min_atoms=self.restrict_min_atoms,
                                        max_atoms=self.restrict_max_atoms,
-                                       logging="info")
+                                       logging="none")
         idx = [idx[i] for i in idx2]
         smiles = [s for i, s in enumerate(smiles) if i in idx2]
 
         if self.use_external_criterion:
             adj_all = [s for i, s in enumerate(adj_all) if i in idx]
+            adj_encoded_all = [s for i, s in enumerate(adj_encoded_all) if i in idx]
             classes_all = [s for i, s in enumerate(classes_all) if i in idx]
             len_all = [s for i, s in enumerate(len_all) if i in idx]
 
@@ -235,7 +250,7 @@ class GraphRNNModel(OpenChemModel):
             c_out = -1 * torch.ones(
                 len(smiles), self.max_num_nodes, dtype=torch.long)
             for i, (adj, classes, num_nodes) in enumerate(
-                    zip(adj_all, classes_all, len_all)):
+                    zip(adj_encoded_all, classes_all, len_all)):
                 y[i, :num_nodes - 1, :] = adj
                 x[i, 1:num_nodes, :] = adj
                 c_in[i, 1:num_nodes] = classes
@@ -245,13 +260,15 @@ class GraphRNNModel(OpenChemModel):
                      "y": y.to(device),
                      "c_in": c_in.to(device),
                      "c_out": c_out.to(device),
-                     "num_nodes": num_nodes.to(device)}
+                     "num_nodes": num_nodes.to(device),
+                     "adj": adj_all,
+                     "classes": classes_all}
         else:
             batch = None
 
         return batch, smiles
 
-    def forward_train(self, inp, smiles=None):
+    def forward_train(self, inp):
         device = torch.device("cuda")
 
         x_unsorted = inp["x"]
@@ -276,8 +293,6 @@ class GraphRNNModel(OpenChemModel):
         y = torch.index_select(y_unsorted, 0, sort_index)
         c_in = torch.index_select(c_in_unsorted, 0, sort_index)
         c_out = torch.index_select(c_out_unsorted, 0, sort_index)
-        if smiles is not None:
-            smiles = [smiles[i] for i in sort_index.to('cpu').numpy()]
 
         # input, output for output rnn module
         # a smart use of pytorch builtin function:
@@ -291,6 +306,7 @@ class GraphRNNModel(OpenChemModel):
         c_out = c_out.index_select(0, idx)
         y_reshape = y_reshape.view(y_reshape.size(0), y_reshape.size(1), 1)
 
+        # TODO: make sure this is consistent with BFSGraphDataset
         if self.num_edge_classes == 2:
             output_x = torch.cat(
                 (torch.ones(y_reshape.size(0), 1, 1, device=device),
@@ -373,7 +389,8 @@ class GraphRNNModel(OpenChemModel):
             idx = torch.tensor(idx, dtype=torch.long, device=device)
             sum_y_pred = sum_y_pred.index_select(0, idx)
 
-            return node_pred + sum_y_pred, num_nodes, smiles
+            return node_pred + sum_y_pred, num_nodes, \
+                   sort_index.to('cpu').numpy()
         else:
             # internal criterion
             weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)
