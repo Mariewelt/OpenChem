@@ -102,7 +102,7 @@ class GraphRNNModel(OpenChemModel):
             batch, smiles = self.forward_test()
             return smiles
 
-    def forward_test(self, batch_size=1024):
+    def forward_test(self, batch_size=64):
         device = torch.device("cuda")
 
         # TODO: handle float type for x_step in case of no node embedding
@@ -299,11 +299,9 @@ class GraphRNNModel(OpenChemModel):
         # pack variable -- b1_l1,b2_l1,...,b1_l2,b2_l2,...
         y_reshape = pack_padded_sequence(y, num_nodes, batch_first=True).data
         c_out = pack_padded_sequence(c_out, num_nodes, batch_first=True).data
-        # reverse y_reshape, so that their lengths are sorted, add dimension
-        idx = [i for i in range(y_reshape.size(0) - 1, -1, -1)]
-        idx = torch.tensor(idx, dtype=torch.long, device=device)
-        y_reshape = y_reshape.index_select(0, idx)
-        c_out = c_out.index_select(0, idx)
+        # reverse y_reshape, so that their (edge) lengths are sorted, add dimension
+        y_reshape = torch.flip(y_reshape, (0, ))
+        c_out = torch.flip(c_out, (0, ))
         y_reshape = y_reshape.view(y_reshape.size(0), y_reshape.size(1), 1)
 
         # TODO: make sure this is consistent with BFSGraphDataset
@@ -354,10 +352,8 @@ class GraphRNNModel(OpenChemModel):
         # [sum(L) x hidden_dim]
         # get packed hidden vector
         h = pack_padded_sequence(h, num_nodes, batch_first=True).data
-        # reverse h
-        idx = [i for i in range(h.size(0) - 1, -1, -1)]
-        idx = torch.tensor(idx, dtype=torch.long, device=device)
-        h = h.index_select(0, idx)
+        # reverse h (consistent with output_x, output_y, c_out)
+        h = torch.flip(h, (0, ))
 
         self.edge_rnn.hidden = self.edge_rnn.init_hidden(h.size(0), device)
         self.edge_rnn.hidden = torch.cat(
@@ -371,26 +367,30 @@ class GraphRNNModel(OpenChemModel):
         y_pred = self.edge_rnn(output_x, pack=True, input_len=output_y_len)
 
         if self.use_external_criterion:
+
             node_pred = F.log_softmax(node_pred, dim=-1)
             # valid edges are those that do not have all zeros in a row
             valid = torch.ones_like(y_pred)
             valid = pack_padded_sequence(valid, output_y_len, batch_first=True)
             valid = pad_packed_sequence(valid, batch_first=True)[0]
             y_pred = F.log_softmax(y_pred, dim=-1) * valid
+            y_pred = y_pred.gather(2, output_y).squeeze(2)
+            sum_y_pred = y_pred.sum(dim=1)
 
             valid = (c_out >= 0).to(node_pred.dtype)
             node_pred = node_pred.gather(
                 1, c_out.view(-1, 1).clamp(min=0)).view(-1) * valid
-            y_pred = y_pred.gather(2, output_y).squeeze(2)
 
-            sum_y_pred = y_pred.sum(dim=1)
+            # correct
+            logp = node_pred + sum_y_pred
+            logp = torch.flip(logp, (0,))
 
-            idx = [i for i in range(sum_y_pred.size(0) - 1, -1, -1)]
-            idx = torch.tensor(idx, dtype=torch.long, device=device)
-            sum_y_pred = sum_y_pred.index_select(0, idx)
+            # wrong
+            # logp = sum_y_pred
+            # logp = torch.flip(logp, (0, ))
+            # logp = node_pred + logp
 
-            return node_pred + sum_y_pred, num_nodes, \
-                   sort_index.to('cpu').numpy()
+            return logp, num_nodes, sort_index.to('cpu').numpy()
         else:
             # internal criterion
             weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)

@@ -6,6 +6,7 @@ import copy
 import runpy
 import random
 import argparse
+import numpy as np
 
 from six import string_types
 
@@ -57,6 +58,7 @@ def main():
 
     model_config = config_module.get('model_params', None)
     random.seed(args.random_seed)
+    np.random.seed(args.random_seed)
     torch.manual_seed(args.random_seed)
     torch.cuda.manual_seed_all(args.random_seed)
     model_config['use_cuda'] = args.use_cuda
@@ -225,7 +227,7 @@ def main():
         smiles = []
         with torch.no_grad():
             for _ in range(10):
-                smiles.extend(model.forward(None))
+                smiles.extend(model(None))
 
         path = os.path.join(logdir, "debug_smiles.txt")
         with open(path, "w") as f:

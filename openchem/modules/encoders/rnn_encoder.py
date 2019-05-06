@@ -5,8 +5,6 @@ from openchem.modules.encoders.openchem_encoder import OpenChemEncoder
 
 from openchem.utils.utils import check_params
 
-import numpy as np
-
 
 class RNNEncoder(OpenChemEncoder):
     def __init__(self, params, use_cuda):
@@ -75,19 +73,19 @@ class RNNEncoder(OpenChemEncoder):
         return: embedded
         """
         input_tensor = inp[0]
+        # TODO: use batch_first in pack, instead of permuting here
         input_tensor = input_tensor.permute(1, 0, 2)
         input_length = inp[1]
         if pack:
             input_lengths_sorted, perm_idx = torch.sort(input_length, dim=0,
                                                         descending=True)
-            input_lengths_sorted.cpu().numpy().tolist()
+            input_lengths_sorted.detach().to("cpu").tolist()
             input_tensor = torch.index_select(input_tensor, 1, perm_idx)
-            rnn_input = pack_padded_sequence(input_tensor,
-                                                input_lengths_sorted)
+            rnn_input = pack_padded_sequence(input_tensor, input_lengths_sorted)
         else:
             rnn_input = input_tensor
 
-        batch_size = input_tensor.size()[1]
+        batch_size = input_tensor.size(1)
         if previous_hidden is None:
             previous_hidden = self.init_hidden(batch_size)
             if self.layer == 'LSTM':
@@ -100,35 +98,26 @@ class RNNEncoder(OpenChemEncoder):
             _, unperm_idx = perm_idx.sort(0)
             rnn_output = torch.index_select(rnn_output, 1, unperm_idx)
 
-        index_tensor = input_length.cpu().numpy() - 1
-        index_tensor = np.array([index_tensor]).astype('int')
-        index_tensor = np.repeat(np.array([index_tensor]),
-                                 repeats=rnn_output.size()[2],
-                                 axis=0)
-        index_tensor = index_tensor.swapaxes(0, 1)
-        index_tensor = index_tensor.swapaxes(1, 2)
-        index_tensor = torch.LongTensor(index_tensor).cuda()
-        embedded = torch.gather(rnn_output, dim=0,
-                                index=index_tensor).squeeze(0)
+        index_t = (input_length - 1).to(dtype=torch.long)
+        index_t = index_t.unsqueeze(0).expand(rnn_output.size(2), 1, -1)
+        index_t = index_t.permute(1, 2, 0)
+
+        embedded = torch.gather(rnn_output, dim=0, index=index_t).squeeze(0)
 
         return embedded, next_hidden
 
     def init_hidden(self, batch_size):
         if self.use_cuda:
-            return torch.tensor(torch.zeros(self.n_layers * self.n_directions,
-                                            batch_size,
-                                            self.encoder_dim)).cuda()
+            device = torch.device("cuda")
         else:
-            return torch.tensor(torch.zeros(self.n_layers * self.n_directions,
-                                            batch_size,
-                                            self.encoder_dim))
+            device = torch.device("cpu")
+        return torch.zeros(self.n_layers * self.n_directions,
+                           batch_size, self.encoder_dim, device=device)
 
     def init_cell(self, batch_size):
         if self.use_cuda:
-            return torch.tensor(torch.zeros(self.n_layers * self.n_directions,
-                                            batch_size,
-                                            self.encoder_dim)).cuda()
+            device = torch.device("cuda")
         else:
-            return torch.tensor(torch.zeros(self.n_layers * self.n_directions,
-                                            batch_size,
-                                            self.encoder_dim))
+            device = torch.device("cpu")
+        return torch.zeros(self.n_layers * self.n_directions,
+                           batch_size, self.encoder_dim, device=device)

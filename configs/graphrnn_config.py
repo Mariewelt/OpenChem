@@ -110,24 +110,24 @@ edge_attributes = dict(
 )
 
 restrict_min_atoms = 10
-restrict_max_atoms = 100
+restrict_max_atoms = 50
 train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
     # './benchmark_datasets/logp_dataset/logP_labels.csv',
     # cols_to_read=[1, 2],
-    './benchmark_datasets/chembl_small/small_chembl.smi',
-    cols_to_read=[0, 1],
-    # 'benchmark_datasets/chembl_full/full_chembl.smi',
+    # './benchmark_datasets/chembl_small/small_chembl.smi',
     # cols_to_read=[0, 1],
-    # pickled='benchmark_datasets/chembl_full/' +
-    #        'full_chembl_cleaned.pkl',
+    'benchmark_datasets/chembl_full/full_chembl.smi',
+    cols_to_read=[0, 1],
+    pickled='benchmark_datasets/chembl_full/' +
+            'full_chembl_cleaned.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',
     random_order=True, max_prev_nodes=max_prev_nodes,
     original_start_node_label=original_start_node_label,
     edge_relabel_map=edge_relabel_map,
-    # node_relabel_map=node_relabel_map,
+    node_relabel_map=node_relabel_map,
     restrict_min_atoms=restrict_min_atoms,
     restrict_max_atoms=restrict_max_atoms
 )
@@ -145,7 +145,7 @@ label2atom = [number2atom[int(v)] for i, v
 edge2type = [t for e, t
              in sorted(train_dataset.inverse_edge_relabel_map.items())]
 
-edge_embedding_dim = 32
+edge_embedding_dim = 16
 
 if num_edge_classes > 2:
     node_rnn_input_size = edge_embedding_dim * max_prev_nodes
@@ -156,8 +156,6 @@ else:
 # TODO: maybe update node rnn input size to include previous predicted node label
 if num_node_classes > 2:
     node_rnn_input_size += node_embedding_dim
-
-node_rnn_hidden_size = 16
 
 
 class DummyCriterion(object):
@@ -189,7 +187,7 @@ model_params = {
     'use_cuda': True,
     'random_seed': 0,
     'use_clip_grad': False,
-    'batch_size': 32,
+    'batch_size': 512,
     'num_epochs': 51,
     'logdir': './logs/graphrnn_log',
     # 'logdir': './logs/debug',
@@ -240,9 +238,9 @@ model_params = {
 
     'NodeMLP': OpenChemMLPSimple,
     'node_mlp_params': dict(
-        input_size=node_rnn_hidden_size,
+        input_size=128,
         n_layers=2,
-        hidden_size=[64, num_node_classes],
+        hidden_size=[128, num_node_classes],
         activation=[nn.ReLU(inplace=True), identity],
         init="xavier_uniform"
     ),
@@ -250,19 +248,19 @@ model_params = {
     'NodeRNN': GRUPlain,
     'node_rnn_params': dict(
         input_size=node_rnn_input_size,
-        embedding_size=64,
+        embedding_size=128,
         hidden_size=128,
         num_layers=4,
         has_input=True,
-        has_output=True,
-        output_size=16
+        has_output=False,
+        # output_size=128
     ),
 
     'EdgeRNN': GRUPlain,
     'edge_rnn_params': dict(
         input_size=edge_embedding_dim if num_edge_classes > 2 else 1,
-        embedding_size=8,
-        hidden_size=16,
+        embedding_size=64,
+        hidden_size=128,
         num_layers=4,
         has_input=True,
         has_output=True,

@@ -1,3 +1,5 @@
+import bisect
+import numpy as np
 import torch
 from torch.nn.modules.loss import _Loss
 
@@ -41,6 +43,7 @@ class PolicyGradientLoss(_Loss):
         discounted_rewards = pack_padded_sequence(discounted_rewards,
                                                   sizes,
                                                   batch_first=True).data
+        """
         if self.max_atom_bonds:
             atom_bonds = torch.cat(
                 [torch.from_numpy(a).sum(dim=0) for a in adj]
@@ -52,8 +55,17 @@ class PolicyGradientLoss(_Loss):
             max_atom_bonds = torch.tensor(self.max_atom_bonds)
             max_atom_bonds = max_atom_bonds[classes]
             structure_reward = (atom_bonds <= max_atom_bonds)
+
+            # indices = (atom_bonds > max_atom_bonds).nonzero()
+            # cum_sizes = np.cumsum(sizes)
+            # sm_indices = [bisect.bisect_right(cum_sizes, i) for i in indices]
+            # for i in np.unique(sm_indices):
+            #     print(trajectories[i])
+
             discounted_rewards *= structure_reward
+        """
 
         loss = - discounted_rewards * log_policy
+        # print(loss.max().item())
         loss = loss.mean()
         return loss
