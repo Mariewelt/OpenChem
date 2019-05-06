@@ -47,9 +47,22 @@ def main():
                         help='number of data loading workers (default: 0)')
     parser.add_argument('--random_seed', default=0, type=int, metavar='N',
                         help='random_seed (default: 0)')
-    parser.add_argument("--local_rank", type=int, default=-1)
+    parser.add_argument("--local_rank", type=int, default=0)
 
     args, unknown = parser.parse_known_args()
+
+    num_gpus = int(os.environ["WORLD_SIZE"]) \
+        if "WORLD_SIZE" in os.environ else 1
+    args.distributed = num_gpus > 1
+
+    if args.distributed:
+        torch.cuda.set_device(args.local_rank)
+        dist.init_process_group(backend=args.dist_backend,
+                                init_method='env://')
+        print('Distributed process with rank {:d} initalized'.format(
+            args.local_rank))
+
+    cudnn.benchmark = True
 
     if args.mode not in ['train', 'eval', 'train_eval', 'infer']:
         raise ValueError("Mode has to be one of "
@@ -122,8 +135,6 @@ def main():
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
 
-    args.distributed = args.local_rank >= 0
-
     if args.mode == 'train' or args.mode == 'train_eval':
         if 'train_params' in config_module:
             nested_update(train_config,
@@ -140,20 +151,6 @@ def main():
                 checkpoint))
     else:
         deco_print("Loading model from {}".format(checkpoint))
-
-    if args.distributed:
-        torch.cuda.set_device(args.local_rank)
-        dist.init_process_group(backend=args.dist_backend,
-                                init_method='env://')
-        print('Distributed process with rank ' + str(args.local_rank) +
-              ' initiated')
-
-        args.world_size = torch.distributed.get_world_size()
-        model_config['world_size'] = args.world_size
-    else:
-        model_config['world_size'] = 1
-
-    cudnn.benchmark = True
 
     if args.mode == "train" or args.mode == "train_eval":
         train_dataset = copy.deepcopy(model_config['train_data_layer'])

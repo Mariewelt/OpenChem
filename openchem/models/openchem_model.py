@@ -7,6 +7,7 @@ from openchem.utils.utils import check_params
 
 import time
 
+from openchem.utils import comm
 from openchem.utils.logger import Logger
 from openchem.utils.utils import time_since, calculate_metrics
 from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
@@ -30,7 +31,6 @@ class OpenChemModel(nn.Module):
         self.eval_metrics = self.params['eval_metrics']
         self.task = self.params['task']
         self.logdir = self.params['logdir']
-        self.world_size = self.params['world_size']
 
         self.num_epochs = self.params['num_epochs']
         self.use_clip_grad = self.params['use_clip_grad']
@@ -83,6 +83,7 @@ class OpenChemModel(nn.Module):
         
 def build_training(model, params):
 
+    print(params["optimizer_params"]["lr"])
     optimizer = OpenChemOptimizer([params['optimizer'],
                                    params['optimizer_params']],
                                   model.parameters())
@@ -119,15 +120,6 @@ def train_step(model, optimizer, criterion, inp, target):
     return loss
 
 
-def print_logs(world_size):
-    if world_size == 1:
-        return True
-    elif torch.distributed.get_rank() == 0:
-        return True
-    else:
-        return False
-
-
 def fit(model, scheduler, train_loader, optimizer, criterion, params,
         eval=False, val_loader=None):
     cur_epoch = 0
@@ -145,10 +137,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
     has_module = False
     if hasattr(model, 'module'):
         has_module = True
-    if has_module:
-        world_size = model.module.world_size
-    else:
-        world_size = model.world_size     
+    world_size = comm.get_world_size()
 
     for epoch in range(cur_epoch, n_epochs + cur_epoch):
         model.train()
@@ -161,16 +150,16 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
             loss = train_step(model, optimizer, criterion,
                               batch_input, batch_target)
             if world_size > 1:
-                reduced_loss = reduce_tensor(loss, world_size)
+                reduced_loss = reduce_tensor(loss, world_size).item()
             else:
-                reduced_loss = loss.clone()
-            loss_total += reduced_loss.item()
+                reduced_loss = loss.item()
+            loss_total += reduced_loss
             n_batches += 1
         cur_loss = loss_total / n_batches
         all_losses.append(cur_loss)
 
         if epoch % print_every == 0:
-            if print_logs(world_size):
+            if comm.is_main_process():
                 print('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
                       'Loss: %.4f]' % (time_since(start), epoch,
                                        epoch / n_epochs * 100, cur_loss))
@@ -185,7 +174,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                 info = {'Train loss': cur_loss,
                         'LR': optimizer.param_groups[0]['lr']}
 
-            if print_logs(world_size):
+            if comm.is_main_process():
                 for tag, value in info.items():
                     logger.scalar_summary(tag, value, epoch + 1)
 
@@ -206,7 +195,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                             logger.histo_summary(
                                 tag + '/grad', log_value_grad, epoch + 1)
 
-        if epoch % save_every == 0 and print_logs(world_size):
+        if epoch % save_every == 0 and comm.is_main_process():
             torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
 
         loss_total = 0
@@ -229,11 +218,10 @@ def evaluate(model, val_loader, criterion):
     if has_module:
         task = model.module.task
         eval_metrics = model.module.eval_metrics
-        world_size = model.module.world_size
     else:
         task = model.task
         eval_metrics = model.eval_metrics
-        world_size = model.world_size
+
     for i_batch, sample_batched in enumerate(val_loader):
         if has_module:
             batch_input, batch_target = model.module.cast_inputs(sample_batched)
@@ -256,7 +244,7 @@ def evaluate(model, val_loader, criterion):
 
     metrics = calculate_metrics(prediction, ground_truth,
                                 eval_metrics)
-    if print_logs(world_size):
+    if comm.is_main_process():
         print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
               (time_since(start), cur_loss, metrics))
     return cur_loss, metrics
