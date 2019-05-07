@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
 import torch.distributed as dist
+import logging
 
 from openchem.utils.utils import check_params
 
@@ -121,6 +122,7 @@ def train_step(model, optimizer, criterion, inp, target):
 
 def fit(model, scheduler, train_loader, optimizer, criterion, params,
         eval=False, val_loader=None, cur_epoch=0):
+    textlogger = logging.getLogger("openchem.fit")
     logdir = params['logdir']
     print_every = params['print_every']
     save_every = params['save_every']
@@ -158,9 +160,10 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
         if epoch % print_every == 0:
             if comm.is_main_process():
-                print('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
-                      'Loss: %.4f]' % (time_since(start), epoch,
-                                       epoch / n_epochs * 100, cur_loss))
+                textlogger.info(
+                    'TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
+                    'Loss: %.4f]' % (time_since(start), epoch,
+                                     epoch / n_epochs * 100, cur_loss))
             if eval:
                 assert val_loader is not None
                 val_loss, metrics = evaluate(model, val_loader, criterion)
@@ -180,8 +183,9 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                     tag = tag.replace('.', '/')
                     if torch.std(value).item() < 1e-3 or \
                             torch.isnan(torch.std(value)).item():
-                        print("Warning: {} has zero variance ".format(tag) +
-                              "(i.e. constant vector)")
+                        textlogger.warning(
+                            "Warning: {} has zero variance ".format(tag) +
+                            "(i.e. constant vector)")
                     else:
                         log_value = value.detach().cpu().numpy()
                         logger.histo_summary(

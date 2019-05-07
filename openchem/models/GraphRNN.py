@@ -28,7 +28,7 @@ class GraphRNNModel(OpenChemModel):
         self.edge2type = params["edge2type"]
         self.restrict_min_atoms = params["restrict_min_atoms"]
         self.restrict_max_atoms = params["restrict_max_atoms"]
-        self.use_external_criterion = params["use_external_criterion"]
+        self.use_external_crit = params.get("use_external_criterion", False)
 
         if self.num_edge_classes > 2:
             EdgeEmbedding = params["EdgeEmbedding"]
@@ -78,8 +78,8 @@ class GraphRNNModel(OpenChemModel):
     #     return {}
 
     def forward(self, inp, eval=False):
-        if self.use_external_criterion:
-            assert self.training, "Must be in training mode for external criterion"
+        if self.use_external_crit and self.training:
+            # TODO: check if .eval() creates any problems with batchnorm, dropout, etc.
             # generate batch
             # self.eval()
             with torch.no_grad():
@@ -237,7 +237,7 @@ class GraphRNNModel(OpenChemModel):
         idx = [idx[i] for i in idx2]
         smiles = [s for i, s in enumerate(smiles) if i in idx2]
 
-        if self.use_external_criterion:
+        if self.use_external_crit:
             adj_all = [s for i, s in enumerate(adj_all) if i in idx]
             adj_encoded_all = [s for i, s in enumerate(adj_encoded_all) if i in idx]
             classes_all = [s for i, s in enumerate(classes_all) if i in idx]
@@ -370,7 +370,7 @@ class GraphRNNModel(OpenChemModel):
 
         y_pred = self.edge_rnn(output_x, pack=True, input_len=output_y_len)
 
-        if self.use_external_criterion:
+        if self.use_external_crit:
 
             node_pred = F.log_softmax(node_pred, dim=-1)
             # valid edges are those that do not have all zeros in a row
