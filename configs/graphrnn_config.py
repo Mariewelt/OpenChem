@@ -206,7 +206,7 @@ model_params = {
 
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.03,
+        'lr': 0.003,
         },
     'lr_scheduler': MultiStepLR,
     'lr_scheduler_params': {

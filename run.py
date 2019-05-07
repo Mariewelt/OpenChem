@@ -96,6 +96,10 @@ def main():
     config_update = parser_unk.parse_args(unknown)
     nested_update(model_config, nest_dict(vars(config_update)))
 
+    print("Running with config:")
+    for k, v in sorted(flatten_dict(model_config).items()):
+        print(("{}:\t{}".format(k, v)).expandtabs(50))
+
     # checking that everything is correct with log directory
     logdir = model_config['logdir']
     ckpt_dir = os.path.join(logdir, 'checkpoint')

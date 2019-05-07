@@ -83,7 +83,6 @@ class OpenChemModel(nn.Module):
         
 def build_training(model, params):
 
-    print(params["optimizer_params"]["lr"])
     optimizer = OpenChemOptimizer([params['optimizer'],
                                    params['optimizer_params']],
                                   model.parameters())
