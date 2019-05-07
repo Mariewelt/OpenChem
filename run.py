@@ -22,6 +22,7 @@ from openchem.data.utils import create_loader
 from openchem.utils.utils import get_latest_checkpoint, deco_print
 from openchem.utils.utils import flatten_dict, nested_update, nest_dict
 from openchem.utils import comm
+from openchem.utils.textlogger import setup_textlogger
 
 
 def main():
@@ -60,7 +61,7 @@ def main():
         dist.init_process_group(backend=args.dist_backend,
                                 init_method='env://')
         print('Distributed process with rank {:d} initalized'.format(
-            args.local_rank))
+              args.local_rank))
 
     cudnn.benchmark = True
 
@@ -95,10 +96,6 @@ def main():
 
     config_update = parser_unk.parse_args(unknown)
     nested_update(model_config, nest_dict(vars(config_update)))
-
-    print("Running with config:")
-    for k, v in sorted(flatten_dict(model_config).items()):
-        print(("{}:\t{}".format(k, v)).expandtabs(50))
 
     # checking that everything is correct with log directory
     logdir = model_config['logdir']
@@ -142,6 +139,16 @@ def main():
                 "continue learning, you should provide "
                 "\"--continue_learning\" flag")
 
+    doprint = comm.is_main_process()
+    tofile = os.path.join(logdir, "log.txt")
+    logger = setup_textlogger("openchem", doprint, tofile)
+    msg = "Running with config:\n"
+    for k, v in sorted(flatten_dict(model_config).items()):
+        msg += ("{}:\t{}\n".format(k, v)).expandtabs(50)
+    logger.info("Running on {:d} GPUs".format(comm.get_world_size()))
+    logger.info("Logging directory is set to {}".format(logdir))
+    logger.info(msg)
+
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
 
@@ -153,14 +160,6 @@ def main():
         if 'eval_params' in config_module:
             nested_update(eval_config,
                           copy.deepcopy(config_module['eval_params']))
-
-    if checkpoint is None:
-        deco_print("Starting training from scratch")
-    elif args.continue_learning:
-        deco_print("Restored checkpoint from {}. ".format(checkpoint) +
-                   "Resuming training (epoch {:d})".format(cur_epoch))
-    else:
-        deco_print("Loading model from {}".format(checkpoint))
 
     if args.mode == "train" or args.mode == "train_eval":
         train_dataset = copy.deepcopy(model_config['train_data_layer'])
@@ -215,9 +214,13 @@ def main():
         model = DataParallel(model)
 
     if checkpoint is not None:
-        print("=> loading model  pre-trained model")
+        logger.info("Loading model from {}".format(checkpoint))
         weights = torch.load(checkpoint)
         model.load_state_dict(weights)
+    else:
+        logger.info("Starting training from scratch")
+    if args.mode in ["train", "train_eval"]:
+        logger.info("Training is set up from epoch {:d}".format(cur_epoch))
 
     criterion, optimizer, lr_scheduler = build_training(model, model_config)
 
