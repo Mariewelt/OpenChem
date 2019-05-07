@@ -82,9 +82,8 @@ def seq2tensor(seqs, tokens, flip=True):
 
 def pad_sequences(seqs, max_length=None, pad_symbol=' '):
     if max_length is None:
-        max_length = -1
-        for seq in seqs:
-            max_length = max(max_length, len(seq))
+        max_length = max([len(s) for s in seqs])
+
     lengths = []
     for i in range(len(seqs)):
         cur_len = len(seqs[i])

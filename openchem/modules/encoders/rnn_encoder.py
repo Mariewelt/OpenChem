@@ -36,17 +36,20 @@ class RNNEncoder(OpenChemEncoder):
             self.rnn = nn.LSTM(self.input_size, self.encoder_dim,
                                self.n_layers,
                                bidirectional=self.bidirectional,
-                               dropout=self.dropout)
+                               dropout=self.dropout,
+                               batch_first=True)
         elif self.layer == 'GRU':
             self.rnn = nn.GRU(self.input_size, self.encoder_dim,
                               self.n_layers,
                               bidirectional=self.bidirectional,
-                              dropout=self.dropout)
+                              dropout=self.dropout,
+                              batch_first=True)
         else:
             self.layer = nn.RNN(self.input_size, self.encoder_dim,
                                 self.n_layers,
                                 bidirectional=self.bidirectional,
-                                dropout=self.dropout)
+                                dropout=self.dropout,
+                                batch_first=True)
 
     @staticmethod
     def get_required_params():
@@ -73,19 +76,20 @@ class RNNEncoder(OpenChemEncoder):
         return: embedded
         """
         input_tensor = inp[0]
-        # TODO: use batch_first in pack, instead of permuting here
-        input_tensor = input_tensor.permute(1, 0, 2)
         input_length = inp[1]
+        batch_size = input_tensor.size(0)
+
+        # TODO: warning: output shape is changed! (batch_first=True) Check hidden
         if pack:
             input_lengths_sorted, perm_idx = torch.sort(input_length, dim=0,
                                                         descending=True)
             input_lengths_sorted.detach().to("cpu").tolist()
-            input_tensor = torch.index_select(input_tensor, 1, perm_idx)
-            rnn_input = pack_padded_sequence(input_tensor, input_lengths_sorted)
+            input_tensor = torch.index_select(input_tensor, 0, perm_idx)
+            rnn_input = pack_padded_sequence(
+                input_tensor, input_lengths_sorted, batch_first=True)
         else:
             rnn_input = input_tensor
 
-        batch_size = input_tensor.size(1)
         if previous_hidden is None:
             previous_hidden = self.init_hidden(batch_size)
             if self.layer == 'LSTM':
@@ -94,15 +98,14 @@ class RNNEncoder(OpenChemEncoder):
         rnn_output, next_hidden = self.rnn(rnn_input, previous_hidden)
 
         if pack:
-            rnn_output, _ = pad_packed_sequence(rnn_output)
+            rnn_output, _ = pad_packed_sequence(rnn_output, batch_first=True)
             _, unperm_idx = perm_idx.sort(0)
-            rnn_output = torch.index_select(rnn_output, 1, unperm_idx)
+            rnn_output = torch.index_select(rnn_output, 0, unperm_idx)
 
         index_t = (input_length - 1).to(dtype=torch.long)
-        index_t = index_t.unsqueeze(0).expand(rnn_output.size(2), 1, -1)
-        index_t = index_t.permute(1, 2, 0)
+        index_t = index_t.view(-1, 1, 1).expand(-1, 1, rnn_output.size(2))
 
-        embedded = torch.gather(rnn_output, dim=0, index=index_t).squeeze(0)
+        embedded = torch.gather(rnn_output, dim=1, index=index_t).squeeze(1)
 
         return embedded, next_hidden
 

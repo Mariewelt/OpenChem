@@ -102,7 +102,7 @@ class GraphRNNModel(OpenChemModel):
             batch, smiles = self.forward_test()
             return smiles
 
-    def forward_test(self, batch_size=64):
+    def forward_test(self, batch_size=1024):
         device = torch.device("cuda")
 
         # TODO: handle float type for x_step in case of no node embedding
@@ -226,10 +226,13 @@ class GraphRNNModel(OpenChemModel):
 
         smiles = [s for i, s in enumerate(smiles) if i in idx]
 
-        smiles, idx2 = sanitize_smiles(smiles,
-                                       min_atoms=self.restrict_min_atoms,
-                                       max_atoms=self.restrict_max_atoms,
-                                       logging="none")
+        smiles, idx2 = sanitize_smiles(
+            smiles,
+            min_atoms=self.restrict_min_atoms,
+            max_atoms=self.restrict_max_atoms,
+            allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
+            logging="none"
+        )
         idx = [idx[i] for i in idx2]
         smiles = [s for i, s in enumerate(smiles) if i in idx2]
 
@@ -381,14 +384,8 @@ class GraphRNNModel(OpenChemModel):
             node_pred = node_pred.gather(
                 1, c_out.view(-1, 1).clamp(min=0)).view(-1) * valid
 
-            # correct
             logp = node_pred + sum_y_pred
             logp = torch.flip(logp, (0,))
-
-            # wrong
-            # logp = sum_y_pred
-            # logp = torch.flip(logp, (0, ))
-            # logp = node_pred + logp
 
             return logp, num_nodes, sort_index.to('cpu').numpy()
         else:

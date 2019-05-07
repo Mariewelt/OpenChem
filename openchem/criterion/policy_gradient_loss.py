@@ -15,7 +15,7 @@ class PolicyGradientLoss(_Loss):
         self.critic = critic
         self.tokens = tokens
         self.fn = fn
-        self.max_atom_bonds=max_atom_bonds
+        self.max_atom_bonds = max_atom_bonds
 
     def forward(self, input, target=None):
 

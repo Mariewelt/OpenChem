@@ -4,8 +4,7 @@ from openchem.data.utils import process_smiles
 
 
 def melt_t_max_fn(prediction):
-    # rewards = torch.exp(prediction + 1.0)
-    rewards = torch.exp(prediction).clamp(min=0, max=20)
+    rewards = torch.exp(prediction + 1.0)
     return rewards
 
 
@@ -26,6 +25,5 @@ def reward_fn(smiles, predictor, old_tokens, device, fn):
         prediction = torch.argmax(prediction, dim=1)
 
     rewards = fn(prediction.to(torch.float))
-    print(rewards.max().item())
 
     return rewards
