@@ -120,8 +120,7 @@ def train_step(model, optimizer, criterion, inp, target):
 
 
 def fit(model, scheduler, train_loader, optimizer, criterion, params,
-        eval=False, val_loader=None):
-    cur_epoch = 0
+        eval=False, val_loader=None, cur_epoch=0):
     logdir = params['logdir']
     print_every = params['print_every']
     save_every = params['save_every']

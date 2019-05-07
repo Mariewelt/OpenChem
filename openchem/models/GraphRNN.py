@@ -102,7 +102,7 @@ class GraphRNNModel(OpenChemModel):
             batch, smiles = self.forward_test()
             return smiles
 
-    def forward_test(self, batch_size=1024):
+    def forward_test(self, batch_size=512):
         device = torch.device("cuda")
 
         # TODO: handle float type for x_step in case of no node embedding
@@ -207,13 +207,14 @@ class GraphRNNModel(OpenChemModel):
 
                 adj = decode_adj_new(adj_encoded)
                 if self.num_edge_classes > 2:
-                    adj = adj.astype("float32")
+                    adj_t = np.zeros(adj.shape, dtype="float32")
                     for bond_label, bond_type in enumerate(self.edge2type):
-                        adj[adj == bond_label] = bond_type
-                adj_all.append(adj)
+                        adj_t[adj == bond_label] = bond_type
+                else:
+                    adj_t = adj
+                adj_all.append(adj_t)
 
-                # remap = self.edge2type if self.num_edge_classes > 2 else None
-                sstring = SmilesFromGraphs(atoms, adj)  # remap=remap)
+                sstring = SmilesFromGraphs(atoms, adj_t)
                 smiles.append(sstring)
 
         # TODO: think how to avoid double sanitization
@@ -384,8 +385,11 @@ class GraphRNNModel(OpenChemModel):
             node_pred = node_pred.gather(
                 1, c_out.view(-1, 1).clamp(min=0)).view(-1) * valid
 
-            logp = node_pred + sum_y_pred
-            logp = torch.flip(logp, (0,))
+            # logp = node_pred + sum_y_pred
+            # logp = torch.flip(logp, (0,))
+
+            logp = torch.flip(sum_y_pred, (0, ))
+            logp += node_pred
 
             return logp, num_nodes, sort_index.to('cpu').numpy()
         else:

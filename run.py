@@ -105,8 +105,12 @@ def main():
     ckpt_dir = os.path.join(logdir, 'checkpoint')
 
     if args.force_checkpoint:
+        assert not args.continue_learning, \
+            "force_checkpoint and continue_learning are " \
+            "mutually exclusive flags"
         checkpoint = args.force_checkpoint
         assert os.path.isfile(checkpoint), "{} is not a file".format(checkpoint)
+        cur_epoch = 0
     elif args.mode in ['eval', 'infer'] or args.continue_learning:
         checkpoint = get_latest_checkpoint(ckpt_dir)
         if checkpoint is None:
@@ -114,8 +118,10 @@ def main():
                 "Failed to find model checkpoint under "
                 "{}. Can't load the model".format(ckpt_dir)
             )
+        cur_epoch = int(os.path.basename(checkpoint).split("_")[-1]) + 1
     else:
         checkpoint = None
+        cur_epoch = 0
 
     if not os.path.exists(logdir):
         comm.mkdir(logdir)
@@ -151,8 +157,8 @@ def main():
     if checkpoint is None:
         deco_print("Starting training from scratch")
     elif args.continue_learning:
-        deco_print("Restored checkpoint from {}. Resuming training".format(
-                checkpoint))
+        deco_print("Restored checkpoint from {}. ".format(checkpoint) +
+                   "Resuming training (epoch {:d})".format(cur_epoch))
     else:
         deco_print("Loading model from {}".format(checkpoint))
 
@@ -217,10 +223,10 @@ def main():
 
     if args.mode == 'train':
         fit(model, lr_scheduler, train_loader, optimizer, criterion,
-            model_config, eval=False)
+            model_config, eval=False, cur_epoch=cur_epoch)
     elif args.mode == 'train_eval':
         fit(model, lr_scheduler, train_loader, optimizer, criterion,
-            model_config, eval=True, val_loader=val_loader)
+            model_config, eval=True, val_loader=val_loader, cur_epoch=cur_epoch)
     elif args.mode == "eval":
         evaluate(model, val_loader, criterion)
     elif args.mode == "infer":
