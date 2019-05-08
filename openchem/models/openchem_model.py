@@ -209,7 +209,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
 
 def evaluate(model, val_loader, criterion):
-    textlogger = logging.getLogger("openchem.fit")
+    textlogger = logging.getLogger("openchem.evaluate")
     model.eval()
     loss_total = 0
     n_batches = 0
@@ -234,7 +234,7 @@ def evaluate(model, val_loader, criterion):
         predicted = model(batch_input, eval=True)
         loss = criterion(predicted, batch_target)
         if hasattr(predicted, 'detach'):
-            predicted = predicted
+            predicted = predicted.detach().cpu().numpy()
         if hasattr(batch_target, 'cpu'):
             batch_target = batch_target.cpu().numpy()
         if hasattr(loss, 'item'):
