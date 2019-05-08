@@ -40,9 +40,11 @@ class Graph:
     """Describes an undirected graph class"""
 
     def __init__(self, smiles, max_size, get_atom_attributes,
-                 get_bond_attributes=None):
+                 get_bond_attributes=None, kekulize=True):
         self.smiles = smiles
         rdmol = Chem.MolFromSmiles(smiles)
+        if kekulize:
+            Chem.Kekulize(rdmol)
         self.num_nodes = rdmol.GetNumAtoms()
         self.num_edges = rdmol.GetNumBonds()
 

@@ -18,11 +18,13 @@ class GraphDataset(Dataset):
                  cols_to_read, delimiter=',', get_bond_attributes=None,
                  edge_attributes=None,
                  restrict_min_atoms=-1, restrict_max_atoms=-1,
+                 kekulize=True,
                  **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
         self.restrict_min_atoms = restrict_min_atoms
         self.restrict_max_atoms = restrict_max_atoms
+        self.kekulize = kekulize
 
         if "pickled" in kwargs:
             data = pickle.load(open(kwargs["pickled"], "rb"))
@@ -73,7 +75,7 @@ class GraphDataset(Dataset):
 
         graph = Graph(
             sm, self.max_size, self.get_atomic_attributes,
-            self.get_bond_attributes)
+            self.get_bond_attributes, kekulize=self.kekulize)
         node_feature_matrix = graph.get_node_feature_matrix(
             self.node_attributes, self.max_size)
 
