@@ -82,8 +82,9 @@ def seq2tensor(seqs, tokens, flip=True):
 
 def pad_sequences(seqs, max_length=None, pad_symbol=' '):
     if max_length is None:
-        max_length = max([len(s) for s in seqs])
-
+        max_length = -1
+        for seq in seqs:
+            max_length = max(max_length, len(seq))
     lengths = []
     for i in range(len(seqs)):
         cur_len = len(seqs[i])
@@ -160,8 +161,12 @@ def sanitize_smiles(smiles, canonize=True,
 
     smiles_set = set(new_smiles)
     num_unique = len(smiles_set) - ('' in smiles_set)
-    valid_unique_rate = float(num_unique) / len(idx)
-    invalid_rate = 1.0 - len(idx) / len(smiles)
+    if len(idx) > 0:
+        valid_unique_rate = float(num_unique) / len(idx)
+        invalid_rate = 1.0 - len(idx) / len(smiles)
+    else:
+        valid_unique_rate = 0.0
+        invalid_rate = 1.0
     num_bad = len(smiles) - len(idx)
 
     if len(idx) != len(smiles) and logging == "warn":

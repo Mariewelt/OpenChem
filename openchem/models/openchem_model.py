@@ -84,6 +84,7 @@ class OpenChemModel(nn.Module):
         
 def build_training(model, params):
 
+    print(params["optimizer_params"]["lr"])
     optimizer = OpenChemOptimizer([params['optimizer'],
                                    params['optimizer_params']],
                                   model.parameters())
@@ -208,6 +209,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
 
 def evaluate(model, val_loader, criterion):
+    textlogger = logging.getLogger("openchem.fit")
     model.eval()
     loss_total = 0
     n_batches = 0
@@ -232,12 +234,14 @@ def evaluate(model, val_loader, criterion):
         predicted = model(batch_input, eval=True)
         loss = criterion(predicted, batch_target)
         if hasattr(predicted, 'detach'):
-            predicted = predicted.detach().cpu().numpy()
+            predicted = predicted
         if hasattr(batch_target, 'cpu'):
             batch_target = batch_target.cpu().numpy()
+        if hasattr(loss, 'item'):
+            loss = loss.item()
         prediction += list(predicted)
         ground_truth += list(batch_target)
-        loss_total += loss.item()
+        loss_total += loss
         n_batches += 1
 
     cur_loss = loss_total / n_batches
@@ -247,7 +251,7 @@ def evaluate(model, val_loader, criterion):
     metrics = calculate_metrics(prediction, ground_truth,
                                 eval_metrics)
     if comm.is_main_process():
-        print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
+        textlogger.info('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
               (time_since(start), cur_loss, metrics))
     return cur_loss, metrics
 

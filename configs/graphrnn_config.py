@@ -13,26 +13,15 @@ from openchem.utils.sa_score import sascorer
 from rdkit import Chem
 import numpy as np
 from openchem.data.utils import DummyDataset
+from openchem.utils.metrics import qed, sa_score
 
 
 def get_sa_score(target, smiles):
-    scores = []
-    if len(smiles) > 0:
-        for sm in smiles:
-            try:
-                if sm != '':
-                    mol = Chem.MolFromSmiles(sm)
-                    scores.append(sascorer.calculateScore(mol))
-            except:
-                pass
-        mean_score = np.nanmean(scores)
-        if np.isnan(mean_score):
-            return -1.0
-        else:
-            return mean_score
-    else:
-        return -1.0
+    return sa_score(smiles)
 
+
+def get_qed(target, smiles):
+    return qed(smiles)
 
 max_prev_nodes = 12
 # this in Carbon original id in the Periodic Table
@@ -115,12 +104,12 @@ train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
     # './benchmark_datasets/logp_dataset/logP_labels.csv',
     # cols_to_read=[1, 2],
-    # './benchmark_datasets/chembl_small/small_chembl.smi',
+     './benchmark_datasets/chembl_small/small_chembl.smi',
     # cols_to_read=[0, 1],
-    'benchmark_datasets/chembl_full/full_chembl.smi',
+    #'benchmark_datasets/chembl_full/full_chembl.smi',
     cols_to_read=[0, 1],
-    pickled='benchmark_datasets/chembl_full/' +
-            'full_chembl_cleaned.pkl',
+    #pickled='benchmark_datasets/chembl_full/' +
+    #        'full_chembl_cleaned.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',
@@ -201,12 +190,12 @@ model_params = {
     # 'criterion': RLCriterion(),
     # 'use_external_criterion': True,
 
-    'eval_metrics': get_sa_score,
+    'eval_metrics': get_qed,
     'val_data_layer': val_dataset,
 
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.003,
+        'lr': 0.03,
         },
     'lr_scheduler': MultiStepLR,
     'lr_scheduler_params': {

@@ -22,7 +22,7 @@ from openchem.data.utils import create_loader
 from openchem.utils.utils import get_latest_checkpoint, deco_print
 from openchem.utils.utils import flatten_dict, nested_update, nest_dict
 from openchem.utils import comm
-from openchem.utils.textlogger import setup_textlogger
+from openchem.utils import metrics
 
 
 def main():
@@ -61,7 +61,7 @@ def main():
         dist.init_process_group(backend=args.dist_backend,
                                 init_method='env://')
         print('Distributed process with rank {:d} initalized'.format(
-              args.local_rank))
+            args.local_rank))
 
     cudnn.benchmark = True
 
@@ -102,12 +102,8 @@ def main():
     ckpt_dir = os.path.join(logdir, 'checkpoint')
 
     if args.force_checkpoint:
-        assert not args.continue_learning, \
-            "force_checkpoint and continue_learning are " \
-            "mutually exclusive flags"
         checkpoint = args.force_checkpoint
         assert os.path.isfile(checkpoint), "{} is not a file".format(checkpoint)
-        cur_epoch = 0
     elif args.mode in ['eval', 'infer'] or args.continue_learning:
         checkpoint = get_latest_checkpoint(ckpt_dir)
         if checkpoint is None:
@@ -115,10 +111,8 @@ def main():
                 "Failed to find model checkpoint under "
                 "{}. Can't load the model".format(ckpt_dir)
             )
-        cur_epoch = int(os.path.basename(checkpoint).split("_")[-1]) + 1
     else:
         checkpoint = None
-        cur_epoch = 0
 
     if not os.path.exists(logdir):
         comm.mkdir(logdir)
@@ -139,16 +133,6 @@ def main():
                 "continue learning, you should provide "
                 "\"--continue_learning\" flag")
 
-    doprint = comm.is_main_process()
-    tofile = os.path.join(logdir, "log.txt")
-    logger = setup_textlogger("openchem", doprint, tofile)
-    msg = "Running with config:\n"
-    for k, v in sorted(flatten_dict(model_config).items()):
-        msg += ("{}:\t{}\n".format(k, v)).expandtabs(50)
-    logger.info("Running on {:d} GPUs".format(comm.get_world_size()))
-    logger.info("Logging directory is set to {}".format(logdir))
-    logger.info(msg)
-
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
 
@@ -160,6 +144,14 @@ def main():
         if 'eval_params' in config_module:
             nested_update(eval_config,
                           copy.deepcopy(config_module['eval_params']))
+
+    if checkpoint is None:
+        deco_print("Starting training from scratch")
+    elif args.continue_learning:
+        deco_print("Restored checkpoint from {}. Resuming training".format(
+                checkpoint))
+    else:
+        deco_print("Loading model from {}".format(checkpoint))
 
     if args.mode == "train" or args.mode == "train_eval":
         train_dataset = copy.deepcopy(model_config['train_data_layer'])
@@ -214,22 +206,18 @@ def main():
         model = DataParallel(model)
 
     if checkpoint is not None:
-        logger.info("Loading model from {}".format(checkpoint))
+        print("=> loading model  pre-trained model")
         weights = torch.load(checkpoint)
         model.load_state_dict(weights)
-    else:
-        logger.info("Starting training from scratch")
-    if args.mode in ["train", "train_eval"]:
-        logger.info("Training is set up from epoch {:d}".format(cur_epoch))
 
     criterion, optimizer, lr_scheduler = build_training(model, model_config)
 
     if args.mode == 'train':
         fit(model, lr_scheduler, train_loader, optimizer, criterion,
-            model_config, eval=False, cur_epoch=cur_epoch)
+            model_config, eval=False)
     elif args.mode == 'train_eval':
         fit(model, lr_scheduler, train_loader, optimizer, criterion,
-            model_config, eval=True, val_loader=val_loader, cur_epoch=cur_epoch)
+            model_config, eval=True, val_loader=val_loader)
     elif args.mode == "eval":
         evaluate(model, val_loader, criterion)
     elif args.mode == "infer":
@@ -246,7 +234,9 @@ def main():
 
         eval_metrics = model_config['eval_metrics']
         score = eval_metrics(None, smiles)
+        qed_score = metrics.qed(smiles)
         print("SA score = {:.2f}".format(score))
+        print("QED score = {:.2f}".format(qed_score))
 
 
 if __name__ == '__main__':

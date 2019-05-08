@@ -226,7 +226,7 @@ model_params = {
     'use_cuda': True,
     'random_seed': 0,
     'use_clip_grad': False,
-    'batch_size': 100,
+    'batch_size': 1000,
     'num_epochs': 51,
     'logdir': './logs/graphrnn_log',
     # 'logdir': './logs/debug',
