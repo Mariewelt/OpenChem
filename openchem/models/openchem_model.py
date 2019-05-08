@@ -132,6 +132,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
     start = time.time()
     loss_total = 0
     n_batches = 0
+    schedule_by_iter = scheduler.by_iteration
     scheduler = scheduler.scheduler
     all_losses = []
     val_losses = []
@@ -150,6 +151,9 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                 batch_input, batch_target = model.cast_inputs(sample_batched)
             loss = train_step(model, optimizer, criterion,
                               batch_input, batch_target)
+            if schedule_by_iter:
+                # steps are in iters
+                scheduler.step()
             if world_size > 1:
                 reduced_loss = reduce_tensor(loss, world_size).item()
             else:
@@ -203,7 +207,9 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
         loss_total = 0
         n_batches = 0
-        scheduler.step()
+        if not schedule_by_iter:
+            # steps are in epochs
+            scheduler.step()
 
     return all_losses, val_losses
 

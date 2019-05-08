@@ -1,6 +1,6 @@
 from torch import nn
 from torch.optim import Adam
-from torch.optim.lr_scheduler import MultiStepLR
+from torch.optim.lr_scheduler import MultiStepLR, StepLR
 
 from openchem.utils.graph import Attribute
 from openchem.data.graph_data_layer import BFSGraphDataset
@@ -104,12 +104,12 @@ train_dataset = BFSGraphDataset(
     get_atomic_attributes, node_attributes,
     # './benchmark_datasets/logp_dataset/logP_labels.csv',
     # cols_to_read=[1, 2],
-     './benchmark_datasets/chembl_small/small_chembl.smi',
+    # './benchmark_datasets/chembl_small/small_chembl.smi',
     # cols_to_read=[0, 1],
-    #'benchmark_datasets/chembl_full/full_chembl.smi',
+    'benchmark_datasets/chembl_full/full_chembl.smi',
     cols_to_read=[0, 1],
-    #pickled='benchmark_datasets/chembl_full/' +
-    #        'full_chembl_cleaned.pkl',
+    pickled='benchmark_datasets/chembl_full/' +
+            'full_chembl_cleaned.pkl',
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',
@@ -177,7 +177,7 @@ model_params = {
     'random_seed': 0,
     'use_clip_grad': False,
     'batch_size': 512,
-    'num_epochs': 51,
+    'num_epochs': 121,
     'logdir': './logs/graphrnn_log',
     # 'logdir': './logs/debug',
     'print_every': 1,
@@ -195,12 +195,13 @@ model_params = {
 
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.03,
+        'lr': 0.001,
         },
-    'lr_scheduler': MultiStepLR,
+    'lr_scheduler': StepLR,
     'lr_scheduler_params': {
-        'milestones': [10, 30, 40, 45, 48],
-        'gamma': 0.3
+        'step_size': 20,
+        'gamma': 0.999,
+        'by_iter': True
     },
 
     'num_node_classes': num_node_classes,
