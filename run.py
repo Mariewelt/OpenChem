@@ -7,6 +7,7 @@ import runpy
 import random
 import argparse
 import numpy as np
+import shutil
 
 from six import string_types
 
@@ -50,6 +51,8 @@ def main():
     parser.add_argument('--random_seed', default=0, type=int, metavar='N',
                         help='random_seed (default: 0)')
     parser.add_argument("--local_rank", type=int, default=0)
+    parser.add_argument("--copy_config_file", action="store_true",
+                        help="Copy config file to logdir (useful in training)")
 
     args, unknown = parser.parse_known_args()
 
@@ -149,6 +152,8 @@ def main():
     logger.info("Running on {:d} GPUs".format(comm.get_world_size()))
     logger.info("Logging directory is set to {}".format(logdir))
     logger.info(msg)
+    if args.copy_config_file:
+        shutil.copy(args.config_file, logdir)
 
     train_config = copy.deepcopy(model_config)
     eval_config = copy.deepcopy(model_config)
