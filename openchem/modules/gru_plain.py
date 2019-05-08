@@ -10,6 +10,7 @@ import torch.nn.init as init
 class GRUPlain(nn.Module):
     def __init__(self, input_size, embedding_size, hidden_size,
                  num_layers, has_input=True, has_output=False,
+                 has_output_nonlin=False,
                  output_size=None):
         super(GRUPlain, self).__init__()
         self.num_layers = num_layers
@@ -27,7 +28,14 @@ class GRUPlain(nn.Module):
             self.rnn = nn.GRU(
                 input_size=input_size, hidden_size=hidden_size,
                 num_layers=num_layers, batch_first=True)
-        if has_output:
+        if has_output and has_output_nonlin:
+            self.output = nn.Sequential(
+                nn.Linear(hidden_size, embedding_size),
+                nn.ReLU(),
+                nn.Linear(embedding_size, output_size),
+                nn.ReLU()
+            )
+        elif has_output:
             self.output = nn.Sequential(
                 nn.Linear(hidden_size, embedding_size),
                 nn.ReLU(),
