@@ -80,9 +80,8 @@ original_start_node_label = 6
 edge_relabel_map = {
     0.: 0,
     1.: 1,
-    1.5: 2,
-    2.: 3,
-    3.: 4
+    2.: 2,
+    3.: 3
 }
 
 node_relabel_map = {
@@ -221,7 +220,7 @@ model_params = {
 
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.0003,
+        'lr': 0.00003,
         },
     'lr_scheduler': MultiStepLR,
     'lr_scheduler_params': {
@@ -238,7 +237,7 @@ model_params = {
     'edge2type': edge2type,
     "restrict_min_atoms": restrict_min_atoms,
     "restrict_max_atoms": restrict_max_atoms,
-    "max_atom_bonds": max_atom_bonds,
+    # "max_atom_bonds": max_atom_bonds,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(

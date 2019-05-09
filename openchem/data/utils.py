@@ -338,8 +338,10 @@ def save_smiles_property_file(path, smiles, labels, delimiter=','):
 
 
 def process_smiles(smiles, target=None, augment=False, pad=True,
-                   tokenize=True, tokens=None, flip=False):
-    clean_smiles, clean_idx = sanitize_smiles(smiles)
+                   tokenize=True, tokens=None, flip=False,
+                   return_idx=False, allowed_tokens=None):
+    clean_smiles, clean_idx = sanitize_smiles(
+        smiles, allowed_tokens=allowed_tokens)
     if target is not None:
         target = target[clean_idx]
 
@@ -354,4 +356,8 @@ def process_smiles(smiles, target=None, augment=False, pad=True,
     if tokenize:
         clean_smiles, tokens = seq2tensor(clean_smiles, tokens, flip)
 
-    return clean_smiles, target, length, tokens, token2idx, num_tokens
+    if return_idx:
+        return clean_smiles, target, length, tokens, \
+               token2idx, num_tokens, clean_idx
+    else:
+        return clean_smiles, target, length, tokens, token2idx, num_tokens

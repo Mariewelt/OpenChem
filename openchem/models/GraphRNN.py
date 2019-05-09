@@ -78,7 +78,7 @@ class GraphRNNModel(OpenChemModel):
     # def get_required_params(self):
     #     return {}
 
-    def forward(self, inp, eval=False):
+    def forward(self, inp, eval=False, **kwargs):
         if self.use_external_crit and self.training:
             # TODO: check if .eval() creates any problems with batchnorm, dropout, etc.
             # generate batch
@@ -86,7 +86,7 @@ class GraphRNNModel(OpenChemModel):
             with torch.no_grad():
                 inp, smiles = self.forward_test()
             # self.train()
-            logp, sizes, sort_index = self.forward_train(inp)
+            logp, sizes, sort_index = self.forward_train(inp, **kwargs)
             smiles = [smiles[i] for i in sort_index]
             adj = [inp["adj"][i] for i in sort_index]
             classes = [inp["classes"][i] for i in sort_index]
@@ -98,12 +98,12 @@ class GraphRNNModel(OpenChemModel):
                 "classes": classes,
             }
         elif self.training:
-            return self.forward_train(inp)
+            return self.forward_train(inp, **kwargs)
         else:
-            batch, smiles = self.forward_test()
+            batch, smiles = self.forward_test(**kwargs)
             return smiles
 
-    def forward_test(self, batch_size=512):
+    def forward_test(self, batch_size=512, **kwargs):
         device = torch.device("cuda")
 
         # TODO: handle float type for x_step in case of no node embedding
@@ -238,6 +238,10 @@ class GraphRNNModel(OpenChemModel):
                 atoms = [self.label2atom[start_c], ]
                 atoms += [self.label2atom[c] for c in c_pred_long[i, cur:nxt]]
 
+                if not (self.restrict_min_atoms <= len(atoms)
+                        <= self.restrict_max_atoms):
+                    continue
+
                 adj_encoded_all.append(torch.from_numpy(adj_encoded))
                 classes_all.append(torch.from_numpy(c_pred_long[i, cur:nxt]))
                 len_all.append(nxt - cur + 1)
@@ -256,26 +260,27 @@ class GraphRNNModel(OpenChemModel):
                 sstring = SmilesFromGraphs(atoms, adj_t)
                 smiles.append(sstring)
 
-        # TODO: think how to avoid double sanitization
-        smiles, idx = sanitize_smiles(
-            smiles,
-            min_atoms=self.restrict_min_atoms,
-            max_atoms=self.restrict_max_atoms,
-            allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
-            logging="info"
-        )
-
-        smiles = [s for i, s in enumerate(smiles) if i in idx]
-
-        smiles, idx2 = sanitize_smiles(
-            smiles,
-            min_atoms=self.restrict_min_atoms,
-            max_atoms=self.restrict_max_atoms,
-            allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
-            logging="none"
-        )
-        idx = [idx[i] for i in idx2]
-        smiles = [s for i, s in enumerate(smiles) if i in idx2]
+        # # TODO: think how to avoid double sanitization
+        # smiles, idx = sanitize_smiles(
+        #     smiles,
+        #     # min_atoms=self.restrict_min_atoms,
+        #     # max_atoms=self.restrict_max_atoms,
+        #     # allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
+        #     logging="info"
+        # )
+        #
+        # smiles = [s for i, s in enumerate(smiles) if i in idx]
+        #
+        # smiles, idx2 = sanitize_smiles(
+        #     smiles,
+        #     min_atoms=self.restrict_min_atoms,
+        #     max_atoms=self.restrict_max_atoms,
+        #     allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
+        #     logging="none"
+        # )
+        # idx = [idx[i] for i in idx2]
+        # smiles = [s for i, s in enumerate(smiles) if i in idx2]
+        idx = list(range(len(smiles)))
 
         if self.use_external_crit:
             adj_all = [s for i, s in enumerate(adj_all) if i in idx]
@@ -312,7 +317,7 @@ class GraphRNNModel(OpenChemModel):
 
         return batch, smiles
 
-    def forward_train(self, inp):
+    def forward_train(self, inp, **kwargs):
         device = torch.device("cuda")
 
         x_unsorted = inp["x"]
@@ -425,11 +430,11 @@ class GraphRNNModel(OpenChemModel):
             node_pred = node_pred.gather(
                 1, c_out.view(-1, 1).clamp(min=0)).view(-1) * valid
 
-            # logp = node_pred + sum_y_pred
-            # logp = torch.flip(logp, (0,))
+            logp = node_pred + sum_y_pred
+            logp = torch.flip(logp, (0,))
 
-            logp = torch.flip(sum_y_pred, (0, ))
-            logp += node_pred
+            # logp = torch.flip(sum_y_pred, (0, ))
+            # logp += node_pred
 
             return logp, num_nodes, sort_index.to('cpu').numpy()
         else:

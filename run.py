@@ -8,6 +8,7 @@ import random
 import argparse
 import numpy as np
 import shutil
+import time
 
 from six import string_types
 
@@ -25,6 +26,7 @@ from openchem.utils.utils import flatten_dict, nested_update, nest_dict
 from openchem.utils import comm
 from openchem.utils.textlogger import setup_textlogger
 from openchem.utils import metrics
+from openchem.data.utils import sanitize_smiles
 
 
 def main():
@@ -214,14 +216,13 @@ def main():
 
     if args.distributed:
         model = DistributedDataParallel(model, device_ids=[args.local_rank],
-                                        output_device=args.local_rank
-                                        )
+                                        output_device=args.local_rank)
     else:
         model = DataParallel(model)
 
     if checkpoint is not None:
         logger.info("Loading model from {}".format(checkpoint))
-        weights = torch.load(checkpoint)
+        weights = torch.load(checkpoint, map_location=torch.device("cpu"))
         model.load_state_dict(weights)
     else:
         logger.info("Starting training from scratch")
@@ -239,22 +240,67 @@ def main():
     elif args.mode == "eval":
         evaluate(model, val_loader, criterion)
     elif args.mode == "infer":
+        comm.synchronize()
+        start_time = time.time()
+
+        if comm.get_world_size() > 1:
+            seed = comm.get_rank() * 10000
+            random.seed(seed)
+            np.random.seed(seed)
+            torch.manual_seed(seed)
+            torch.cuda.manual_seed_all(seed)
+
         model.eval()
         smiles = []
+
         with torch.no_grad():
-            for _ in range(10):
-                smiles.extend(model(None))
+            for i in range(2):
+                batch_smiles = model(None, batch_size=1024)
+                smiles.extend(batch_smiles)
+                # print("Iteration {:d}: {:d} smiles".format(i+1, len(batch_smiles)))
+
+        if comm.get_world_size() > 1:
+            path = os.path.join(logdir, "debug_smiles_{:d}.txt".format(
+                comm.get_rank()
+            ))
+            with open(path, "w") as f:
+                for s in smiles:
+                    f.write(s + "\n")
+
+            comm.synchronize()
+
+            if not comm.is_main_process():
+                return
+
+            smiles = []
+            for i in range(comm.get_world_size()):
+                path = os.path.join(logdir, "debug_smiles_{:d}.txt".format(i))
+                with open(path) as f:
+                    smiles_local = f.readlines()
+                os.remove(path)
+
+                smiles_local = [s.rstrip() for s in smiles_local]
+                smiles.extend(smiles_local)
 
         path = os.path.join(logdir, "debug_smiles.txt")
         with open(path, "w") as f:
             for s in smiles:
                 f.write(s + "\n")
 
+        print("Generated {:d} molecules in {:.1f} seconds".format(
+            len(smiles), time.time() - start_time
+        ))
+
         eval_metrics = model_config['eval_metrics']
         score = eval_metrics(None, smiles)
         qed_score = metrics.qed(smiles)
         logger.info("SA score = {:.2f}".format(score))
         logger.info("QED score = {:.2f}".format(qed_score))
+
+        smiles, idx = sanitize_smiles(
+            smiles,
+            logging="info"
+        )
 
 
 if __name__ == '__main__':
