@@ -29,6 +29,7 @@ class GraphRNNModel(OpenChemModel):
         self.restrict_min_atoms = params["restrict_min_atoms"]
         self.restrict_max_atoms = params["restrict_max_atoms"]
         self.use_external_crit = params.get("use_external_criterion", False)
+        self.max_atom_bonds = params.get("max_atom_bonds", None)
 
         if self.num_edge_classes > 2:
             EdgeEmbedding = params["EdgeEmbedding"]
@@ -121,6 +122,13 @@ class GraphRNNModel(OpenChemModel):
         # start generation from second vertex
         prev_num = torch.ones(batch_size, device=device, dtype=torch.float)
 
+        if self.max_atom_bonds is not None:
+            if not isinstance(self.max_atom_bonds, torch.Tensor):
+                self.max_atom_bonds = torch.tensor(
+                    self.max_atom_bonds, dtype=torch.float, device=device)
+            max_valency_all = [self.max_atom_bonds[c_step.view(-1)]]
+            valency_all = [torch.zeros_like(max_valency_all[0])]
+
         for i in range(max_num_nodes):
             if self.edge_emb is not None:
                 x_step = self.edge_emb(
@@ -147,22 +155,53 @@ class GraphRNNModel(OpenChemModel):
                 c_step = torch.multinomial(
                     vert_pred.view(-1, self.num_node_classes), 1)
                 c_pred_long[:, i:i + 1] = c_step
+
+            if self.max_atom_bonds is not None:
+                max_valency = self.max_atom_bonds[c_step.view(-1)]
+                valency = torch.zeros_like(max_valency)
+
             for j in range(min(self.max_prev_nodes, i + 1)):
+                valid_edge = (j < prev_num)
+
                 if self.edge_emb is not None:
                     output_x_step = self.edge_emb(output_x_step).view(
                         batch_size, 1, -1)
-                output_y_pred_step = self.edge_rnn(output_x_step)
-                if self.num_edge_classes == 2:
-                    output_y_pred_step = torch.sigmoid(output_y_pred_step)
-                    output_x_step = torch.bernoulli(output_y_pred_step)
-                else:
-                    output_y_pred_step = F.softmax(output_y_pred_step, dim=-1)
-                    output_x_step = torch.multinomial(
-                        output_y_pred_step.view(-1, self.num_edge_classes),
-                        num_samples=1).view(-1, 1, 1)
-                valid_edge = (j < prev_num).to(dtype=x_step.dtype)
-                x_step[:, :, j:j + 1] = output_x_step * valid_edge.view(-1, 1, 1)
+                output_y_pred_step = self.edge_rnn(output_x_step).view(
+                    -1, self.num_edge_classes)
+
+                output_y_pred_step = F.softmax(output_y_pred_step, dim=-1)
+
+                if self.max_atom_bonds is not None:
+                    for edge, etype in enumerate(self.edge2type):
+                        prev_idx = -j - 1
+                        prev_valency = valency_all[prev_idx]
+                        prev_max_valency = max_valency_all[prev_idx]
+                        allowed = (
+                            (valency + etype <= max_valency) &
+                            (prev_valency + etype <= prev_max_valency)
+                        ) | ~valid_edge
+                        allowed = allowed.to(dtype=torch.float)
+                        output_y_pred_step[:, edge] *= allowed
+                    output_y_pred_step = output_y_pred_step / \
+                        output_y_pred_step.sum(dim=-1).view(-1, 1)
+
+                output_x_step = torch.multinomial(
+                    output_y_pred_step, num_samples=1).view(-1, 1, 1)
+
+                if self.max_atom_bonds is not None:
+                    edge2type = torch.tensor(
+                        self.edge2type, dtype=torch.float, device=device)
+                    types = edge2type[output_x_step.view(-1)]
+                    types = types * valid_edge.to(dtype=types.dtype)
+                    valency += types
+                    valency_all[-j-1] += types
+
+                x_step[:, :, j:j + 1] = output_x_step * valid_edge.view(-1, 1, 1).to(dtype=x_step.dtype)
                 # edge rnn keeps the state from current state
+
+            if self.max_atom_bonds is not None:
+                valency_all.append(valency)
+                max_valency_all.append(max_valency)
 
             y_pred_long[:, i:i + 1, :] = x_step
 
@@ -219,7 +258,8 @@ class GraphRNNModel(OpenChemModel):
 
         # TODO: think how to avoid double sanitization
         smiles, idx = sanitize_smiles(
-            smiles, min_atoms=self.restrict_min_atoms,
+            smiles,
+            min_atoms=self.restrict_min_atoms,
             max_atoms=self.restrict_max_atoms,
             allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
             logging="info"

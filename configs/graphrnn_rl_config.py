@@ -47,7 +47,7 @@ tokens = params['tokens']
 #     7: 1.,     # Br
 #     8: 1.,     # I
 # }
-max_atom_bonds = [4.5, 5., 2., 1., 5., 6., 1., 1., 1.]
+max_atom_bonds = [4., 3., 2., 1., 5., 6., 1., 1., 1.]
 
 my_loss = PolicyGradientLoss(reward_fn=reward_fn, critic=model, tokens=tokens,
                              fn=melt_t_max_fn, gamma=0.97,
@@ -97,30 +97,6 @@ node_relabel_map = {
     53.0: 8
 }
 
-# edge_relabel_map = {
-#     0.: 0,
-#     1.: 1,
-#     1.5: 1,
-#     2.: 1,
-#     3.: 1
-# }
-
-# node_relabel_map = {
-#     0.: 0,
-#     5.: 1,
-#     6.: 1,
-#     7.: 1,
-#     8.: 1,
-#     9.: 1,
-#     14.: 1,
-#     15.: 1,
-#     16.: 1,
-#     17.: 1,
-#     33.: 1,
-#     34.: 1,
-#     35.: 1,
-#     53.: 1,
-# }
 atom2number = {'H': 1, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9,
                'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'As': 33, 'Se': 34,
                'Br': 35, 'I': 53}
@@ -262,6 +238,7 @@ model_params = {
     'edge2type': edge2type,
     "restrict_min_atoms": restrict_min_atoms,
     "restrict_max_atoms": restrict_max_atoms,
+    "max_atom_bonds": max_atom_bonds,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(

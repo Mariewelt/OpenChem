@@ -30,9 +30,8 @@ original_start_node_label = 6
 edge_relabel_map = {
     0.: 0,
     1.: 1,
-    1.5: 2,
-    2.: 3,
-    3.: 4
+    2.: 2,
+    3.: 3,
 }
 
 node_relabel_map = {
@@ -47,30 +46,8 @@ node_relabel_map = {
     53.0: 8
 }
 
-# edge_relabel_map = {
-#     0.: 0,
-#     1.: 1,
-#     1.5: 1,
-#     2.: 1,
-#     3.: 1
-# }
+max_atom_bonds = [4., 3., 2., 1., 5., 6., 1., 1., 1.]
 
-# node_relabel_map = {
-#     0.: 0,
-#     5.: 1,
-#     6.: 1,
-#     7.: 1,
-#     8.: 1,
-#     9.: 1,
-#     14.: 1,
-#     15.: 1,
-#     16.: 1,
-#     17.: 1,
-#     33.: 1,
-#     34.: 1,
-#     35.: 1,
-#     53.: 1,
-# }
 atom2number = {'H': 1, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9,
                'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'As': 33, 'Se': 34,
                'Br': 35, 'I': 53}
@@ -190,7 +167,7 @@ model_params = {
     # 'criterion': RLCriterion(),
     # 'use_external_criterion': True,
 
-    'eval_metrics': get_qed,
+    'eval_metrics': get_sa_score,
     'val_data_layer': val_dataset,
 
     'optimizer': Adam,
@@ -213,6 +190,7 @@ model_params = {
     'edge2type': edge2type,
     "restrict_min_atoms": restrict_min_atoms,
     "restrict_max_atoms": restrict_max_atoms,
+    "max_atom_bonds": max_atom_bonds,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(
@@ -239,11 +217,12 @@ model_params = {
     'node_rnn_params': dict(
         input_size=node_rnn_input_size,
         embedding_size=128,
-        hidden_size=128,
+        hidden_size=256,
         num_layers=4,
         has_input=True,
-        has_output=False,
-        # output_size=128
+        has_output=True,
+        output_size=128,
+        # has_output_nonlin=True
     ),
 
     'EdgeRNN': GRUPlain,
