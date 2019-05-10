@@ -25,7 +25,8 @@ from openchem.criterion.policy_gradient_loss import PolicyGradientLoss
 params = pickle.load(open('logs/rl_start/critic_params.pkl', 'rb'))
 
 model = Smiles2Label(params).cuda()
-weights = torch.load('./logs/rl_start/critic_checkpoint')
+weights = torch.load('./logs/rl_start/critic_checkpoint',
+                     map_location=torch.device("cpu"))
 new_weights = {}
 
 for key in weights.keys():
@@ -49,9 +50,11 @@ tokens = params['tokens']
 # }
 max_atom_bonds = [4., 3., 2., 1., 5., 6., 1., 1., 1.]
 
+# critic=None
 my_loss = PolicyGradientLoss(reward_fn=reward_fn, critic=model, tokens=tokens,
                              fn=melt_t_max_fn, gamma=0.97,
-                             max_atom_bonds=max_atom_bonds)
+                             # max_atom_bonds=max_atom_bonds,
+                             enable_supervised_loss=True)
 
 
 def get_sa_score(target, smiles):
@@ -220,7 +223,7 @@ model_params = {
 
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.00003,
+        'lr': 0.0003,
         },
     'lr_scheduler': MultiStepLR,
     'lr_scheduler_params': {

@@ -190,7 +190,7 @@ model_params = {
     'edge2type': edge2type,
     "restrict_min_atoms": restrict_min_atoms,
     "restrict_max_atoms": restrict_max_atoms,
-    "max_atom_bonds": max_atom_bonds,
+    # "max_atom_bonds": max_atom_bonds,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(

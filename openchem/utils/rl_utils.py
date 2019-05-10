@@ -38,4 +38,4 @@ def reward_fn(smiles, predictor, old_tokens, device, fn):
     clean_idx = torch.tensor(clean_idx, device=rewards.device)
     rewards_all.index_copy_(0, clean_idx, rewards)
 
-    return rewards
+    return rewards_all

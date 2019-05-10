@@ -237,7 +237,10 @@ def evaluate(model, val_loader, criterion):
         else:
             batch_input, batch_target = model.cast_inputs(sample_batched)
         predicted = model(batch_input, eval=True)
-        loss = criterion(predicted, batch_target)
+        try:
+            loss = criterion(predicted, batch_target)
+        except TypeError:
+            loss = 0.0
         if hasattr(predicted, 'detach'):
             predicted = predicted.detach().cpu().numpy()
         if hasattr(batch_target, 'cpu'):

@@ -86,19 +86,21 @@ class GraphRNNModel(OpenChemModel):
             with torch.no_grad():
                 inp, smiles = self.forward_test()
             # self.train()
-            logp, sizes, sort_index = self.forward_train(inp, **kwargs)
+            output = self.forward_train(inp, **kwargs)
+            sort_index = output["sort_index"]
             smiles = [smiles[i] for i in sort_index]
             adj = [inp["adj"][i] for i in sort_index]
             classes = [inp["classes"][i] for i in sort_index]
             return {
-                "log_policy": logp,
-                "sizes": sizes,
+                "log_policy": output["logp"],
+                "sizes": output["sizes"],
                 "smiles": smiles,
                 "adj": adj,
                 "classes": classes,
+                "loss": output["loss"]
             }
         elif self.training:
-            return self.forward_train(inp, **kwargs)
+            return self.forward_train(inp, **kwargs)["loss"]
         else:
             batch, smiles = self.forward_test(**kwargs)
             return smiles
@@ -415,6 +417,34 @@ class GraphRNNModel(OpenChemModel):
 
         y_pred = self.edge_rnn(output_x, pack=True, input_len=output_y_len)
 
+        # internal criterion
+        weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)
+        weights = pack_padded_sequence(weights, output_y_len, batch_first=True)
+        weights = pad_packed_sequence(weights, batch_first=True)[0]
+
+        if self.num_edge_classes == 2:
+            # loss_edges = F.binary_cross_entropy(
+            #     y_pred, output_y.to(torch.float))
+            loss_edges = F.binary_cross_entropy_with_logits(
+                y_pred, output_y.to(torch.float), reduction='none')
+            n = weights.sum().clamp(min=1.)
+            loss_edges = (loss_edges * weights).sum() / n
+        else:
+            loss_edges = F.cross_entropy(
+                y_pred.reshape(-1, self.num_edge_classes),
+                output_y.reshape(-1), reduction='none') / self.num_edge_classes
+            n = weights.sum().clamp(min=1.)
+            loss_edges = (loss_edges * weights.reshape(-1)).sum() / n
+        if self.node_mlp is not None:
+            loss_vertices = F.cross_entropy(node_pred, c_out,
+                                            ignore_index=-1)
+            loss_vertices = loss_vertices / self.num_node_classes
+            loss = loss_edges + loss_vertices
+        else:
+            loss = loss_edges
+
+        output = {"loss": loss}
+
         if self.use_external_crit:
 
             node_pred = F.log_softmax(node_pred, dim=-1)
@@ -436,35 +466,11 @@ class GraphRNNModel(OpenChemModel):
             # logp = torch.flip(sum_y_pred, (0, ))
             # logp += node_pred
 
-            return logp, num_nodes, sort_index.to('cpu').numpy()
-        else:
-            # internal criterion
-            weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)
-            weights = pack_padded_sequence(weights, output_y_len, batch_first=True)
-            weights = pad_packed_sequence(weights, batch_first=True)[0]
+            output["logp"] = logp
+            output["sizes"] = num_nodes
+            output["sort_index"] = sort_index.to('cpu').numpy()
 
-            if self.num_edge_classes == 2:
-                # loss_edges = F.binary_cross_entropy(
-                #     y_pred, output_y.to(torch.float))
-                loss_edges = F.binary_cross_entropy_with_logits(
-                    y_pred, output_y.to(torch.float), reduction='none')
-                n = weights.sum().clamp(min=1.)
-                loss_edges = (loss_edges * weights).sum() / n
-            else:
-                loss_edges = F.cross_entropy(
-                    y_pred.reshape(-1, self.num_edge_classes),
-                    output_y.reshape(-1), reduction='none') / self.num_edge_classes
-                n = weights.sum().clamp(min=1.)
-                loss_edges = (loss_edges * weights.reshape(-1)).sum() / n
-            if self.node_mlp is not None:
-                loss_vertices = F.cross_entropy(node_pred, c_out,
-                                                ignore_index=-1)
-                loss_vertices = loss_vertices / self.num_node_classes
-                loss = loss_edges + loss_vertices
-            else:
-                loss = loss_edges
-
-            return loss
+        return output
 
     def load_model(self, path):
         super(GraphRNNModel, self).load_model(path)
