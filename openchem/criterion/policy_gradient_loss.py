@@ -89,7 +89,7 @@ class PolicyGradientLoss(_Loss):
                                                     batch_first=True).data
 
             if self.critic is not None:
-                discounted_rewards *= structure_reward
+                discounted_rewards += structure_reward
             else:
                 discounted_rewards = structure_reward
 
