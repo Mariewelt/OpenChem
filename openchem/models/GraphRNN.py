@@ -242,13 +242,12 @@ class GraphRNNModel(OpenChemModel):
 
                 if not (self.restrict_min_atoms <= len(atoms)
                         <= self.restrict_max_atoms):
+                    cur = nxt + 1
                     continue
 
                 adj_encoded_all.append(torch.from_numpy(adj_encoded))
                 classes_all.append(torch.from_numpy(c_pred_long[i, cur:nxt]))
                 len_all.append(nxt - cur + 1)
-
-                cur = nxt + 1
 
                 adj = decode_adj_new(adj_encoded)
                 if self.num_edge_classes > 2:
@@ -262,12 +261,14 @@ class GraphRNNModel(OpenChemModel):
                 sstring = SmilesFromGraphs(atoms, adj_t)
                 smiles.append(sstring)
 
+                cur = nxt + 1
+
         # # TODO: think how to avoid double sanitization
         # smiles, idx = sanitize_smiles(
         #     smiles,
         #     # min_atoms=self.restrict_min_atoms,
         #     # max_atoms=self.restrict_max_atoms,
-        #     # allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
+        #     allowed_tokens=r'#()+-/123456789=@BCFHINOPS[\]cilnors ',
         #     logging="info"
         # )
         #

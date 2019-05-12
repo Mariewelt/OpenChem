@@ -5,6 +5,8 @@ from torch.nn.modules.loss import _Loss
 
 from torch.nn.utils.rnn import pack_padded_sequence
 
+from openchem.data.utils import sanitize_smiles
+
 
 class PolicyGradientLoss(_Loss):
     def __init__(self, reward_fn, critic, tokens, fn, gamma=1.0,
@@ -27,13 +29,27 @@ class PolicyGradientLoss(_Loss):
         classes = input["classes"]
 
         device = log_policy.device
+        len_trajectory = max(sizes)
+        batch_size = len(sizes)
 
         if self.critic is not None:
-            len_trajectory = max(sizes)
-            batch_size = len(sizes)
+            # Current convention is to run critic only on valid molecules
+            # Others receive zero reward from the critic
+
+            clean_smiles, clean_idx = sanitize_smiles(
+                trajectories, allowed_tokens=self.tokens, logging="none")
+            clean_smiles = [clean_smiles[i] for i in clean_idx]
+
             with torch.no_grad():
-                rewards = self.reward_fn(trajectories, self.critic,
-                                         self.tokens, device, self.fn)
+                clean_rewards = self.reward_fn(clean_smiles, self.critic,
+                                               self.tokens, device, self.fn)
+
+            rewards = torch.zeros((batch_size, *clean_rewards.shape[1:]),
+                                  dtype=clean_rewards.dtype,
+                                  device=clean_rewards.device)
+            clean_idx = torch.tensor(clean_idx, device=clean_rewards.device)
+            rewards.index_copy_(0, clean_idx, clean_rewards)
+
             rewards = rewards.view(batch_size, 1)
             discounts = torch.pow(
                 self.gamma,
@@ -45,34 +61,30 @@ class PolicyGradientLoss(_Loss):
             discounted_rewards = pack_padded_sequence(discounted_rewards,
                                                       sizes,
                                                       batch_first=True).data
-        # """
         if self.max_atom_bonds is not None:
-            atom_bonds = torch.cat(
-                [torch.from_numpy(a).sum(dim=0) for a in adj]
-            )
-            classes = [classes[i // 2] if i % 2 == 1
-                       else torch.tensor([0], dtype=torch.long)
-                       for i in range(2 * len(classes))]
-            classes = torch.cat(classes)
-            max_atom_bonds = torch.tensor(self.max_atom_bonds)
-            max_atom_bonds = max_atom_bonds[classes]
-            # objective: (atom_bonds <= max_atom_bonds)
-            # structure_reward = -1 * (atom_bonds > max_atom_bonds).to(
-            #     dtype=torch.float, device=device)
-            structure_reward = (atom_bonds <= max_atom_bonds).to(
-                dtype=torch.float, device=device)
 
-            # indices = (atom_bonds > max_atom_bonds).nonzero()
-            # cum_sizes = np.cumsum(sizes)
-            # sm_indices = [bisect.bisect_right(cum_sizes, i) for i in indices]
-            # for i in np.unique(sm_indices):
-            #     print(trajectories[i])
+            structure_reward = torch.zeros((batch_size, len_trajectory),
+                                           dtype=log_policy.dtype,
+                                           device=log_policy.device)
+            for i in range(batch_size):
+                atom_bonds = torch.from_numpy(adj[i]).sum(dim=0)
+                cl = torch.cat([torch.tensor([0], dtype=torch.long),
+                                classes[i]])
+                max_atom_bonds = torch.tensor(self.max_atom_bonds)
+                max_atom_bonds = max_atom_bonds[cl]
+
+                structure_reward[i, :sizes[i]] = \
+                    (atom_bonds <= max_atom_bonds).to(
+                        dtype=torch.float, device=device)
+
+            structure_reward = pack_padded_sequence(structure_reward,
+                                                    sizes,
+                                                    batch_first=True).data
 
             if self.critic is not None:
                 discounted_rewards *= structure_reward
             else:
                 discounted_rewards = structure_reward
-        # """
 
         loss = - discounted_rewards * log_policy
         # print(loss.max().item())

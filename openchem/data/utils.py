@@ -134,25 +134,24 @@ def sanitize_smiles(smiles, canonize=True,
     num_atoms = []
     for i in range(len(smiles)):
         sm = smiles[i]
+
+        mol = Chem.MolFromSmiles(sm, sanitize=True)
+        sm_new = Chem.MolToSmiles(mol) if canonize and mol is not None else sm
+
         if allowed_tokens is not None:
-            has_bad_tokens = sum([(t not in allowed_tokens) for t in sm]) > 0
+            has_bad_tokens = sum([(t not in allowed_tokens)
+                                  for t in sm_new]) > 0
         else:
             has_bad_tokens = False
-        mol = Chem.MolFromSmiles(sm, sanitize=True)
+
         if mol is not None and not has_bad_tokens:
             n = mol.GetNumAtoms()
             if (n < min_atoms and min_atoms > -1) or \
                     (n > max_atoms > -1):
                 new_smiles.append('')
                 num_atoms.append(0)
-            elif canonize:
-                new_smiles.append(
-                    Chem.MolToSmiles(mol)
-                )
-                idx.append(i)
-                num_atoms.append(n)
             else:
-                new_smiles.append(sm)
+                new_smiles.append(sm_new)
                 idx.append(i)
                 num_atoms.append(n)
         else:
@@ -163,7 +162,7 @@ def sanitize_smiles(smiles, canonize=True,
     num_unique = len(smiles_set) - ('' in smiles_set)
     if len(idx) > 0:
         valid_unique_rate = float(num_unique) / len(idx)
-        invalid_rate = 1.0 - len(idx) / len(smiles)
+        invalid_rate = 1.0 - float(len(idx)) / len(smiles)
     else:
         valid_unique_rate = 0.0
         invalid_rate = 1.0
@@ -337,27 +336,26 @@ def save_smiles_property_file(path, smiles, labels, delimiter=','):
     f.close()
 
 
-def process_smiles(smiles, target=None, augment=False, pad=True,
+def process_smiles(smiles, sanitized=False,
+                   target=None, augment=False, pad=True,
                    tokenize=True, tokens=None, flip=False,
-                   return_idx=False, allowed_tokens=None):
-    clean_smiles, clean_idx = sanitize_smiles(
-        smiles, allowed_tokens=allowed_tokens)
-    if target is not None:
-        target = target[clean_idx]
+                   allowed_tokens=None):
+    if not sanitized:
+        clean_smiles, clean_idx = sanitize_smiles(
+            smiles, allowed_tokens=allowed_tokens)
+        clean_smiles = [clean_smiles[i] for i in clean_idx]
+        if target is not None:
+            target = target[clean_idx]
+    else:
+        clean_smiles = smiles
 
     length = None
     if augment and target is not None:
-        clean_smiles, target = augment_smiles(clean_smiles,
-                                              target)
+        clean_smiles, target = augment_smiles(clean_smiles, target)
     if pad:
         clean_smiles, length = pad_sequences(clean_smiles)
-    tokens, token2idx, num_tokens = get_tokens(clean_smiles,
-                                               tokens)
+    tokens, token2idx, num_tokens = get_tokens(clean_smiles, tokens)
     if tokenize:
         clean_smiles, tokens = seq2tensor(clean_smiles, tokens, flip)
 
-    if return_idx:
-        return clean_smiles, target, length, tokens, \
-               token2idx, num_tokens, clean_idx
-    else:
-        return clean_smiles, target, length, tokens, token2idx, num_tokens
+    return clean_smiles, target, length, tokens, token2idx, num_tokens
