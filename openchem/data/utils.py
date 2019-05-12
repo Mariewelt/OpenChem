@@ -106,6 +106,7 @@ def sanitize_smiles(smiles, canonize=True,
                     min_atoms=-1, max_atoms=-1,
                     return_num_atoms=False,
                     allowed_tokens=None,
+                    allow_charges=False,
                     logging="warn"):
     """
     Takes list of SMILES strings and returns list of their sanitized versions.
@@ -119,6 +120,7 @@ def sanitize_smiles(smiles, canonize=True,
             max_atoms (int): maxumum allowed number of atoms
             return_num_atoms (bool): return additional array of atom numbers
             allowed_tokens (iterable, optional): allowed tokens set
+            allow_charges (bool): allow nonzero charges of atoms
             logging ("warn", "info", "none"): logging level
         Output:
             new_smiles (list): list of SMILES and NaNs if SMILES string is
@@ -138,22 +140,24 @@ def sanitize_smiles(smiles, canonize=True,
         mol = Chem.MolFromSmiles(sm, sanitize=True)
         sm_new = Chem.MolToSmiles(mol) if canonize and mol is not None else sm
 
-        if allowed_tokens is not None:
-            has_bad_tokens = sum([(t not in allowed_tokens)
-                                  for t in sm_new]) > 0
-        else:
-            has_bad_tokens = False
+        good = mol is not None
+        if good and allowed_tokens is not None:
+            good &= all([t in allowed_tokens for t in sm_new])
 
-        if mol is not None and not has_bad_tokens:
+        if good and not allow_charges:
+            good &= all([a.GetFormalCharge() == 0 for a in mol.GetAtoms()])
+
+        if good:
             n = mol.GetNumAtoms()
-            if (n < min_atoms and min_atoms > -1) or \
-                    (n > max_atoms > -1):
-                new_smiles.append('')
-                num_atoms.append(0)
-            else:
-                new_smiles.append(sm_new)
-                idx.append(i)
-                num_atoms.append(n)
+            if (n < min_atoms and min_atoms > -1) or (n > max_atoms > -1):
+                good = False
+        else:
+            n = 0
+
+        if good:
+            new_smiles.append(sm_new)
+            idx.append(i)
+            num_atoms.append(n)
         else:
             new_smiles.append('')
             num_atoms.append(0)

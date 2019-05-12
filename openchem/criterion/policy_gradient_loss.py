@@ -61,6 +61,10 @@ class PolicyGradientLoss(_Loss):
             discounted_rewards = pack_padded_sequence(discounted_rewards,
                                                       sizes,
                                                       batch_first=True).data
+
+        sanitize_smiles(
+            trajectories, allowed_tokens=self.tokens, logging="info")
+
         if self.max_atom_bonds is not None:
 
             structure_reward = torch.zeros((batch_size, len_trajectory),
@@ -73,8 +77,11 @@ class PolicyGradientLoss(_Loss):
                 max_atom_bonds = torch.tensor(self.max_atom_bonds)
                 max_atom_bonds = max_atom_bonds[cl]
 
+                # structure_reward[i, :sizes[i]] = \
+                #     (atom_bonds <= max_atom_bonds).to(
+                #         dtype=torch.float, device=device)
                 structure_reward[i, :sizes[i]] = \
-                    (atom_bonds <= max_atom_bonds).to(
+                    -10 * (atom_bonds > max_atom_bonds).to(
                         dtype=torch.float, device=device)
 
             structure_reward = pack_padded_sequence(structure_reward,
