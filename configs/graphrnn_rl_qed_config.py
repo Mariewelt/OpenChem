@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/home/mariewelt/Work/OpenChem.mshvets/")
 from torch import nn
 from torch.optim import Adam, Adadelta, SGD
 from torch.optim.lr_scheduler import MultiStepLR
@@ -60,7 +62,8 @@ max_atom_bonds = [4, 3., 2., 1., 5., 6., 1., 1., 1.]
 
 my_loss = PolicyGradientLoss(reward_fn=qed_reward_fn, critic=qed, tokens=None,
                              fn=qed_max_rew, gamma=0.97,
-                             max_atom_bonds=max_atom_bonds)
+                             #max_atom_bonds=max_atom_bonds,
+                             enable_supervised_loss=False)
 
 
 max_prev_nodes = 12
@@ -283,7 +286,7 @@ model_params = {
         has_input=True,
         has_output=True,
         output_size=128,
-        has_output_nonlin=True
+        has_output_nonlin=False
     ),
 
     'EdgeRNN': GRUPlain,

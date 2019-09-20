@@ -247,6 +247,8 @@ def evaluate(model, val_loader, criterion):
             batch_target = batch_target.cpu().numpy()
         if hasattr(loss, 'item'):
             loss = loss.item()
+        if isinstance(loss, list):
+            loss = 0.0
         prediction += list(predicted)
         ground_truth += list(batch_target)
         loss_total += loss

@@ -9,9 +9,6 @@ from openchem.modules.embeddings.basic_embedding import Embedding
 from openchem.modules.mlp.openchem_mlp import OpenChemMLPSimple
 from openchem.utils.utils import identity
 from openchem.modules.gru_plain import GRUPlain
-from openchem.utils.sa_score import sascorer
-from rdkit import Chem
-import numpy as np
 from openchem.data.utils import DummyDataset
 
 import torch
@@ -21,11 +18,21 @@ from openchem.models.Smiles2Label import Smiles2Label
 
 from openchem.criterion.policy_gradient_loss import PolicyGradientLoss
 
+from openchem.utils.metrics import qed, sa_score
 
-params = pickle.load(open('logs/rl_start/critic_params.pkl', 'rb'))
 
-model = Smiles2Label(params).cuda()
-weights = torch.load('./logs/rl_start/critic_checkpoint',
+def get_sa_score(target, smiles):
+    return sa_score(smiles)
+
+
+def get_qed(target, smiles):
+    return qed(smiles)
+
+
+params = pickle.load(open('logs/rl_start_new/params.pkl', 'rb'))
+
+model = Smiles2Label(params)
+weights = torch.load('./logs/rl_start_new/checkpoint/epoch_29',
                      map_location=torch.device("cpu"))
 new_weights = {}
 
@@ -33,6 +40,7 @@ for key in weights.keys():
     new_weights[key[7:]] = weights[key]
 
 model.load_state_dict(new_weights)
+model = model.to(device='cuda')
 
 tokens = params['tokens']
 
@@ -52,28 +60,9 @@ max_atom_bonds = [4., 3., 2., 1., 5., 6., 1., 1., 1.]
 
 # critic=None
 my_loss = PolicyGradientLoss(reward_fn=reward_fn, critic=model, tokens=tokens,
-                             fn=melt_t_max_fn, gamma=0.97,
-                             # max_atom_bonds=max_atom_bonds,
+                             fn=melt_t_max_fn, gamma=0.0,
+                             max_atom_bonds=max_atom_bonds,
                              enable_supervised_loss=True)
-
-
-def get_sa_score(target, smiles):
-    scores = []
-    if len(smiles) > 0:
-        for sm in smiles:
-            try:
-                if sm != '':
-                    mol = Chem.MolFromSmiles(sm)
-                    scores.append(sascorer.calculateScore(mol))
-            except:
-                pass
-        mean_score = np.nanmean(scores)
-        if np.isnan(mean_score):
-            return -1.0
-        else:
-            return mean_score
-    else:
-        return -1.0
 
 
 max_prev_nodes = 12
@@ -83,6 +72,7 @@ original_start_node_label = 6
 edge_relabel_map = {
     0.: 0,
     1.: 1,
+    #1.5: 2,
     2.: 2,
     3.: 3
 }
@@ -202,10 +192,10 @@ model_params = {
     
     'task': 'graph_generation',
     'use_cuda': True,
-    'random_seed': 0,
+    'random_seed': 1476,
     'use_clip_grad': False,
     'batch_size': 1000,
-    'num_epochs': 51,
+    'num_epochs': 16,
     'logdir': './logs/graphrnn_log',
     # 'logdir': './logs/debug',
     'print_every': 1,
@@ -223,11 +213,11 @@ model_params = {
 
     'optimizer': Adam,
     'optimizer_params': {
-        'lr': 0.0003,
+        'lr': 0.00001,
         },
     'lr_scheduler': MultiStepLR,
     'lr_scheduler_params': {
-        'milestones': [10, 30, 40, 45, 48],
+        'milestones': [100, 300, 400, 1000, 2000],
         'gamma': 0.3
     },
 
@@ -240,7 +230,7 @@ model_params = {
     'edge2type': edge2type,
     "restrict_min_atoms": restrict_min_atoms,
     "restrict_max_atoms": restrict_max_atoms,
-    # "max_atom_bonds": max_atom_bonds,
+    "max_atom_bonds": max_atom_bonds,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(
@@ -271,6 +261,7 @@ model_params = {
         num_layers=4,
         has_input=True,
         has_output=True,
+        has_output_nonlin=False,
         output_size=128
     ),
 

@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from openchem.modules.encoders.openchem_encoder import OpenChemEncoder
@@ -95,12 +96,31 @@ class RNNEncoder(OpenChemEncoder):
             if self.layer == 'LSTM':
                 cell = self.init_cell(batch_size)
                 previous_hidden = (previous_hidden, cell)
-        rnn_output, next_hidden = self.rnn(rnn_input, previous_hidden)
+        else:
+            if self.layer == 'LSTM':
+                hidden = previous_hidden[0]
+                cell = previous_hidden[1]
+                hidden = torch.index_select(hidden, 1, perm_idx)
+                cell = torch.index_select(cell, 1, perm_idx)
+                previous_hidden = (hidden, cell)
+            else:
+                previous_hidden = torch.index_select(
+                    previous_hidden, 1, perm_idx
+                )
+        rnn_output, next_hidden = self.rnn(rnn_input)  # , previous_hidden)
 
         if pack:
             rnn_output, _ = pad_packed_sequence(rnn_output, batch_first=True)
             _, unperm_idx = perm_idx.sort(0)
             rnn_output = torch.index_select(rnn_output, 0, unperm_idx)
+            if self.layer == 'LSTM':
+                hidden = next_hidden[0]
+                cell = next_hidden[1]
+                hidden = torch.index_select(hidden, 1, unperm_idx)
+                cell = torch.index_select(cell, 1, unperm_idx)
+                next_hidden = (hidden, cell)
+            else:
+                next_hidden = torch.index_select(next_hidden, 1, unperm_idx)
 
         index_t = (input_length - 1).to(dtype=torch.long)
         index_t = index_t.view(-1, 1, 1).expand(-1, 1, rnn_output.size(2))

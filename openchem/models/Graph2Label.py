@@ -37,18 +37,16 @@ class Graph2Label(OpenChemModel):
         return output
 
     def cast_inputs(self, sample):
-        batch_adj = torch.tensor(sample['adj_matrix'],
-                                 requires_grad=True).float()
-        batch_x = torch.tensor(sample['node_feature_matrix'],
-                               requires_grad=True).float()
-        batch_labels = torch.tensor(sample['labels'])
+        batch_adj = sample['adj_matrix'].to(torch.float)
+        batch_x = sample['node_feature_matrix'].to(torch.float)
+        batch_labels = sample['labels']
         if self.task == 'classification':
-            batch_labels = batch_labels.long()
+            batch_labels = batch_labels.to(torch.long)
         else:
-            batch_labels = batch_labels.float()
+            batch_labels = batch_labels.to(torch.float)
         if self.use_cuda:
-            batch_x = batch_x.cuda()
-            batch_adj = batch_adj.cuda()
-            batch_labels = batch_labels.cuda()
+            batch_x = batch_x.to(device='cuda')
+            batch_adj = batch_adj.to(device='cuda')
+            batch_labels = batch_labels.to(device='cuda')
         batch_inp = (batch_x, batch_adj)
         return batch_inp, batch_labels

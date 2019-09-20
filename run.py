@@ -243,21 +243,21 @@ def main():
         comm.synchronize()
         start_time = time.time()
 
-        if comm.get_world_size() > 1:
-            seed = comm.get_rank() * 10000
-            random.seed(seed)
-            np.random.seed(seed)
-            torch.manual_seed(seed)
-            torch.cuda.manual_seed_all(seed)
+        #if comm.get_world_size() > 1:
+        #    seed = comm.get_rank() * 10000
+        #    random.seed(seed)
+        #    np.random.seed(seed)
+        #    torch.manual_seed(seed)
+        #    torch.cuda.manual_seed_all(seed)
 
         model.eval()
         smiles = []
 
         with torch.no_grad():
-            for i in range(2):
+            for i in range(200):
                 batch_smiles = model(None, batch_size=1024)
                 smiles.extend(batch_smiles)
-                # print("Iteration {:d}: {:d} smiles".format(i+1, len(batch_smiles)))
+                print("Iteration {:d}: {:d} smiles".format(i+1, len(batch_smiles)))
 
         if comm.get_world_size() > 1:
             path = os.path.join(logdir, "debug_smiles_{:d}.txt".format(

@@ -45,7 +45,8 @@ class SmilesDataset(Dataset):
 
         self.data, self.target, self.length, \
             self.tokens, self.token2idx, self.num_tokens = process_smiles(
-                smiles, target, augment, pad, tokenize, tokens, flip)
+            smiles, sanitized=False, target=target, augment=augment, pad=pad,
+            tokenize=tokenize, tokens=tokens, flip=flip)
 
     def __len__(self):
         return len(self.data)

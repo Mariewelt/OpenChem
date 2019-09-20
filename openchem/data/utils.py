@@ -14,6 +14,7 @@ from torch.utils.data import Dataset
 from openchem.data.smiles_enumerator import SmilesEnumerator
 
 from rdkit import rdBase
+from openchem.utils.graph import Graph
 rdBase.DisableLog('rdApp.error')
 
 
@@ -363,3 +364,35 @@ def process_smiles(smiles, sanitized=False,
         clean_smiles, tokens = seq2tensor(clean_smiles, tokens, flip)
 
     return clean_smiles, target, length, tokens, token2idx, num_tokens
+
+
+def process_graphs(smiles, node_attributes, get_atomic_attributes,
+                   edge_attributes, get_bond_attributes=None,
+                   kekulize=True):
+
+    clean_smiles, clean_idx, num_atoms = sanitize_smiles(smiles, return_num_atoms=True)
+    clean_smiles = [clean_smiles[i] for i in clean_idx]
+
+    max_size = np.max(num_atoms)
+
+    adj = []
+    node_feat = []
+    for sm in clean_smiles:
+        graph = Graph(
+            sm, max_size, get_atomic_attributes,
+            get_bond_attributes, kekulize=kekulize)
+        node_feature_matrix = graph.get_node_feature_matrix(
+            node_attributes, max_size)
+
+        # TODO: remove diagonal elements from adjacency matrix
+        if get_bond_attributes is None:
+            adj_matrix = graph.adj_matrix
+        else:
+            adj_matrix = graph.get_edge_attr_adj_matrix(
+                edge_attributes, max_size)
+        adj.append(adj_matrix.astype('float32'))
+        node_feat.append(node_feature_matrix.astype('float32'))
+
+    return adj, node_feat
+
+

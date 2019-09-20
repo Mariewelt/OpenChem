@@ -105,7 +105,7 @@ class GraphRNNModel(OpenChemModel):
             batch, smiles = self.forward_test(**kwargs)
             return smiles
 
-    def forward_test(self, batch_size=512, **kwargs):
+    def forward_test(self, batch_size=128, **kwargs):
         device = torch.device("cuda")
 
         # TODO: handle float type for x_step in case of no node embedding
@@ -130,7 +130,8 @@ class GraphRNNModel(OpenChemModel):
                     self.max_atom_bonds, dtype=torch.float, device=device)
             max_valency_all = [self.max_atom_bonds[c_step.view(-1)]]
             valency_all = [torch.zeros_like(max_valency_all[0])]
-
+        
+        collect_node_hiddens = []
         for i in range(max_num_nodes):
             if self.edge_emb is not None:
                 x_step = self.edge_emb(
@@ -139,6 +140,7 @@ class GraphRNNModel(OpenChemModel):
                 c_step = self.node_emb(c_step)
                 x_step = torch.cat([x_step, c_step], dim=2)
             h = self.node_rnn(x_step, return_output_raw=False)
+            collect_node_hiddens.append(h.data.cpu().numpy())
             # output.hidden = h.permute(1,0,2)
             self.edge_rnn.hidden = self.edge_rnn.init_hidden(h.size(0), device)
             self.edge_rnn.hidden = torch.cat(
@@ -233,6 +235,8 @@ class GraphRNNModel(OpenChemModel):
             #  next sample
             anchors = np.where(np.all(adj_encoded_full == 0, axis=1))[0]
             cur = 0
+            atoms_list = []
+            adj_list = []
             for nxt in anchors:
                 # slice adjacency matrix into connected components
                 adj_encoded = adj_encoded_full[cur:nxt, :]
@@ -259,6 +263,8 @@ class GraphRNNModel(OpenChemModel):
                 adj_all.append(adj_t)
 
                 sstring = SmilesFromGraphs(atoms, adj_t)
+                atoms_list.append(atoms)
+                adj_list.append(adj_t)
                 smiles.append(sstring)
 
                 cur = nxt + 1
@@ -318,7 +324,7 @@ class GraphRNNModel(OpenChemModel):
         else:
             batch = None
 
-        return batch, smiles
+        return batch, smiles, atoms_list, adj_list, collect_node_hiddens
 
     def forward_train(self, inp, **kwargs):
         device = torch.device("cuda")
@@ -464,8 +470,8 @@ class GraphRNNModel(OpenChemModel):
             logp = node_pred + sum_y_pred
             logp = torch.flip(logp, (0,))
 
-            # logp = torch.flip(sum_y_pred, (0, ))
-            # logp += node_pred
+            #logp = torch.flip(sum_y_pred, (0, ))
+            #logp += node_pred
 
             output["logp"] = logp
             output["sizes"] = num_nodes

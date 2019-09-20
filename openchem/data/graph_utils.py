@@ -138,8 +138,9 @@ def SmilesFromGraphs(node_list, adjacency_matrix, remap=None):
 
     # Convert RWMol to Mol object
     mol = mol.GetMol()
+    Chem.Kekulize(mol)
 
     # Convert RWMol to SMILES
-    smiles = Chem.MolToSmiles(mol)
+    smiles = Chem.MolToSmiles(mol, kekuleSmiles=True)
 
     return smiles

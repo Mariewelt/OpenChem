@@ -81,7 +81,7 @@ class PolicyGradientLoss(_Loss):
                 #     (atom_bonds <= max_atom_bonds).to(
                 #         dtype=torch.float, device=device)
                 structure_reward[i, :sizes[i]] = \
-                    -10 * (atom_bonds > max_atom_bonds).to(
+                    -15. * (atom_bonds > max_atom_bonds).to(
                         dtype=torch.float, device=device)
 
             structure_reward = pack_padded_sequence(structure_reward,

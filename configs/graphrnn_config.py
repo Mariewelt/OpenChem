@@ -155,7 +155,7 @@ model_params = {
     'use_clip_grad': False,
     'batch_size': 512,
     'num_epochs': 121,
-    'logdir': './logs/graphrnn_log',
+    'logdir': './logs/graphrnn_zinc_250k',
     # 'logdir': './logs/debug',
     'print_every': 1,
     'save_every': 5,
@@ -190,7 +190,7 @@ model_params = {
     'edge2type': edge2type,
     "restrict_min_atoms": restrict_min_atoms,
     "restrict_max_atoms": restrict_max_atoms,
-    # "max_atom_bonds": max_atom_bonds,
+    "max_atom_bonds": max_atom_bonds,
 
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': dict(
@@ -222,7 +222,7 @@ model_params = {
         has_input=True,
         has_output=True,
         output_size=128,
-        # has_output_nonlin=True
+        has_output_nonlin=False
     ),
 
     'EdgeRNN': GRUPlain,
