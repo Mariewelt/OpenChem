@@ -15,8 +15,9 @@ from torch.optim.lr_scheduler import ExponentialLR, StepLR, MultiStepLR
 
 
 from openchem.data.utils import read_smiles_property_file
-data = read_smiles_property_file('/data/masha/melting/melting_data.txt',
-                                 cols_to_read=[0, 1], delimiter='\t',
+data = read_smiles_property_file('./benchmark_datasets/melt_temp/melting_data.txt',
+                                 cols_to_read=[0, 1],
+                                 delimiter='\t',
                                  keep_header=False)
 smiles = data[0][1:]
 labels = np.array(data[1][1:], dtype='float').reshape(-1)

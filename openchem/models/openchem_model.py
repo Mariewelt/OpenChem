@@ -9,7 +9,8 @@ from openchem.utils.utils import check_params
 import time
 
 from openchem.utils import comm
-from openchem.utils.logger import Logger
+from tensorboardX import SummaryWriter
+#from openchem.utils.logger import Logger
 from openchem.utils.utils import time_since, calculate_metrics
 from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
 from openchem.optimizer.openchem_lr_scheduler import OpenChemLRScheduler
@@ -127,7 +128,8 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
     print_every = params['print_every']
     save_every = params['save_every']
     n_epochs = params['num_epochs']
-    logger = Logger(logdir + '/tensorboard_log/')
+    writer = SummaryWriter()
+    #logger = Logger(logdir + '/tensorboard_log/')
     start = time.time()
     loss_total = 0
     n_batches = 0
@@ -181,7 +183,8 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
             if comm.is_main_process():
                 for tag, value in info.items():
-                    logger.scalar_summary(tag, value, epoch + 1)
+                    writer.add_scalar(tag, value, epoch + 1)
+                    #logger.scalar_summary(tag, value, epoch + 1)
 
                 for tag, value in model.named_parameters():
                     tag = tag.replace('.', '/')
@@ -192,17 +195,22 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                             "(i.e. constant vector)")
                     else:
                         log_value = value.detach().cpu().numpy()
-                        logger.histo_summary(
-                            tag, log_value, epoch + 1)
+                        writer.add_histogram(tag, log_value, epoch + 1)
+                        #logger.histo_summary(
+                        #    tag, log_value, epoch + 1)
                         if value.grad is None:
                             print("Warning: {} grad is undefined".format(tag))
                         else:
                             log_value_grad = value.grad.detach().cpu().numpy()
-                            logger.histo_summary(
-                                tag + '/grad', log_value_grad, epoch + 1)
+                            writer.add_histogram(tag + "/grad",
+                                                 log_value_grad,
+                                                 epoch + 1)
+                            #logger.histo_summary(
+                            #    tag + '/grad', log_value_grad, epoch + 1)
 
         if epoch % save_every == 0 and comm.is_main_process():
-            torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
+            torch.save(model.state_dict(),
+                       logdir + '/checkpoint/epoch_' + str(epoch))
 
         loss_total = 0
         n_batches = 0
