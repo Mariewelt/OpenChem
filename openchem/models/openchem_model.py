@@ -25,8 +25,7 @@ class OpenChemModel(nn.Module):
     """
     def __init__(self, params):
         super(OpenChemModel, self).__init__()
-        check_params(params, self.get_required_params(),
-                     self.get_optional_params())
+        check_params(params, self.get_required_params(), self.get_optional_params())
         self.params = params
         self.use_cuda = self.params['use_cuda']
         self.batch_size = self.params['batch_size']
@@ -46,7 +45,7 @@ class OpenChemModel(nn.Module):
 
     @staticmethod
     def get_required_params():
-        return{
+        return {
             'task': str,
             'batch_size': int,
             'num_epochs': int,
@@ -56,7 +55,7 @@ class OpenChemModel(nn.Module):
 
     @staticmethod
     def get_optional_params():
-        return{
+        return {
             'use_cuda': bool,
             'use_clip_grad': bool,
             'max_grad_norm': float,
@@ -82,22 +81,18 @@ class OpenChemModel(nn.Module):
     def save_model(self, path):
         torch.save(self.state_dict(), path)
 
-        
+
 def build_training(model, params):
 
-    optimizer = OpenChemOptimizer([params['optimizer'],
-                                   params['optimizer_params']],
-                                  model.parameters())
-    lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'],
-                                        params['lr_scheduler_params']],
-                                       optimizer.optimizer)
+    optimizer = OpenChemOptimizer([params['optimizer'], params['optimizer_params']], model.parameters())
+    lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'], params['lr_scheduler_params']], optimizer.optimizer)
     use_cuda = params['use_cuda']
     criterion = params['criterion']
     if use_cuda:
         criterion = criterion.cuda()
     # train_loader = params['train_loader']
     # val_loader = params['val_loader']
-    return criterion, optimizer, lr_scheduler #, train_loader, val_loader
+    return criterion, optimizer, lr_scheduler  #, train_loader, val_loader
 
 
 def train_step(model, optimizer, criterion, inp, target):
@@ -121,8 +116,7 @@ def train_step(model, optimizer, criterion, inp, target):
     return loss
 
 
-def fit(model, scheduler, train_loader, optimizer, criterion, params,
-        eval=False, val_loader=None, cur_epoch=0):
+def fit(model, scheduler, train_loader, optimizer, criterion, params, eval=False, val_loader=None, cur_epoch=0):
     textlogger = logging.getLogger("openchem.fit")
     logdir = params['logdir']
     print_every = params['print_every']
@@ -150,8 +144,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                 batch_input, batch_target = model.module.cast_inputs(sample_batched)
             else:
                 batch_input, batch_target = model.cast_inputs(sample_batched)
-            loss = train_step(model, optimizer, criterion,
-                              batch_input, batch_target)
+            loss = train_step(model, optimizer, criterion, batch_input, batch_target)
             if schedule_by_iter:
                 # steps are in iters
                 scheduler.step()
@@ -166,20 +159,20 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
 
         if epoch % print_every == 0:
             if comm.is_main_process():
-                textlogger.info(
-                    'TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
-                    'Loss: %.4f]' % (time_since(start), epoch,
-                                     epoch / n_epochs * 100, cur_loss))
+                textlogger.info('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
+                                'Loss: %.4f]' % (time_since(start), epoch, epoch / n_epochs * 100, cur_loss))
             if eval:
                 assert val_loader is not None
                 val_loss, metrics = evaluate(model, val_loader, criterion)
                 val_losses.append(val_loss)
-                info = {'Train loss': cur_loss, 'Validation loss': val_loss,
-                        'Validation metrics': metrics,
-                        'LR': optimizer.param_groups[0]['lr']}
+                info = {
+                    'Train loss': cur_loss,
+                    'Validation loss': val_loss,
+                    'Validation metrics': metrics,
+                    'LR': optimizer.param_groups[0]['lr']
+                }
             else:
-                info = {'Train loss': cur_loss,
-                        'LR': optimizer.param_groups[0]['lr']}
+                info = {'Train loss': cur_loss, 'LR': optimizer.param_groups[0]['lr']}
 
             if comm.is_main_process():
                 for tag, value in info.items():
@@ -190,9 +183,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                     tag = tag.replace('.', '/')
                     if torch.std(value).item() < 1e-3 or \
                             torch.isnan(torch.std(value)).item():
-                        textlogger.warning(
-                            "Warning: {} has zero variance ".format(tag) +
-                            "(i.e. constant vector)")
+                        textlogger.warning("Warning: {} has zero variance ".format(tag) + "(i.e. constant vector)")
                     else:
                         log_value = value.detach().cpu().numpy()
                         writer.add_histogram(tag, log_value, epoch + 1)
@@ -202,15 +193,12 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params,
                             print("Warning: {} grad is undefined".format(tag))
                         else:
                             log_value_grad = value.grad.detach().cpu().numpy()
-                            writer.add_histogram(tag + "/grad",
-                                                 log_value_grad,
-                                                 epoch + 1)
+                            writer.add_histogram(tag + "/grad", log_value_grad, epoch + 1)
                             #logger.histo_summary(
                             #    tag + '/grad', log_value_grad, epoch + 1)
 
         if epoch % save_every == 0 and comm.is_main_process():
-            torch.save(model.state_dict(),
-                       logdir + '/checkpoint/epoch_' + str(epoch))
+            torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
 
         loss_total = 0
         n_batches = 0
@@ -266,11 +254,9 @@ def evaluate(model, val_loader, criterion):
     if task == 'classification':
         prediction = np.argmax(prediction, axis=1)
 
-    metrics = calculate_metrics(prediction, ground_truth,
-                                eval_metrics)
+    metrics = calculate_metrics(prediction, ground_truth, eval_metrics)
     if comm.is_main_process():
-        textlogger.info('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
-              (time_since(start), cur_loss, metrics))
+        textlogger.info('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' % (time_since(start), cur_loss, metrics))
     return cur_loss, metrics
 
 

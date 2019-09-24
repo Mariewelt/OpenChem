@@ -27,8 +27,15 @@ class SmilesDataset(Dataset):
         augment (bool): argument specifying whether to augment SMILES.
 
     """
-    def __init__(self, filename, cols_to_read, delimiter=',', tokens=None,
-                 pad=True, tokenize=True, augment=False, flip=False):
+    def __init__(self,
+                 filename,
+                 cols_to_read,
+                 delimiter=',',
+                 tokens=None,
+                 pad=True,
+                 tokenize=True,
+                 augment=False,
+                 flip=False):
         super(SmilesDataset, self).__init__()
         self.tokenize = tokenize
         data = read_smiles_property_file(filename, cols_to_read, delimiter)
@@ -53,7 +60,7 @@ class SmilesDataset(Dataset):
 
     def __getitem__(self, index):
         sample = {}
-        sample['tokenized_smiles'] = self.data[index] 
+        sample['tokenized_smiles'] = self.data[index]
         sample['length'] = self.length[index]
         if self.target is not None:
             sample['labels'] = self.target[index]

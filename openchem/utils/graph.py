@@ -5,8 +5,7 @@ import numpy as np
 class Attribute:
     def __init__(self, attr_type, name, one_hot=True, values=None):
         if attr_type not in ['node', 'edge']:
-            raise ValueError('Invalid value for attribute type: must be "node" '
-                             'or "edge"')
+            raise ValueError('Invalid value for attribute type: must be "node" ' 'or "edge"')
         self.attr_type = attr_type
         self.name = name
         if values is not None:
@@ -38,9 +37,7 @@ class Edge:
 
 class Graph:
     """Describes an undirected graph class"""
-
-    def __init__(self, smiles, max_size, get_atom_attributes,
-                 get_bond_attributes=None, kekulize=True):
+    def __init__(self, smiles, max_size, get_atom_attributes, get_bond_attributes=None, kekulize=True):
         self.smiles = smiles
         rdmol = Chem.MolFromSmiles(smiles)
         if kekulize:
@@ -59,10 +56,8 @@ class Graph:
         for _, bond in enumerate(rdmol.GetBonds()):
             cur_edge = Edge(bond, get_bond_attributes)
             self.edges.append(cur_edge)
-            adj_matrix[cur_edge.begin_atom_idx,
-                       cur_edge.end_atom_idx] = 1.0
-            adj_matrix[cur_edge.end_atom_idx,
-                       cur_edge.begin_atom_idx] = 1.0
+            adj_matrix[cur_edge.begin_atom_idx, cur_edge.end_atom_idx] = 1.0
+            adj_matrix[cur_edge.end_atom_idx, cur_edge.begin_atom_idx] = 1.0
         self.adj_matrix = np.zeros((max_size, max_size))
         self.adj_matrix[:self.num_nodes, :self.num_nodes] = adj_matrix
         if get_bond_attributes is not None and len(self.edges) > 0:
@@ -70,8 +65,7 @@ class Graph:
             self.n_attr = len(tmp.attributes_dict.keys())
 
     def get_node_attr_adj_matrix(self, attr):
-        node_attr_adj_matrix = np.zeros((self.num_nodes, self.num_nodes,
-                                         attr.n_values))
+        node_attr_adj_matrix = np.zeros((self.num_nodes, self.num_nodes, attr.n_values))
         attr_one_hot = []
         node_idx = []
 
@@ -86,8 +80,7 @@ class Graph:
             end = edge.end_atom_idx
             begin_one_hot = attr_one_hot[node_idx.index(begin)]
             end_one_hot = attr_one_hot[node_idx.index(end)]
-            node_attr_adj_matrix[begin, end, :] = (begin_one_hot +
-                                                   end_one_hot)/2
+            node_attr_adj_matrix[begin, end, :] = (begin_one_hot + end_one_hot) / 2
 
         return node_attr_adj_matrix
 
@@ -100,8 +93,7 @@ class Graph:
             for attr_name in edge.attributes_dict.keys():
                 cur_attr = all_atr_dict[attr_name]
                 if cur_attr.one_hot:
-                    cur_features += list(cur_attr.one_hot_dict[edge.
-                                         attributes_dict[cur_attr.name]])
+                    cur_features += list(cur_attr.one_hot_dict[edge.attributes_dict[cur_attr.name]])
                 else:
                     cur_features += [edge.attributes_dict[cur_attr.name]]
             cur_features = np.array(cur_features)
@@ -111,10 +103,9 @@ class Graph:
                 fl = False
             edge_attr_adj_matrix[begin, end, :] = cur_features
             edge_attr_adj_matrix[end, begin, :] = cur_features
-        
+
         return edge_attr_adj_matrix
-   
-    
+
     def get_node_feature_matrix(self, all_atr_dict, max_size):
         features = []
         for node in self.nodes:
@@ -122,8 +113,7 @@ class Graph:
             for attr_name in node.attributes_dict.keys():
                 cur_attr = all_atr_dict[attr_name]
                 if cur_attr.one_hot:
-                    cur_features += list(cur_attr.one_hot_dict[node.
-                                         attributes_dict[cur_attr.name]])
+                    cur_features += list(cur_attr.one_hot_dict[node.attributes_dict[cur_attr.name]])
                 else:
                     cur_features += [node.attributes_dict[cur_attr.name]]
             features.append(cur_features)

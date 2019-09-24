@@ -14,10 +14,16 @@ from .graph_utils import bfs_seq, encode_adj
 
 
 class GraphDataset(Dataset):
-    def __init__(self, get_atomic_attributes, node_attributes, filename,
-                 cols_to_read, delimiter=',', get_bond_attributes=None,
+    def __init__(self,
+                 get_atomic_attributes,
+                 node_attributes,
+                 filename,
+                 cols_to_read,
+                 delimiter=',',
+                 get_bond_attributes=None,
                  edge_attributes=None,
-                 restrict_min_atoms=-1, restrict_max_atoms=-1,
+                 restrict_min_atoms=-1,
+                 restrict_max_atoms=-1,
                  kekulize=True,
                  **kwargs):
         super(GraphDataset, self).__init__()
@@ -31,27 +37,23 @@ class GraphDataset(Dataset):
 
             # this cleanup must be consistent with sanitize_smiles
             mn, mx = restrict_min_atoms, restrict_max_atoms
-            indices = [i for i, n in enumerate(data["num_atoms_all"])
-                       if (n >= mn or mn < 0) and (n <= mx or mx < 0)]
-            data = {key: value[indices]
-                    if isinstance(value, np.ndarray)
-                    else [value[i] for i in indices]
-                    for key, value in data.items()}
+            indices = [i for i, n in enumerate(data["num_atoms_all"]) if (n >= mn or mn < 0) and (n <= mx or mx < 0)]
+            data = {
+                key: value[indices] if isinstance(value, np.ndarray) else [value[i] for i in indices]
+                for key, value in data.items()
+            }
 
             self.num_atoms_all = data["num_atoms_all"]
             self.target = data["target"]
             self.smiles = data["smiles"]
         else:
-            data_set = read_smiles_property_file(filename, cols_to_read,
-                                                 delimiter)
+            data_set = read_smiles_property_file(filename, cols_to_read, delimiter)
             data = data_set[0]
             target = data_set[1:]
-            clean_smiles, clean_idx, num_atoms = sanitize_smiles(
-                data,
-                min_atoms=restrict_min_atoms,
-                max_atoms=restrict_max_atoms,
-                return_num_atoms=True
-            )
+            clean_smiles, clean_idx, num_atoms = sanitize_smiles(data,
+                                                                 min_atoms=restrict_min_atoms,
+                                                                 max_atoms=restrict_max_atoms,
+                                                                 return_num_atoms=True)
             target = np.asarray(target, dtype=np.float).T
             clean_smiles = [clean_smiles[i] for i in clean_idx]
             num_atoms = [num_atoms[i] for i in clean_idx]
@@ -73,23 +75,20 @@ class GraphDataset(Dataset):
     def __getitem__(self, index):
         sm = self.smiles[index]
 
-        graph = Graph(
-            sm, self.max_size, self.get_atomic_attributes,
-            self.get_bond_attributes, kekulize=self.kekulize)
-        node_feature_matrix = graph.get_node_feature_matrix(
-            self.node_attributes, self.max_size)
+        graph = Graph(sm, self.max_size, self.get_atomic_attributes, self.get_bond_attributes, kekulize=self.kekulize)
+        node_feature_matrix = graph.get_node_feature_matrix(self.node_attributes, self.max_size)
 
         # TODO: remove diagonal elements from adjacency matrix
         if self.get_bond_attributes is None:
             adj_matrix = graph.adj_matrix
         else:
-            adj_matrix = graph.get_edge_attr_adj_matrix(
-                self.edge_attributes, self.max_size)
+            adj_matrix = graph.get_edge_attr_adj_matrix(self.edge_attributes, self.max_size)
 
-        sample = {'adj_matrix': adj_matrix.astype('float32'),
-                  'node_feature_matrix':
-                      node_feature_matrix.astype('float32'),
-                  'labels': self.target[index].astype('float32')}
+        sample = {
+            'adj_matrix': adj_matrix.astype('float32'),
+            'node_feature_matrix': node_feature_matrix.astype('float32'),
+            'labels': self.target[index].astype('float32')
+        }
         return sample
 
 
@@ -107,8 +106,7 @@ class BFSGraphDataset(GraphDataset):
                 self.max_num_nodes
             )
 
-        original_start_node_label = kwargs.get(
-            "original_start_node_label", None)
+        original_start_node_label = kwargs.get("original_start_node_label", None)
 
         if "node_relabel_map" not in kwargs:
             # define relabelling from Periodic Table numbers to {0, 1, ...}
@@ -124,13 +122,10 @@ class BFSGraphDataset(GraphDataset):
             # discard 0 padding
             unique_labels.discard(0)
 
-            self.node_relabel_map = {
-                v: i for i, v in enumerate(sorted(unique_labels))
-            }
+            self.node_relabel_map = {v: i for i, v in enumerate(sorted(unique_labels))}
         else:
             self.node_relabel_map = kwargs["node_relabel_map"]
-        self.inverse_node_relabel_map = {i: v for v, i in
-                                         self.node_relabel_map.items()}
+        self.inverse_node_relabel_map = {i: v for v, i in self.node_relabel_map.items()}
 
         if original_start_node_label is not None:
             self.start_node_label = \
@@ -142,9 +137,7 @@ class BFSGraphDataset(GraphDataset):
             raise NotImplementedError()
         else:
             self.edge_relabel_map = kwargs["edge_relabel_map"]
-        self.inverse_edge_relabel_map = {
-            i: v for v, i in
-            sorted(self.edge_relabel_map.items(), reverse=True)}
+        self.inverse_edge_relabel_map = {i: v for v, i in sorted(self.edge_relabel_map.items(), reverse=True)}
 
         self.num_node_classes = len(self.inverse_node_relabel_map)
         self.num_edge_classes = len(self.inverse_edge_relabel_map)
@@ -160,9 +153,7 @@ class BFSGraphDataset(GraphDataset):
         for v, i in self.edge_relabel_map.items():
             adj[adj_original == v] = i
 
-        labels = np.array(
-            [self.node_relabel_map[v] if v != 0 else 0
-             for v in node_feature_matrix.flatten()])
+        labels = np.array([self.node_relabel_map[v] if v != 0 else 0 for v in node_feature_matrix.flatten()])
 
         if self.random_order:
             order = np.random.permutation(num_nodes)
@@ -175,8 +166,7 @@ class BFSGraphDataset(GraphDataset):
         if self.start_node_label is None:
             start_idx = np.random.randint(num_nodes)
         else:
-            start_idx = np.random.choice(
-                np.where(labels == self.start_node_label)[0])
+            start_idx = np.random.choice(np.where(labels == self.start_node_label)[0])
 
         # BFS ordering
         order = np.array(bfs_seq(G, start_idx))
@@ -192,20 +182,23 @@ class BFSGraphDataset(GraphDataset):
         adj_encoded = torch.tensor(adj_encoded, dtype=torch.float)
         labels = torch.tensor(labels, dtype=torch.long)
 
-        x = torch.zeros((self.max_num_nodes, self.max_prev_nodes),
-                        dtype=torch.float)
+        x = torch.zeros((self.max_num_nodes, self.max_prev_nodes), dtype=torch.float)
         # TODO: the first input token is all ones?
         x[0, :] = 1.
-        y = torch.zeros((self.max_num_nodes, self.max_prev_nodes),
-                        dtype=torch.long)
+        y = torch.zeros((self.max_num_nodes, self.max_prev_nodes), dtype=torch.long)
         c_in = torch.zeros(self.max_num_nodes, dtype=torch.long)
         c_out = -1 * torch.ones(self.max_num_nodes, dtype=torch.long)
 
-        y[:num_nodes-1, :] = adj_encoded.to(dtype=torch.long)
+        y[:num_nodes - 1, :] = adj_encoded.to(dtype=torch.long)
         x[1:num_nodes, :] = adj_encoded
         c_in[:num_nodes] = labels
-        c_out[:num_nodes-1] = labels[1:]
+        c_out[:num_nodes - 1] = labels[1:]
 
-        return {'x': x, 'y': y, 'num_nodes': num_nodes,
-                'c_in': c_in, 'c_out': c_out,
-                'max_prev_nodes_local': max_prev_nodes_local}
+        return {
+            'x': x,
+            'y': y,
+            'num_nodes': num_nodes,
+            'c_in': c_in,
+            'c_out': c_out,
+            'max_prev_nodes_local': max_prev_nodes_local
+        }

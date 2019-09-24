@@ -8,8 +8,13 @@ import torch.nn.init as init
 
 
 class GRUPlain(nn.Module):
-    def __init__(self, input_size, embedding_size, hidden_size,
-                 num_layers, has_input=True, has_output=False,
+    def __init__(self,
+                 input_size,
+                 embedding_size,
+                 hidden_size,
+                 num_layers,
+                 has_input=True,
+                 has_output=False,
                  has_output_nonlin=False,
                  output_size=None):
         super(GRUPlain, self).__init__()
@@ -21,26 +26,18 @@ class GRUPlain(nn.Module):
         if has_input:
             # TODO (mshvets): use small embedding layer here for edge class
             self.input = nn.Linear(input_size, embedding_size)
-            self.rnn = nn.GRU(
-                input_size=embedding_size, hidden_size=hidden_size,
-                num_layers=num_layers, batch_first=True)
+            self.rnn = nn.GRU(input_size=embedding_size,
+                              hidden_size=hidden_size,
+                              num_layers=num_layers,
+                              batch_first=True)
         else:
-            self.rnn = nn.GRU(
-                input_size=input_size, hidden_size=hidden_size,
-                num_layers=num_layers, batch_first=True)
+            self.rnn = nn.GRU(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, batch_first=True)
         if has_output and has_output_nonlin:
-            self.output = nn.Sequential(
-                nn.Linear(hidden_size, embedding_size),
-                nn.ReLU(),
-                nn.Linear(embedding_size, output_size),
-                nn.ReLU()
-            )
+            self.output = nn.Sequential(nn.Linear(hidden_size, embedding_size), nn.ReLU(),
+                                        nn.Linear(embedding_size, output_size), nn.ReLU())
         elif has_output:
-            self.output = nn.Sequential(
-                nn.Linear(hidden_size, embedding_size),
-                nn.ReLU(),
-                nn.Linear(embedding_size, output_size)
-            )
+            self.output = nn.Sequential(nn.Linear(hidden_size, embedding_size), nn.ReLU(),
+                                        nn.Linear(embedding_size, output_size))
 
         self.relu = nn.ReLU()
         # initialize
@@ -50,20 +47,15 @@ class GRUPlain(nn.Module):
             if 'bias' in name:
                 nn.init.constant_(param, 0.25)
             elif 'weight' in name:
-                nn.init.xavier_uniform_(
-                    param, gain=nn.init.calculate_gain('sigmoid'))
+                nn.init.xavier_uniform_(param, gain=nn.init.calculate_gain('sigmoid'))
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                init.xavier_uniform_(
-                    m.weight, gain=nn.init.calculate_gain('relu'))
+                init.xavier_uniform_(m.weight, gain=nn.init.calculate_gain('relu'))
 
     def init_hidden(self, batch_size, device):
-        return torch.zeros(self.num_layers,
-                           batch_size,
-                           self.hidden_size, device=device)
+        return torch.zeros(self.num_layers, batch_size, self.hidden_size, device=device)
 
-    def forward(self, input_raw, pack=False, input_len=None,
-                return_output_raw=False):
+    def forward(self, input_raw, pack=False, input_len=None, return_output_raw=False):
         if self.has_input:
             input = self.input(input_raw)
             input = self.relu(input)

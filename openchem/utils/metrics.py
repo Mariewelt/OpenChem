@@ -29,8 +29,7 @@ def reward_penalized_log_p(smiles, return_mean=True):
     # cycle score
     cycle_score = []
     for mol in mols:
-        cycle_list = nx.cycle_basis(nx.Graph(
-        Chem.rdmolops.GetAdjacencyMatrix(mol)))
+        cycle_list = nx.cycle_basis(nx.Graph(Chem.rdmolops.GetAdjacencyMatrix(mol)))
         if len(cycle_list) == 0:
             cycle_length = 0
         else:
@@ -52,12 +51,12 @@ def reward_penalized_log_p(smiles, return_mean=True):
     else:
         return score
 
+
 def logP_pen(smiles, return_mean=True):
     mols = [Chem.MolFromSmiles(s) for s in smiles]
     logp_pen = []
     for mol in mols:
-        cycle_list = nx.cycle_basis(nx.Graph(
-            Chem.rdmolops.GetAdjacencyMatrix(mol)))
+        cycle_list = nx.cycle_basis(nx.Graph(Chem.rdmolops.GetAdjacencyMatrix(mol)))
 
         tmp = sum([len(c) > 6 for c in cycle_list])
 

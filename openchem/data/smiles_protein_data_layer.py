@@ -11,8 +11,14 @@ from openchem.data.utils import get_tokens
 
 
 class SmilesProteinDataset(Dataset):
-    def __init__(self, filename, tokenized=False, cols_to_read=None,
-                 delimiter=',', mol_tokens=None, prot_tokens=None, pad=True):
+    def __init__(self,
+                 filename,
+                 tokenized=False,
+                 cols_to_read=None,
+                 delimiter=',',
+                 mol_tokens=None,
+                 prot_tokens=None,
+                 pad=True):
         super(SmilesProteinDataset, self).__init__()
         if not tokenized:
             data = read_smiles_property_file(filename, cols_to_read, delimiter)
@@ -50,10 +56,11 @@ class SmilesProteinDataset(Dataset):
         return len(self.target)
 
     def __getitem__(self, index):
-        sample = {'tokenized_smiles': self.molecules[index],
-                  'tokenized_protein': self.proteins[index],
-                  'labels': self.target[index],
-                  'mol_length': self.mol_lengths[index],
-                  'prot_length': self.prot_lengths[index]}
+        sample = {
+            'tokenized_smiles': self.molecules[index],
+            'tokenized_protein': self.proteins[index],
+            'labels': self.target[index],
+            'mol_length': self.mol_lengths[index],
+            'prot_length': self.prot_lengths[index]
+        }
         return sample
-

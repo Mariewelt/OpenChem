@@ -1,7 +1,7 @@
 from openchem.models.Smiles2Label import Smiles2Label
 from openchem.modules.embeddings.basic_embedding import Embedding
 from openchem.modules.encoders.rnn_encoder import RNNEncoder
-from openchem.modules.mlp.openchem_mlp import OpenChemMLP#Simple
+from openchem.modules.mlp.openchem_mlp import OpenChemMLP  #Simple
 from openchem.utils.utils import identity
 
 from sklearn.metrics import mean_squared_error, r2_score
@@ -12,7 +12,6 @@ import numpy as np
 
 from torch.optim import RMSprop, Adam
 from torch.optim.lr_scheduler import ExponentialLR, StepLR, MultiStepLR
-
 
 from openchem.data.utils import read_smiles_property_file
 data = read_smiles_property_file('./benchmark_datasets/melt_temp/melting_data.txt',
@@ -28,9 +27,7 @@ tokens, _, _ = get_tokens(smiles)
 tokens = tokens + ' '
 
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(smiles, labels,
-                                                    test_size=0.2,
-                                                    random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(smiles, labels, test_size=0.2, random_state=42)
 
 train_mean = np.mean(y_train)
 train_std = np.std(y_train)
@@ -42,24 +39,23 @@ y_train = (y_train - train_mean) / train_std
 y_test = (y_test - train_mean) / train_std
 
 from openchem.data.utils import save_smiles_property_file
-save_smiles_property_file('./benchmark_datasets/melt_temp/train.smi',
-                          X_train,
-                          y_train.reshape(-1, 1))
+save_smiles_property_file('./benchmark_datasets/melt_temp/train.smi', X_train, y_train.reshape(-1, 1))
 
-save_smiles_property_file('./benchmark_datasets/melt_temp/test.smi',
-                          X_test,
-                          y_test.reshape(-1, 1))
+save_smiles_property_file('./benchmark_datasets/melt_temp/test.smi', X_test, y_test.reshape(-1, 1))
 
 from openchem.data.smiles_data_layer import SmilesDataset
 train_dataset = SmilesDataset('./benchmark_datasets/melt_temp/train.smi',
-                              delimiter=',', cols_to_read=[0, 1],
-                              tokens=tokens, augment=True)
+                              delimiter=',',
+                              cols_to_read=[0, 1],
+                              tokens=tokens,
+                              augment=True)
 
 #train_dataset.target = train_dataset.target.reshape(-1, 1)
 
 test_dataset = SmilesDataset('./benchmark_datasets/melt_temp/test.smi',
-                            delimiter=',', cols_to_read=[0, 1],
-                            tokens=tokens)
+                             delimiter=',',
+                             cols_to_read=[0, 1],
+                             tokens=tokens)
 #test_dataset.target = test_dataset.target.reshape(-1, 1)
 
 model = Smiles2Label
@@ -82,7 +78,7 @@ model_params = {
     'optimizer': Adam,
     'optimizer_params': {
         'lr': 0.0008,
-        },
+    },
     'lr_scheduler': ExponentialLR,
     'lr_scheduler_params': {
         'gamma': 0.97

@@ -27,16 +27,19 @@ class DummyDataset(Dataset):
         return self.size
 
     def __getitem__(self, index):
-        return {'x': torch.zeros(1), 'y': torch.zeros(1),
-                'num_nodes': torch.zeros(1),
-                'c_in': torch.zeros(1), 'c_out': torch.zeros(1),
-                'max_prev_nodes_local': torch.zeros(1)
-                }
+        return {
+            'x': torch.zeros(1),
+            'y': torch.zeros(1),
+            'num_nodes': torch.zeros(1),
+            'c_in': torch.zeros(1),
+            'c_out': torch.zeros(1),
+            'max_prev_nodes_local': torch.zeros(1)
+        }
 
 
 class DummyDataLoader(object):
     def __init__(self, batch_size):
-        self.batch_size = 32#batch_size
+        self.batch_size = 32  #batch_size
         self.current = 0
 
     def __iter__(self):
@@ -60,10 +63,9 @@ def cut_padding(samples, lengths, padding='left'):
         cut_samples = samples[:, :max_len]
     elif padding == 'left':
         total_len = samples.size()[1]
-        cut_samples = samples[:, total_len-max_len:]
+        cut_samples = samples[:, total_len - max_len:]
     else:
-        raise ValueError('Invalid value for padding argument. Must be right'
-                         'or left')
+        raise ValueError('Invalid value for padding argument. Must be right' 'or left')
     return cut_samples
 
 
@@ -90,21 +92,25 @@ def pad_sequences(seqs, max_length=None, pad_symbol=' '):
     for i in range(len(seqs)):
         cur_len = len(seqs[i])
         lengths.append(cur_len)
-        seqs[i] = seqs[i] + pad_symbol*(max_length - cur_len)
+        seqs[i] = seqs[i] + pad_symbol * (max_length - cur_len)
     return seqs, lengths
 
 
-def create_loader(dataset, batch_size, shuffle=True, num_workers=1,
-                  pin_memory=False, sampler=None):
-    data_loader = DataLoader(dataset=dataset, batch_size=batch_size,
-                             shuffle=shuffle, num_workers=num_workers,
-                             pin_memory=pin_memory, sampler=sampler)
+def create_loader(dataset, batch_size, shuffle=True, num_workers=1, pin_memory=False, sampler=None):
+    data_loader = DataLoader(dataset=dataset,
+                             batch_size=batch_size,
+                             shuffle=shuffle,
+                             num_workers=num_workers,
+                             pin_memory=pin_memory,
+                             sampler=sampler)
 
     return data_loader
 
 
-def sanitize_smiles(smiles, canonize=True,
-                    min_atoms=-1, max_atoms=-1,
+def sanitize_smiles(smiles,
+                    canonize=True,
+                    min_atoms=-1,
+                    max_atoms=-1,
                     return_num_atoms=False,
                     allowed_tokens=None,
                     allow_charges=False,
@@ -174,12 +180,9 @@ def sanitize_smiles(smiles, canonize=True,
     num_bad = len(smiles) - len(idx)
 
     if len(idx) != len(smiles) and logging == "warn":
-        warnings.warn('{:d}/{:d} unsanitized smiles ({:.1f}%)'.format(
-            num_bad, len(smiles), 100 * invalid_rate
-        ))
+        warnings.warn('{:d}/{:d} unsanitized smiles ({:.1f}%)'.format(num_bad, len(smiles), 100 * invalid_rate))
     elif logging == "info":
-        print("Valid: {}/{} ({:.2f}%)".format(
-            len(idx), len(smiles), 100 * (1 - invalid_rate)))
+        print("Valid: {}/{} ({:.2f}%)".format(len(idx), len(smiles), 100 * (1 - invalid_rate)))
         print("Unique valid: {:.2f}%".format(100 * valid_unique_rate))
 
     if return_num_atoms:
@@ -209,17 +212,14 @@ def canonize_smiles(smiles, sanitize=True):
     for i in range(len(smiles)):
         sm = smiles[i]
         try:
-            new_smiles.append(
-                Chem.MolToSmiles(Chem.MolFromSmiles(sm, sanitize=sanitize))
-            )
+            new_smiles.append(Chem.MolToSmiles(Chem.MolFromSmiles(sm, sanitize=sanitize)))
             idx.append(i)
         except:
             new_smiles.append('')
 
         if len(idx) != len(smiles):
             invalid_rate = 1.0 - len(idx) / len(smiles)
-            warnings.warn('Proportion of unsanitized smiles is %.3f '
-                          % (invalid_rate))
+            warnings.warn('Proportion of unsanitized smiles is %.3f ' % (invalid_rate))
     return new_smiles
 
 
@@ -315,8 +315,7 @@ def time_since(since):
     return '%dm %ds' % (m, s)
 
 
-def read_smiles_property_file(path, cols_to_read, delimiter=',',
-                              keep_header=False):
+def read_smiles_property_file(path, cols_to_read, delimiter=',', keep_header=False):
     reader = csv.reader(open(path, 'r'), delimiter=delimiter)
     data = list(reader)
     if keep_header:
@@ -341,13 +340,17 @@ def save_smiles_property_file(path, smiles, labels, delimiter=','):
     f.close()
 
 
-def process_smiles(smiles, sanitized=False,
-                   target=None, augment=False, pad=True,
-                   tokenize=True, tokens=None, flip=False,
+def process_smiles(smiles,
+                   sanitized=False,
+                   target=None,
+                   augment=False,
+                   pad=True,
+                   tokenize=True,
+                   tokens=None,
+                   flip=False,
                    allowed_tokens=None):
     if not sanitized:
-        clean_smiles, clean_idx = sanitize_smiles(
-            smiles, allowed_tokens=allowed_tokens)
+        clean_smiles, clean_idx = sanitize_smiles(smiles, allowed_tokens=allowed_tokens)
         clean_smiles = [clean_smiles[i] for i in clean_idx]
         if target is not None:
             target = target[clean_idx]
@@ -366,8 +369,11 @@ def process_smiles(smiles, sanitized=False,
     return clean_smiles, target, length, tokens, token2idx, num_tokens
 
 
-def process_graphs(smiles, node_attributes, get_atomic_attributes,
-                   edge_attributes, get_bond_attributes=None,
+def process_graphs(smiles,
+                   node_attributes,
+                   get_atomic_attributes,
+                   edge_attributes,
+                   get_bond_attributes=None,
                    kekulize=True):
 
     clean_smiles, clean_idx, num_atoms = sanitize_smiles(smiles, return_num_atoms=True)
@@ -378,21 +384,15 @@ def process_graphs(smiles, node_attributes, get_atomic_attributes,
     adj = []
     node_feat = []
     for sm in clean_smiles:
-        graph = Graph(
-            sm, max_size, get_atomic_attributes,
-            get_bond_attributes, kekulize=kekulize)
-        node_feature_matrix = graph.get_node_feature_matrix(
-            node_attributes, max_size)
+        graph = Graph(sm, max_size, get_atomic_attributes, get_bond_attributes, kekulize=kekulize)
+        node_feature_matrix = graph.get_node_feature_matrix(node_attributes, max_size)
 
         # TODO: remove diagonal elements from adjacency matrix
         if get_bond_attributes is None:
             adj_matrix = graph.adj_matrix
         else:
-            adj_matrix = graph.get_edge_attr_adj_matrix(
-                edge_attributes, max_size)
+            adj_matrix = graph.get_edge_attr_adj_matrix(edge_attributes, max_size)
         adj.append(adj_matrix.astype('float32'))
         node_feat.append(node_feature_matrix.astype('float32'))
 
     return adj, node_feat
-
-

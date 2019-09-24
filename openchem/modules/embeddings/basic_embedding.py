@@ -15,7 +15,6 @@ class Embedding(OpenChemEmbedding):
         embedded = self.embedding(inp)
         return embedded
 
-
     @staticmethod
     def get_required_params():
         return {

@@ -56,34 +56,21 @@ tokens = params['tokens']
 
 max_atom_bonds = [4, 3., 2., 1., 5., 6., 1., 1., 1.]
 
-my_loss = PolicyGradientLoss(reward_fn=None, critic=None, tokens=None,
-                             fn=None, gamma=0.97,
+my_loss = PolicyGradientLoss(reward_fn=None,
+                             critic=None,
+                             tokens=None,
+                             fn=None,
+                             gamma=0.97,
                              max_atom_bonds=max_atom_bonds,
                              enable_supervised_loss=False)
-
 
 max_prev_nodes = 12
 # this in Carbon original id in the Periodic Table
 original_start_node_label = 6
 
-edge_relabel_map = {
-    0.: 0,
-    1.: 1,
-    2.: 2,
-    3.: 3
-}
+edge_relabel_map = {0.: 0, 1.: 1, 2.: 2, 3.: 3}
 
-node_relabel_map = {
-    6.0: 0,
-    7.0: 1,
-    8.0: 2,
-    9.0: 3,
-    15.0: 4,
-    16.0: 5,
-    17.0: 6,
-    35.0: 7,
-    53.0: 8
-}
+node_relabel_map = {6.0: 0, 7.0: 1, 8.0: 2, 9.0: 3, 15.0: 4, 16.0: 5, 17.0: 6, 35.0: 7, 53.0: 8}
 
 # edge_relabel_map = {
 #     0.: 0,
@@ -109,9 +96,23 @@ node_relabel_map = {
 #     35.: 1,
 #     53.: 1,
 # }
-atom2number = {'H': 1, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9,
-               'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'As': 33, 'Se': 34,
-               'Br': 35, 'I': 53}
+atom2number = {
+    'H': 1,
+    'Be': 4,
+    'B': 5,
+    'C': 6,
+    'N': 7,
+    'O': 8,
+    'F': 9,
+    'Si': 14,
+    'P': 15,
+    'S': 16,
+    'Cl': 17,
+    'As': 33,
+    'Se': 34,
+    'Br': 35,
+    'I': 53
+}
 number2atom = {i: v for v, i in atom2number.items()}
 
 
@@ -128,18 +129,15 @@ def get_edge_attributes(bond):
     return attr_dict
 
 
-node_attributes = dict(
-    atom_element=Attribute('node', 'atom_element', one_hot=False),
-)
+node_attributes = dict(atom_element=Attribute('node', 'atom_element', one_hot=False), )
 
-edge_attributes = dict(
-    bond_type=Attribute('edge', 'bond_type', one_hot=False)
-)
+edge_attributes = dict(bond_type=Attribute('edge', 'bond_type', one_hot=False))
 
 restrict_min_atoms = 10
 restrict_max_atoms = 50
 train_dataset = BFSGraphDataset(
-    get_atomic_attributes, node_attributes,
+    get_atomic_attributes,
+    node_attributes,
     # './benchmark_datasets/logp_dataset/logP_labels.csv',
     # cols_to_read=[1, 2],
     './benchmark_datasets/chembl_small/small_chembl.smi',
@@ -151,13 +149,13 @@ train_dataset = BFSGraphDataset(
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
     delimiter=',',
-    random_order=True, max_prev_nodes=max_prev_nodes,
+    random_order=True,
+    max_prev_nodes=max_prev_nodes,
     original_start_node_label=original_start_node_label,
     edge_relabel_map=edge_relabel_map,
     node_relabel_map=node_relabel_map,
     restrict_min_atoms=restrict_min_atoms,
-    restrict_max_atoms=restrict_max_atoms
-)
+    restrict_max_atoms=restrict_max_atoms)
 
 val_dataset = DummyDataset()
 
@@ -167,10 +165,8 @@ node_relabel_map = train_dataset.node_relabel_map
 inverse_node_relabel_map = train_dataset.inverse_node_relabel_map
 max_num_nodes = train_dataset.max_num_nodes
 start_node_label = train_dataset.start_node_label
-label2atom = [number2atom[int(v)] for i, v
-              in sorted(inverse_node_relabel_map.items())]
-edge2type = [t for e, t
-             in sorted(train_dataset.inverse_edge_relabel_map.items())]
+label2atom = [number2atom[int(v)] for i, v in sorted(inverse_node_relabel_map.items())]
+edge2type = [t for e, t in sorted(train_dataset.inverse_edge_relabel_map.items())]
 
 edge_embedding_dim = 16
 
@@ -199,7 +195,6 @@ class DummyCriterion(object):
 original_model_path = "logs/graphrnn_original_checkpoints/" + \
     "GraphRNN_RNN_my_molecules_big_4_128_{}_3000.dat"
 
-
 model = GraphRNNModel
 model_params = {
     # uncomment this to load the model from original codebase snapshot
@@ -209,90 +204,104 @@ model_params = {
     #     original_model_path.format("classes"),
     #     original_model_path.format("classes_emb"),
     # ],
-    
-    'task': 'graph_generation',
-    'use_cuda': True,
-    'random_seed': 0,
-    'use_clip_grad': False,
-    'batch_size': 1000,
-    'num_epochs': 51,
-    'logdir': './logs/graphrnn_log',
+    'task':
+    'graph_generation',
+    'use_cuda':
+    True,
+    'random_seed':
+    0,
+    'use_clip_grad':
+    False,
+    'batch_size':
+    1000,
+    'num_epochs':
+    51,
+    'logdir':
+    './logs/graphrnn_log',
     # 'logdir': './logs/debug',
-    'print_every': 1,
-    'save_every': 1,
-    'train_data_layer': train_dataset,
+    'print_every':
+    1,
+    'save_every':
+    1,
+    'train_data_layer':
+    train_dataset,
     # use these for pretraining
     # 'criterion': DummyCriterion(),
     # 'use_external_criterion': False,
     # use these for RL optimization
-    'criterion': my_loss,
-    'use_external_criterion': True,
-
-    'eval_metrics': get_qed,
-    'val_data_layer': val_dataset,
-
-    'optimizer': Adam,
+    'criterion':
+    my_loss,
+    'use_external_criterion':
+    True,
+    'eval_metrics':
+    get_qed,
+    'val_data_layer':
+    val_dataset,
+    'optimizer':
+    Adam,
     'optimizer_params': {
         'lr': 0.00001,
-        },
-    'lr_scheduler': MultiStepLR,
+    },
+    'lr_scheduler':
+    MultiStepLR,
     'lr_scheduler_params': {
         'milestones': [100, 300, 400, 450, 480],
         'gamma': 0.3
     },
-
-    'num_node_classes': num_node_classes,
-    'num_edge_classes': num_edge_classes,
-    'max_num_nodes': max_num_nodes,
-    'start_node_label': start_node_label,
-    'max_prev_nodes': max_prev_nodes,
-    'label2atom': label2atom,
-    'edge2type': edge2type,
-    "restrict_min_atoms": restrict_min_atoms,
-    "restrict_max_atoms": restrict_max_atoms,
+    'num_node_classes':
+    num_node_classes,
+    'num_edge_classes':
+    num_edge_classes,
+    'max_num_nodes':
+    max_num_nodes,
+    'start_node_label':
+    start_node_label,
+    'max_prev_nodes':
+    max_prev_nodes,
+    'label2atom':
+    label2atom,
+    'edge2type':
+    edge2type,
+    "restrict_min_atoms":
+    restrict_min_atoms,
+    "restrict_max_atoms":
+    restrict_max_atoms,
     #"max_atom_bonds": max_atom_bonds,
-
-    'EdgeEmbedding': Embedding,
-    'edge_embedding_params': dict(
-        num_embeddings=num_edge_classes,
-        embedding_dim=edge_embedding_dim
-    ),
-
-    'NodeEmbedding': Embedding,
-    'node_embedding_params': dict(
-        num_embeddings=num_node_classes,
-        embedding_dim=node_embedding_dim
-    ),
-
-    'NodeMLP': OpenChemMLPSimple,
-    'node_mlp_params': dict(
-        input_size=128,
-        n_layers=2,
-        hidden_size=[128, num_node_classes],
-        activation=[nn.ReLU(inplace=True), identity],
-        init="xavier_uniform"
-    ),
-
-    'NodeRNN': GRUPlain,
-    'node_rnn_params': dict(
-        input_size=node_rnn_input_size,
-        embedding_size=128,
-        hidden_size=256,
-        num_layers=4,
-        has_input=True,
-        has_output=True,
-        output_size=128,
-        has_output_nonlin=False
-    ),
-
-    'EdgeRNN': GRUPlain,
-    'edge_rnn_params': dict(
-        input_size=edge_embedding_dim if num_edge_classes > 2 else 1,
-        embedding_size=64,
-        hidden_size=128,
-        num_layers=4,
-        has_input=True,
-        has_output=True,
-        output_size=num_edge_classes if num_edge_classes > 2 else 1
-    )
+    'EdgeEmbedding':
+    Embedding,
+    'edge_embedding_params':
+    dict(num_embeddings=num_edge_classes, embedding_dim=edge_embedding_dim),
+    'NodeEmbedding':
+    Embedding,
+    'node_embedding_params':
+    dict(num_embeddings=num_node_classes, embedding_dim=node_embedding_dim),
+    'NodeMLP':
+    OpenChemMLPSimple,
+    'node_mlp_params':
+    dict(input_size=128,
+         n_layers=2,
+         hidden_size=[128, num_node_classes],
+         activation=[nn.ReLU(inplace=True), identity],
+         init="xavier_uniform"),
+    'NodeRNN':
+    GRUPlain,
+    'node_rnn_params':
+    dict(input_size=node_rnn_input_size,
+         embedding_size=128,
+         hidden_size=256,
+         num_layers=4,
+         has_input=True,
+         has_output=True,
+         output_size=128,
+         has_output_nonlin=False),
+    'EdgeRNN':
+    GRUPlain,
+    'edge_rnn_params':
+    dict(input_size=edge_embedding_dim if num_edge_classes > 2 else 1,
+         embedding_size=64,
+         hidden_size=128,
+         num_layers=4,
+         has_input=True,
+         has_output=True,
+         output_size=num_edge_classes if num_edge_classes > 2 else 1)
 }

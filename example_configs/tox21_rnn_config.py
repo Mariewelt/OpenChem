@@ -2,35 +2,32 @@ from openchem.models.Smiles2Label import Smiles2Label
 from openchem.modules.embeddings.basic_embedding import Embedding
 from openchem.modules.encoders.rnn_encoder import RNNEncoder
 from openchem.modules.mlp.openchem_mlp import OpenChemMLP
-from openchem.data.smiles_data_layer import SmilesDataset
 from openchem.criterion.multitask_loss import MultitaskLoss
 
 import torch
-import torch.nn as nn
 
 import numpy as np
 
 from torch.optim import RMSprop, Adam
-from torch.optim.lr_scheduler import ExponentialLR, StepLR
+from torch.optim.lr_scheduler import StepLR
 import torch.nn.functional as F
-from sklearn.metrics import roc_auc_score, mean_squared_error
 
 from openchem.data.utils import read_smiles_property_file
-data = read_smiles_property_file('./benchmark_datasets/tox21/tox21.csv',
-                                 cols_to_read=[13] + list(range(0,12)))
-smiles = data[0]
-labels = np.array(data[1:])
+data = read_smiles_property_file('./benchmark_datasets/tox21/tox21.csv', cols_to_read=[13] + list(range(0, 12)))
+smiles = data[12]
+labels = np.array(data[:12])
+smiles = smiles[1:]
 
-labels[np.where(labels=='')] = '999'
+labels[np.where(labels == '')] = '999'
 labels = labels.T
+labels = labels[1:]
 
 from openchem.data.utils import get_tokens
 tokens, _, _ = get_tokens(smiles)
 tokens = tokens + ' '
 
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(smiles, labels, test_size=0.2,
-                                                    random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(smiles, labels, test_size=0.2, random_state=42)
 
 from openchem.data.utils import save_smiles_property_file
 save_smiles_property_file('./benchmark_datasets/tox21/train.smi', X_train, y_train)
@@ -38,11 +35,16 @@ save_smiles_property_file('./benchmark_datasets/tox21/test.smi', X_test, y_test)
 
 from openchem.data.smiles_data_layer import SmilesDataset
 train_dataset = SmilesDataset('./benchmark_datasets/tox21/train.smi',
-                              delimiter=',', cols_to_read=list(range(13)),
-                              tokens=tokens, augment=True)
+                              delimiter=',',
+                              cols_to_read=list(range(13)),
+                              tokens=tokens,
+                              augment=True)
+
 test_dataset = SmilesDataset('./benchmark_datasets/tox21/test.smi',
-                            delimiter=',', cols_to_read=list(range(13)),
-                            tokens=tokens)
+                             delimiter=',',
+                             cols_to_read=list(range(13)),
+                             tokens=tokens)
+
 
 def multitask_auc(ground_truth, predicted):
     from sklearn.metrics import roc_auc_score
@@ -55,9 +57,8 @@ def multitask_auc(ground_truth, predicted):
     for i in range(n_tasks):
         ind = np.where(ground_truth[:, i] != 999)[0]
         auc.append(roc_auc_score(ground_truth[ind, i], predicted[ind, i]))
-    #if torch.distributed.get_rank() == 0:
-    #    print(auc)
     return np.mean(auc)
+
 
 model = Smiles2Label
 
@@ -69,7 +70,7 @@ model_params = {
     'max_grad_norm': 10.0,
     'batch_size': 256,
     'num_epochs': 31,
-    'logdir': '/home/mpopova/Work/OpenChem/logs/rnn_log',
+    'logdir': '/home/mpopova/Work/OpenChem.graphs/logs/rnn_log',
     'print_every': 5,
     'save_every': 5,
     'train_data_layer': train_dataset,
@@ -79,7 +80,7 @@ model_params = {
     'optimizer': RMSprop,
     'optimizer_params': {
         'lr': 0.001,
-        },
+    },
     'lr_scheduler': StepLR,
     'lr_scheduler_params': {
         'step_size': 10,

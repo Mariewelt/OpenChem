@@ -20,7 +20,8 @@ import pickle
 
 from openchem.data.utils import read_smiles_property_file
 data = read_smiles_property_file('/data/masha/melting/melting_data.txt',
-                                 cols_to_read=[0, 1], delimiter='\t',
+                                 cols_to_read=[0, 1],
+                                 delimiter='\t',
                                  keep_header=False)
 smiles = data[0][1:]
 labels = np.array(data[1][1:], dtype='float').reshape(-1)
@@ -31,9 +32,7 @@ tokens, _, _ = get_tokens(smiles)
 tokens = tokens + ' '
 
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(smiles, labels,
-                                                    test_size=0.2,
-                                                    random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(smiles, labels, test_size=0.2, random_state=42)
 
 train_mean = np.mean(y_train)
 train_std = np.std(y_train)
@@ -45,23 +44,18 @@ y_train = (y_train - train_mean) / train_std
 y_test = (y_test - train_mean) / train_std
 
 from openchem.data.utils import save_smiles_property_file
-save_smiles_property_file('./benchmark_datasets/melt_temp/train.smi',
-                          X_train,
-                          y_train.reshape(-1, 1))
+save_smiles_property_file('./benchmark_datasets/melt_temp/train.smi', X_train, y_train.reshape(-1, 1))
 
-save_smiles_property_file('./benchmark_datasets/melt_temp/test.smi',
-                          X_test,
-                          y_test.reshape(-1, 1))
+save_smiles_property_file('./benchmark_datasets/melt_temp/test.smi', X_test, y_test.reshape(-1, 1))
 
 #test_dataset.target = test_dataset.target.reshape(-1, 1)
 
 
 def get_atomic_attributes(atom):
     attr_dict = {}
-  
+
     atomic_num = atom.GetAtomicNum()
-    atomic_mapping = {5: 0, 7: 1, 6: 2, 8: 3, 9: 4, 15: 5, 16: 6, 17: 7, 35: 8,
-                      53: 9}
+    atomic_mapping = {5: 0, 7: 1, 6: 2, 8: 3, 9: 4, 15: 5, 16: 6, 17: 7, 35: 8, 53: 9}
     if atomic_num in atomic_mapping.keys():
         attr_dict['atom_element'] = atomic_mapping[atomic_num]
     else:
@@ -74,31 +68,27 @@ def get_atomic_attributes(atom):
 
 
 node_attributes = {}
-node_attributes['valence'] = Attribute('node', 'valence', one_hot=True,
-                                       values=[1, 2, 3, 4, 5, 6, 7])
+node_attributes['valence'] = Attribute('node', 'valence', one_hot=True, values=[1, 2, 3, 4, 5, 6, 7])
 
-node_attributes['charge'] = Attribute('node', 'charge', one_hot=True,
-                                      values=[-1, 0, 1, 2, 3, 4])
+node_attributes['charge'] = Attribute('node', 'charge', one_hot=True, values=[-1, 0, 1, 2, 3, 4])
 
-node_attributes['hybridization'] = Attribute('node', 'hybridization',
-                                             one_hot=True,
-                                             values=[0, 1, 2, 3, 4, 5, 6, 7])
+node_attributes['hybridization'] = Attribute('node', 'hybridization', one_hot=True, values=[0, 1, 2, 3, 4, 5, 6, 7])
 
-node_attributes['aromatic'] = Attribute('node', 'aromatic', one_hot=True,
-                                        values=[0, 1])
+node_attributes['aromatic'] = Attribute('node', 'aromatic', one_hot=True, values=[0, 1])
 
-node_attributes['atom_element'] = Attribute('node', 'atom_element',
-                                            one_hot=True,
-                                            values=list(range(11)))
+node_attributes['atom_element'] = Attribute('node', 'atom_element', one_hot=True, values=list(range(11)))
 
-train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
+train_dataset = GraphDataset(get_atomic_attributes,
+                             node_attributes,
                              './benchmark_datasets/melt_temp/train.smi',
-                             delimiter=',', cols_to_read=[0, 1])
+                             delimiter=',',
+                             cols_to_read=[0, 1])
 
-test_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-                             './benchmark_datasets/melt_temp/test.smi',
-                             delimiter=',', cols_to_read=[0, 1])
-
+test_dataset = GraphDataset(get_atomic_attributes,
+                            node_attributes,
+                            './benchmark_datasets/melt_temp/test.smi',
+                            delimiter=',',
+                            cols_to_read=[0, 1])
 
 sample = train_dataset[0]
 num_features = sample['node_feature_matrix'].shape[1]

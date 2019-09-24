@@ -10,14 +10,12 @@ from openchem.utils.utils import check_params
 class RNNEncoder(OpenChemEncoder):
     def __init__(self, params, use_cuda):
         super(RNNEncoder, self).__init__(params, use_cuda)
-        check_params(params, self.get_required_params(),
-                     self.get_optional_params())
+        check_params(params, self.get_required_params(), self.get_optional_params())
         self.layer = self.params['layer']
         layers = ['LSTM', 'GRU', 'RNN']
         if self.layer not in ['LSTM', 'GRU', 'RNN']:
             raise ValueError(self.layer + ' is invalid value for argument'
-                                          ' \'layer\'. Choose one from :'
-                             + ', '.join(layers))
+                             ' \'layer\'. Choose one from :' + ', '.join(layers))
 
         self.input_size = self.params['input_size']
         self.encoder_dim = self.params['encoder_dim']
@@ -25,8 +23,7 @@ class RNNEncoder(OpenChemEncoder):
         if self.n_layers > 1:
             self.dropout = self.params['dropout']
         else:
-            UserWarning('dropout can be non zero only when n_layers > 1. '
-                        'Parameter dropout set to 0.')
+            UserWarning('dropout can be non zero only when n_layers > 1. ' 'Parameter dropout set to 0.')
             self.dropout = 0
         self.bidirectional = self.params['is_bidirectional']
         if self.bidirectional:
@@ -34,19 +31,22 @@ class RNNEncoder(OpenChemEncoder):
         else:
             self.n_directions = 1
         if self.layer == 'LSTM':
-            self.rnn = nn.LSTM(self.input_size, self.encoder_dim,
+            self.rnn = nn.LSTM(self.input_size,
+                               self.encoder_dim,
                                self.n_layers,
                                bidirectional=self.bidirectional,
                                dropout=self.dropout,
                                batch_first=True)
         elif self.layer == 'GRU':
-            self.rnn = nn.GRU(self.input_size, self.encoder_dim,
+            self.rnn = nn.GRU(self.input_size,
+                              self.encoder_dim,
                               self.n_layers,
                               bidirectional=self.bidirectional,
                               dropout=self.dropout,
                               batch_first=True)
         else:
-            self.layer = nn.RNN(self.input_size, self.encoder_dim,
+            self.layer = nn.RNN(self.input_size,
+                                self.encoder_dim,
                                 self.n_layers,
                                 bidirectional=self.bidirectional,
                                 dropout=self.dropout,
@@ -61,12 +61,7 @@ class RNNEncoder(OpenChemEncoder):
 
     @staticmethod
     def get_optional_params():
-        return{
-            'layer': str,
-            'n_layers': int,
-            'dropout': float,
-            'is_bidirectional': bool
-        }
+        return {'layer': str, 'n_layers': int, 'dropout': float, 'is_bidirectional': bool}
 
     def forward(self, inp, previous_hidden=None, pack=True):
         """
@@ -82,12 +77,10 @@ class RNNEncoder(OpenChemEncoder):
 
         # TODO: warning: output shape is changed! (batch_first=True) Check hidden
         if pack:
-            input_lengths_sorted, perm_idx = torch.sort(input_length, dim=0,
-                                                        descending=True)
+            input_lengths_sorted, perm_idx = torch.sort(input_length, dim=0, descending=True)
             input_lengths_sorted.detach().to("cpu").tolist()
             input_tensor = torch.index_select(input_tensor, 0, perm_idx)
-            rnn_input = pack_padded_sequence(
-                input_tensor, input_lengths_sorted, batch_first=True)
+            rnn_input = pack_padded_sequence(input_tensor, input_lengths_sorted, batch_first=True)
         else:
             rnn_input = input_tensor
 
@@ -104,9 +97,7 @@ class RNNEncoder(OpenChemEncoder):
                 cell = torch.index_select(cell, 1, perm_idx)
                 previous_hidden = (hidden, cell)
             else:
-                previous_hidden = torch.index_select(
-                    previous_hidden, 1, perm_idx
-                )
+                previous_hidden = torch.index_select(previous_hidden, 1, perm_idx)
         rnn_output, next_hidden = self.rnn(rnn_input)  # , previous_hidden)
 
         if pack:
@@ -134,13 +125,11 @@ class RNNEncoder(OpenChemEncoder):
             device = torch.device("cuda")
         else:
             device = torch.device("cpu")
-        return torch.zeros(self.n_layers * self.n_directions,
-                           batch_size, self.encoder_dim, device=device)
+        return torch.zeros(self.n_layers * self.n_directions, batch_size, self.encoder_dim, device=device)
 
     def init_cell(self, batch_size):
         if self.use_cuda:
             device = torch.device("cuda")
         else:
             device = torch.device("cpu")
-        return torch.zeros(self.n_layers * self.n_directions,
-                           batch_size, self.encoder_dim, device=device)
+        return torch.zeros(self.n_layers * self.n_directions, batch_size, self.encoder_dim, device=device)

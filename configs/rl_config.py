@@ -17,6 +17,4 @@ model.load_state_dict(new_weights)
 tokens = params['tokens']
 
 from openchem.criterion.policy_gradient_loss import PolicyGradientLoss
-my_loss = PolicyGradientLoss(reward_fn=reward_fn, critic=model, tokens=tokens,
-                             fn=melt_t_max_fn, gamma=0.97)
-
+my_loss = PolicyGradientLoss(reward_fn=reward_fn, critic=model, tokens=tokens, fn=melt_t_max_fn, gamma=0.97)

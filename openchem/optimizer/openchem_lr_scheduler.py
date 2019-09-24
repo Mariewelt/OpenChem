@@ -1,5 +1,4 @@
 class OpenChemLRScheduler(object):
-
     def __init__(self, params, optimizer):
         self.params = params[1]
         self._by_iter = self.params.pop("by_iter", False)

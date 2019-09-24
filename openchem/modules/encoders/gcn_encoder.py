@@ -9,8 +9,7 @@ from openchem.layers.gcn import GraphConvolution
 class GraphCNNEncoder(OpenChemEncoder):
     def __init__(self, params, use_cuda):
         super(GraphCNNEncoder, self).__init__(params, use_cuda)
-        check_params(params, self.get_required_params(),
-                     self.get_optional_params())
+        check_params(params, self.get_required_params(), self.get_optional_params())
         self.n_layers = params['n_layers']
         self.hidden_size = params['hidden_size']
         if 'dropout' in params.keys():
@@ -21,19 +20,13 @@ class GraphCNNEncoder(OpenChemEncoder):
         self.hidden_size = [self.input_size] + self.hidden_size
         self.graph_convolutions = nn.ModuleList()
         self.dropout_layer = nn.Dropout(p=self.dropout)
-        self.dense = nn.Linear(in_features=self.hidden_size[-1],
-                                      out_features=self.encoder_dim)
-        for i in range(1, self.n_layers+1):
-            self.graph_convolutions.append(GraphConvolution(self.
-                                                            hidden_size[i-1],
-                                                            self.
-                                                            hidden_size[i]))
+        self.dense = nn.Linear(in_features=self.hidden_size[-1], out_features=self.encoder_dim)
+        for i in range(1, self.n_layers + 1):
+            self.graph_convolutions.append(GraphConvolution(self.hidden_size[i - 1], self.hidden_size[i]))
 
     @staticmethod
     def get_optional_params():
-        return {
-            'dropout': float
-        }
+        return {'dropout': float}
 
     @staticmethod
     def get_required_params():
@@ -53,7 +46,7 @@ class GraphCNNEncoder(OpenChemEncoder):
             adj_new = adj.unsqueeze(3)
             adj_new = adj_new.expand(-1, n, n, d)
             x_new = x.repeat(1, n, 1).view(-1, n, n, d)
-            res = x_new*adj_new
+            res = x_new * adj_new
             x = res.max(dim=2)[0]
         x = torch.tanh(self.dense(x))
         x = torch.tanh(x.sum(dim=1))

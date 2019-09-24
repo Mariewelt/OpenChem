@@ -20,10 +20,9 @@ import pickle
 
 def get_atomic_attributes(atom):
     attr_dict = {}
-  
+
     atomic_num = atom.GetAtomicNum()
-    atomic_mapping = {5: 0, 7: 1, 6: 2, 8: 3, 9: 4, 15: 5, 16: 6, 17: 7, 35: 8,
-                      53: 9}
+    atomic_mapping = {5: 0, 7: 1, 6: 2, 8: 3, 9: 4, 15: 5, 16: 6, 17: 7, 35: 8, 53: 9}
     if atomic_num in atomic_mapping.keys():
         attr_dict['atom_element'] = atomic_mapping[atomic_num]
     else:
@@ -38,20 +37,20 @@ def get_atomic_attributes(atom):
 node_attributes = {}
 node_attributes['valence'] = Attribute('node', 'valence', one_hot=True, values=[1, 2, 3, 4, 5, 6])
 node_attributes['charge'] = Attribute('node', 'charge', one_hot=True, values=[-1, 0, 1, 2, 3, 4])
-node_attributes['hybridization'] = Attribute('node', 'hybridization',
-                                             one_hot=True, values=[0, 1, 2, 3, 4, 5, 6, 7])
-node_attributes['aromatic'] = Attribute('node', 'aromatic', one_hot=True,
-                                        values=[0, 1])
-node_attributes['atom_element'] = Attribute('node', 'atom_element',
-                                            one_hot=True,
-                                            values=list(range(11)))
+node_attributes['hybridization'] = Attribute('node', 'hybridization', one_hot=True, values=[0, 1, 2, 3, 4, 5, 6, 7])
+node_attributes['aromatic'] = Attribute('node', 'aromatic', one_hot=True, values=[0, 1])
+node_attributes['atom_element'] = Attribute('node', 'atom_element', one_hot=True, values=list(range(11)))
 
-train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
+train_dataset = GraphDataset(get_atomic_attributes,
+                             node_attributes,
                              './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv',
-                             delimiter=',', cols_to_read=[0, 1])
-test_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-                             './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv',
-                             delimiter=',', cols_to_read=[0, 1])
+                             delimiter=',',
+                             cols_to_read=[0, 1])
+test_dataset = GraphDataset(get_atomic_attributes,
+                            node_attributes,
+                            './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv',
+                            delimiter=',',
+                            cols_to_read=[0, 1])
 
 model = Graph2Label
 
@@ -92,4 +91,3 @@ model_params = {
         'activation': [F.relu, identity]
     }
 }
-

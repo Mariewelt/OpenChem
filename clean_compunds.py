@@ -8,7 +8,6 @@ parser = argparse.ArgumentParser(description="Clean compounds")
 parser.add_argument("--folder_low", default=None, type=int)
 parser.add_argument("--folder_high", default=None, type=int)
 
-
 args = parser.parse_args()
 
 dir_low = args.folder_low
@@ -33,6 +32,3 @@ for i in range(dir_high, dir_low, -1):
             f.close()
             print("File " + file + " processed!")
     print("Folder " + dir + " processed!")
-
-
-
