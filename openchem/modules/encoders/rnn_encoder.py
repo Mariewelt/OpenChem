@@ -84,7 +84,6 @@ class RNNEncoder(OpenChemEncoder):
                                              batch_first=True)
         else:
             rnn_input = input_tensor
-
         if previous_hidden is None:
             previous_hidden = self.init_hidden(batch_size)
             if self.layer == 'LSTM':

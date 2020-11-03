@@ -67,3 +67,4 @@ class Smiles2Label(OpenChemModel):
             return (batch_mols, batch_length), batch_object
         else:
             return (batch_mols, batch_length), batch_labels
+          

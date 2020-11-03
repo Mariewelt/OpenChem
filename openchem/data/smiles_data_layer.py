@@ -27,6 +27,7 @@ class SmilesDataset(Dataset):
         augment (bool): argument specifying whether to augment SMILES.
 
     """
+
     def __init__(self,
                  filename,
                  cols_to_read,
