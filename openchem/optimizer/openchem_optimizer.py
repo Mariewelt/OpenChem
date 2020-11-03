@@ -1,7 +1,6 @@
 # Modified from
 # github.com/pytorch/fairseq/blob/master/fairseq/optim/fairseq_optimizer.py
 
-
 # Copyright (c) 2017-present, Facebook, Inc.
 # All rights reserved.
 #
@@ -13,7 +12,6 @@ import torch.optim
 
 
 class OpenChemOptimizer(object):
-
     def __init__(self, params, model_params):
         self.params = params[1]
         self._optimizer = params[0](model_params, **self.params)
@@ -21,8 +19,7 @@ class OpenChemOptimizer(object):
     @property
     def optimizer(self):
         if not isinstance(self._optimizer, torch.optim.Optimizer):
-            raise ValueError('_optimizer must be an instance of '
-                             'torch.optim.Optimizer')
+            raise ValueError('_optimizer must be an instance of ' 'torch.optim.Optimizer')
         return self._optimizer
 
     @property
