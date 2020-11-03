@@ -9,8 +9,7 @@ from openchem.layers.gcn import GraphConvolution
 class GraphEdgeAttentionEncoder(OpenChemEncoder):
     def __init__(self, params, use_cuda):
         super(GraphEdgeAttentionEncoder, self).__init__(params, use_cuda)
-        check_params(params, self.get_required_params(),
-                     self.get_optional_params())
+        check_params(params, self.get_required_params(), self.get_optional_params())
         self.n_layers = params['n_layers']
         self.attr_size = params['edge_attr_sizes']
         self.attr_dim = sum(self.attr_size)
@@ -23,18 +22,14 @@ class GraphEdgeAttentionEncoder(OpenChemEncoder):
         self.hidden_size = [self.input_size] + self.hidden_size
         self.graph_conv = nn.ModuleList()
         self.dropout_layer = nn.Dropout(p=self.dropout)
-        self.dense = nn.Linear(in_features=self.hidden_size[-1],
-                               out_features=self.encoder_dim)
+        self.dense = nn.Linear(in_features=self.hidden_size[-1], out_features=self.encoder_dim)
         for i in range(1, self.n_layers + 1):
             for j in range(self.attr_dim):
-                self.graph_conv.append(GraphConvolution(self.hidden_size[i-1],
-                                                        self.hidden_size[i]))
+                self.graph_conv.append(GraphConvolution(self.hidden_size[i - 1], self.hidden_size[i]))
 
     @staticmethod
     def get_optional_params():
-        return {
-            'dropout': float
-        }
+        return {'dropout': float}
 
     @staticmethod
     def get_required_params():
@@ -54,8 +49,8 @@ class GraphEdgeAttentionEncoder(OpenChemEncoder):
         cur_x = x
         for i in range(self.n_layers):
             for j in range(self.attr_dim):
-                cur_adj = nn.functional.softmax(edge_attr[:, :, :, j], dim=2)#*adj
-                x = self.graph_conv[i*self.attr_dim + j](cur_x, cur_adj)
+                cur_adj = nn.functional.softmax(edge_attr[:, :, :, j], dim=2)  #*adj
+                x = self.graph_conv[i * self.attr_dim + j](cur_x, cur_adj)
                 x = torch.tanh(x)
                 n = adj.size(1)
                 d = x.size()[-1]

@@ -16,8 +16,7 @@ from mordred import Calculator, descriptors
 
 
 class RandomForestQSAR(object):
-    def __init__(self, model_type='classifier', feature_type='fingerprints',
-                 n_estimators=100, n_ensemble=5):
+    def __init__(self, model_type='classifier', feature_type='fingerprints', n_estimators=100, n_ensemble=5):
         super(RandomForestQSAR, self).__init__()
         self.n_estimators = n_estimators
         self.n_ensemble = n_ensemble
@@ -34,7 +33,7 @@ class RandomForestQSAR(object):
         self.feature_type = feature_type
         if self.feature_type == 'descriptors':
             self.calc = Calculator(descriptors, ignore_3D=True)
-            self.desc_mean = [0]*self.n_ensemble
+            self.desc_mean = [0] * self.n_ensemble
 
     def load_model(self, path):
         self.model = []
@@ -67,8 +66,7 @@ class RandomForestQSAR(object):
         for i in range(self.n_ensemble):
             train_sm = np.concatenate(cross_val_data[:i] + cross_val_data[(i + 1):])
             test_sm = cross_val_data[i]
-            train_labels = np.concatenate(cross_val_labels[:i] +
-                                          cross_val_labels[(i + 1):])
+            train_labels = np.concatenate(cross_val_labels[:i] + cross_val_labels[(i + 1):])
             test_labels = cross_val_labels[i]
             if self.feature_type == 'descriptors':
                 train_sm, desc_mean = normalize_desc(train_sm)
@@ -147,11 +145,9 @@ class SVMQSAR(object):
     def fit_model(self, data, cross_val_data, cross_val_labels):
         eval_metrics = []
         for i in range(self.n_ensemble):
-            train_sm = np.concatenate(cross_val_data[:i] +
-                                      cross_val_data[(i + 1):])
+            train_sm = np.concatenate(cross_val_data[:i] + cross_val_data[(i + 1):])
             test_sm = cross_val_data[i]
-            train_labels = np.concatenate(cross_val_labels[:i] +
-                                          cross_val_labels[(i + 1):])
+            train_labels = np.concatenate(cross_val_labels[:i] + cross_val_labels[(i + 1):])
             test_labels = cross_val_labels[i]
             fp_train = get_fp(train_sm)
             fp_test = get_fp(test_sm)

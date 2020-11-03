@@ -36,19 +36,29 @@ class Graph2Label(OpenChemModel):
         output = self.MLP(output)
         return output
 
-    def cast_inputs(self, sample):
-        batch_adj = torch.tensor(sample['adj_matrix'],
-                                 requires_grad=True).float()
-        batch_x = torch.tensor(sample['node_feature_matrix'],
-                               requires_grad=True).float()
-        batch_labels = torch.tensor(sample['labels'])
-        if self.task == 'classification':
-            batch_labels = batch_labels.long()
+    @staticmethod
+    def cast_inputs(sample, task, use_cuda, for_prediction=False):
+        batch_adj = sample['adj_matrix'].to(torch.float)
+        batch_x = sample['node_feature_matrix'].to(torch.float)
+        if for_prediction and "object" in sample.keys():
+            batch_object = sample["object"]
         else:
-            batch_labels = batch_labels.float()
-        if self.use_cuda:
-            batch_x = batch_x.cuda()
-            batch_adj = batch_adj.cuda()
-            batch_labels = batch_labels.cuda()
+            batch_object = None
+        if not for_prediction and 'labels' in sample.keys():
+            batch_labels = sample['labels']
+            if task == 'classification':
+                batch_labels = batch_labels.to(torch.long)
+            else:
+                batch_labels = batch_labels.to(torch.float)
+        else:
+            batch_labels = None
+        if use_cuda:
+            batch_x = batch_x.to(device='cuda')
+            batch_adj = batch_adj.to(device='cuda')
+            if batch_labels is not None:
+                batch_labels = batch_labels.to(device='cuda')
         batch_inp = (batch_x, batch_adj)
-        return batch_inp, batch_labels
+        if batch_object is not None:
+            return batch_inp, batch_object
+        else:
+            return batch_inp, batch_labels

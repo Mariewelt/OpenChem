@@ -13,7 +13,6 @@ class Iterator(object):
         shuffle: Boolean, whether to shuffle the data between epochs.
         seed: Random seeding for data shuffling.
     """
-
     def __init__(self, n, batch_size, shuffle, seed):
         self.n = n
         self.batch_size = batch_size
@@ -23,8 +22,7 @@ class Iterator(object):
         self.lock = threading.Lock()
         self.index_generator = self._flow_index(n, batch_size, shuffle, seed)
         if n < batch_size:
-            raise ValueError('Input data length is shorter than batch_size'
-                             'Adjust batch_size')
+            raise ValueError('Input data length is shorter than batch_size' 'Adjust batch_size')
 
     def reset(self):
         self.batch_index = 0
@@ -48,9 +46,7 @@ class Iterator(object):
                 current_batch_size = n - current_index
                 self.batch_index = 0
             self.total_batches_seen += 1
-            yield (index_array[current_index: current_index +
-                               current_batch_size],
-                   current_index, current_batch_size)
+            yield (index_array[current_index:current_index + current_batch_size], current_index, current_batch_size)
 
     def __iter__(self):
         # Needed if we want to do something like:
@@ -74,16 +70,11 @@ class SmilesIterator(Iterator):
         dtype: dtype to use for returned batch.
         Set to keras.backend.floatx if using Keras
     """
-
-    def __init__(self, x, y, smiles_data_generator,
-                 batch_size=32, shuffle=False, seed=None,
-                 dtype=np.float32
-                 ):
+    def __init__(self, x, y, smiles_data_generator, batch_size=32, shuffle=False, seed=None, dtype=np.float32):
         if y is not None and len(x) != len(y):
             raise ValueError('X (images tensor) and y (labels) '
                              'should have the same length. '
-                             'Found: X.shape = %s, y.shape = %s' %
-                             (np.asarray(x).shape, np.asarray(y).shape))
+                             'Found: X.shape = %s, y.shape = %s' % (np.asarray(x).shape, np.asarray(y).shape))
 
         self.x = np.asarray(x)
 
@@ -93,8 +84,7 @@ class SmilesIterator(Iterator):
             self.y = None
         self.smiles_data_generator = smiles_data_generator
         self.dtype = dtype
-        super(SmilesIterator, self).__init__(x.shape[0], batch_size, shuffle,
-                                             seed)
+        super(SmilesIterator, self).__init__(x.shape[0], batch_size, shuffle, seed)
 
     def next(self):
         """For python 2.x.
@@ -108,10 +98,9 @@ class SmilesIterator(Iterator):
                 next(self.index_generator)
         # The transformation of images is not under thread lock
         # so it can be done in parallel
-        batch_x = np.zeros(
-            tuple([current_batch_size] + [self.smiles_data_generator.pad,
-                                          self.smiles_data_generator._charlen]),
-            dtype=self.dtype)
+        batch_x = np.zeros(tuple([current_batch_size] +
+                                 [self.smiles_data_generator.pad, self.smiles_data_generator._charlen]),
+                           dtype=self.dtype)
         for i, j in enumerate(index_array):
             smiles = self.x[j:j + 1]
             x = self.smiles_data_generator.transform(smiles)
@@ -134,9 +123,12 @@ class SmilesEnumerator(object):
         enum: Enumerate the SMILES during transform
         canonical: use canonical SMILES during transform (overrides enum)
     """
-
-    def __init__(self, charset='@C)(=cOn1S2/H[N]\\', pad=120, leftpad=True,
-                 isomericSmiles=True, enum=True,
+    def __init__(self,
+                 charset='@C)(=cOn1S2/H[N]\\',
+                 pad=120,
+                 leftpad=True,
+                 isomericSmiles=True,
+                 enum=True,
                  canonical=False):
         self._charset = None
         self.charset = charset
@@ -178,8 +170,7 @@ class SmilesEnumerator(object):
         ans = list(range(m.GetNumAtoms()))
         np.random.shuffle(ans)
         nm = Chem.RenumberAtoms(m, ans)
-        return Chem.MolToSmiles(nm, canonical=self.canonical,
-                                isomericSmiles=self.isomericSmiles)
+        return Chem.MolToSmiles(nm, canonical=self.canonical, isomericSmiles=self.isomericSmiles)
 
     def transform(self, smiles):
         """Perform an enumeration (randomization) and vectorization of
@@ -213,9 +204,8 @@ class SmilesEnumerator(object):
 
 
 if __name__ == "__main__":
-    smiles = np.array(["CCC(=O)O[C@@]1(CC[NH+](C[C@H]1CC=C)C)c2ccccc2",
-                       "CCC[S@@](=O)c1ccc2c(c1)[nH]/c(=N/C(=O)OC)/[nH]2"] * 10
-                      )
+    smiles = np.array(
+        ["CCC(=O)O[C@@]1(CC[NH+](C[C@H]1CC=C)C)c2ccccc2", "CCC[S@@](=O)c1ccc2c(c1)[nH]/c(=N/C(=O)OC)/[nH]2"] * 10)
     # Test canonical SMILES vectorization
     sm_en = SmilesEnumerator(canonical=True, enum=False)
     sm_en.fit(smiles, extra_chars=["\\"])
@@ -247,8 +237,7 @@ if __name__ == "__main__":
 
     # BUG, when batchsize > x.shape[0], then it only returns x.shape[0]!
     # Test batch generation
-    sm_it = SmilesIterator(smiles, np.array([1, 2] * 10), sm_en, batch_size=10,
-                           shuffle=True)
+    sm_it = SmilesIterator(smiles, np.array([1, 2] * 10), sm_en, batch_size=10, shuffle=True)
     X, y = sm_it.next()
     if sum(y == 1) - sum(y == 2) > 1:
         print("Unbalanced generation of batches")

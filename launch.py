@@ -218,7 +218,12 @@ def main():
                "-u",
                args.training_script,
                "--local_rank={}".format(-1)] + args.training_script_args
-        subprocess.Popen(cmd, env=current_env)
+        process = subprocess.Popen(cmd, env=current_env)
+
+        try:
+            process.wait()
+        except KeyboardInterrupt:
+            process.terminate()
 
 
 if __name__ == "__main__":

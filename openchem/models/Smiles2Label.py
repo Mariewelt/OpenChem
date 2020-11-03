@@ -27,12 +27,9 @@ class Smiles2Label(OpenChemModel):
         self.mlp = self.params['mlp']
         self.mlp_params = self.params['mlp_params']
         self.MLP = self.mlp(self.mlp_params)
-        self.optimizer = OpenChemOptimizer([self.params['optimizer'],
-                                            self.params['optimizer_params']],
+        self.optimizer = OpenChemOptimizer([self.params['optimizer'], self.params['optimizer_params']],
                                            self.parameters())
-        self.scheduler = OpenChemLRScheduler([self.params['lr_scheduler'],
-                                              self.params['lr_scheduler_params']
-                                              ],
+        self.scheduler = OpenChemLRScheduler([self.params['lr_scheduler'], self.params['lr_scheduler_params']],
                                              self.optimizer.optimizer)
 
     def forward(self, inp, eval=False):
@@ -47,15 +44,27 @@ class Smiles2Label(OpenChemModel):
         output = self.MLP(output)
         return output
 
-    def cast_inputs(self, sample):
-        batch_mols = torch.tensor(sample['tokenized_smiles'],
-                                  requires_grad=True).long()
-        batch_labels = torch.tensor(sample['labels']).float()
-        batch_length = torch.tensor(sample['length']).long()
-        if self.task == 'classification':
-            batch_labels = batch_labels.long()
-        if self.use_cuda:
-            batch_mols = batch_mols.cuda()
-            batch_labels = batch_labels.cuda()
-            batch_length = batch_length.cuda()
-        return [batch_mols, batch_length], batch_labels
+    @staticmethod
+    def cast_inputs(sample, task, use_cuda, for_prediction=False):
+        batch_mols = sample['tokenized_smiles'].to(dtype=torch.long)
+        if for_prediction and "object" in sample.keys():
+            batch_object = sample['object']
+        else:
+            batch_object = None
+        batch_length = sample['length'].to(dtype=torch.long)
+        if not for_prediction and "labels" in sample.keys():
+            batch_labels = sample['labels'].to(dtype=torch.float)
+            if task == 'classification':
+                batch_labels = batch_labels.to(dtype=torch.long)
+        else:
+            batch_labels = None
+        if use_cuda:
+            batch_mols = batch_mols.to(device="cuda")
+            batch_length = batch_length.to(device="cuda")
+            if batch_labels is not None:
+                batch_labels = batch_labels.to(device="cuda")
+        if batch_object is not None:
+            return (batch_mols, batch_length), batch_object
+        else:
+            return (batch_mols, batch_length), batch_labels
+          
