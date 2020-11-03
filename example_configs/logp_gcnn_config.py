@@ -47,25 +47,31 @@ node_attributes['atom_element'] = Attribute('node', 'atom_element',
                                             values=list(range(11)))
 
 train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-                             './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_train.csv',
+                             './benchmark_datasets/logp_dataset/train.smi',
                              delimiter=',', cols_to_read=[0, 1])
 test_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-                             './benchmark_datasets/Lipophilicity_dataset/Lipophilicity_test.csv',
+                             './benchmark_datasets/logp_dataset/test.smi',
                              delimiter=',', cols_to_read=[0, 1])
+
+predict_dataset = GraphDataset(get_atomic_attributes, node_attributes,
+                               './benchmark_datasets/logp_dataset/test.smi',
+                               delimiter=',', cols_to_read=[0],
+                               return_smiles=True)
 
 model = Graph2Label
 
 model_params = {
     'task': 'regression',
-    'data_layer': GraphDataset,
+    'random_seed': 42,
     'use_clip_grad': False,
     'batch_size': 256,
     'num_epochs': 101,
-    'logdir': '/home/user/Work/OpenChem/logs/logp_gcnn_logs',
+    'logdir': 'logs/logp_gcnn_logs',
     'print_every': 10,
     'save_every': 5,
     'train_data_layer': train_dataset,
     'val_data_layer': test_dataset,
+    'predict_data_layer': predict_dataset,
     'eval_metrics': r2_score,
     'criterion': nn.MSELoss(),
     'optimizer': Adam,
@@ -79,7 +85,7 @@ model_params = {
     },
     'encoder': GraphCNNEncoder,
     'encoder_params': {
-        'input_size': train_dataset.num_features,
+        'input_size': train_dataset[0]["node_feature_matrix"].shape[1],
         'encoder_dim': 128,
         'n_layers': 5,
         'hidden_size': [128, 128, 128, 128, 128],

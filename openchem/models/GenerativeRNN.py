@@ -11,8 +11,7 @@ class GenerativeRNN(OpenChemModel):
         super(GenerativeRNN, self).__init__(params)
         self.has_stack = params['has_stack']
         if self.has_stack:
-            self.Stack = StackAugmentation(use_cuda=self.use_cuda,
-                                           **self.params['stack_params'])
+            self.Stack = StackAugmentation(use_cuda=self.use_cuda, **self.params['stack_params'])
         self.embedding = self.params['embedding']
         self.embed_params = self.params['embedding_params']
         self.Embedding = self.embedding(self.embed_params)
@@ -32,8 +31,7 @@ class GenerativeRNN(OpenChemModel):
         batch_size = inp_seq.size()[0]
         seq_len = inp_seq.size()[1]
         n_classes = self.MLP.hidden_size[-1]
-        result = torch.zeros(batch_size, seq_len, n_classes,
-                             requires_grad=True)
+        result = torch.zeros(batch_size, seq_len, n_classes, requires_grad=True)
         if self.use_cuda:
             result = result.cuda()
         hidden = self.Encoder.init_hidden(batch_size)
@@ -94,18 +92,17 @@ class GenerativeRNN(OpenChemModel):
 
         return predicted
 
-    def cast_inputs(self, sample):
+    @staticmethod
+    def cast_inputs(sample, task, use_cuda):
         sample_seq = sample['tokenized_smiles']
         lengths = sample['length']
         max_len = lengths.max(dim=0)[0].cpu().numpy()
         batch_size = len(lengths)
         sample_seq = cut_padding(sample_seq, lengths, padding='right')
-        target = sample_seq[:, 1:].contiguous().view(
-            (batch_size * (max_len - 1), 1))
+        target = sample_seq[:, 1:].contiguous().view((batch_size * (max_len - 1), 1))
         seq = sample_seq[:, :-1]
         seq = torch.tensor(seq, requires_grad=True).long()
         target = torch.tensor(target).long()
         seq = seq.cuda()
         target = target.cuda()
         return seq, target.squeeze(1)
-

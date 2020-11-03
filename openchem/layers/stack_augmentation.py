@@ -10,11 +10,9 @@ class StackAugmentation(nn.Module):
         self.stack_width = stack_width
         self.stack_depth = stack_depth
         self.in_features = in_features
-        self.stack_controls_layer = nn.Linear(in_features=in_features,
-                                              out_features=3)
+        self.stack_controls_layer = nn.Linear(in_features=in_features, out_features=3)
 
-        self.stack_input_layer = nn.Linear(in_features=in_features,
-                                           out_features=self.stack_width)
+        self.stack_input_layer = nn.Linear(in_features=in_features, out_features=self.stack_width)
 
     def forward(self, input_val, prev_stack):
         batch_size = prev_stack.size(0)
@@ -27,11 +25,9 @@ class StackAugmentation(nn.Module):
         stack_input = stack_input.permute(1, 0, 2)
         zeros_at_the_bottom = torch.zeros(batch_size, 1, self.stack_width)
         if self.use_cuda:
-            zeros_at_the_bottom = torch.tensor(zeros_at_the_bottom.cuda(),
-                                               requires_grad=True)
+            zeros_at_the_bottom = torch.tensor(zeros_at_the_bottom.cuda(), requires_grad=True)
         else:
-            zeros_at_the_bottom = torch.tensor(zeros_at_the_bottom,
-                                               requires_grad=True)
+            zeros_at_the_bottom = torch.tensor(zeros_at_the_bottom, requires_grad=True)
         a_push, a_pop, a_no_op = controls[:, 0], controls[:, 1], controls[:, 2]
         stack_down = torch.cat((prev_stack[:, 1:], zeros_at_the_bottom), dim=1)
         stack_up = torch.cat((stack_input, prev_stack[:, :-1]), dim=1)
@@ -45,5 +41,3 @@ class StackAugmentation(nn.Module):
             return torch.tensor(result.cuda(), requires_grad=True)
         else:
             return torch.tensor(result, requires_grad=True)
-
-

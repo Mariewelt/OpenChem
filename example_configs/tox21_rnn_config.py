@@ -17,7 +17,8 @@ from sklearn.metrics import roc_auc_score, mean_squared_error
 
 from openchem.data.utils import read_smiles_property_file
 data = read_smiles_property_file('./benchmark_datasets/tox21/tox21.csv',
-                                 cols_to_read=[13] + list(range(0,12)))
+                                 cols_to_read=[13] + list(range(0,12)),
+                                 keep_header=False)
 smiles = data[0]
 labels = np.array(data[1:])
 
@@ -43,6 +44,10 @@ train_dataset = SmilesDataset('./benchmark_datasets/tox21/train.smi',
 test_dataset = SmilesDataset('./benchmark_datasets/tox21/test.smi',
                             delimiter=',', cols_to_read=list(range(13)),
                             tokens=tokens)
+predict_dataset = SmilesDataset('./benchmark_datasets/tox21/test.smi',
+                                delimiter=',', cols_to_read=[0],
+                                tokens=tokens, sanitize=False,
+                                return_smiles=True)
 
 def multitask_auc(ground_truth, predicted):
     from sklearn.metrics import roc_auc_score
@@ -53,10 +58,8 @@ def multitask_auc(ground_truth, predicted):
     n_tasks = ground_truth.shape[1]
     auc = []
     for i in range(n_tasks):
-        ind = np.where(ground_truth[:, i] != 999)[0]
+        ind = np.where(ground_truth[:, i] != 9)[0]
         auc.append(roc_auc_score(ground_truth[ind, i], predicted[ind, i]))
-    #if torch.distributed.get_rank() == 0:
-    #    print(auc)
     return np.mean(auc)
 
 model = Smiles2Label
@@ -68,14 +71,15 @@ model_params = {
     'use_clip_grad': True,
     'max_grad_norm': 10.0,
     'batch_size': 256,
-    'num_epochs': 31,
-    'logdir': '/home/mpopova/Work/OpenChem/logs/rnn_log',
+    'num_epochs': 21,
+    'logdir': './logs/tox21_rnn_log',
     'print_every': 5,
     'save_every': 5,
     'train_data_layer': train_dataset,
     'val_data_layer': test_dataset,
+    'predict_data_layer': predict_dataset,
     'eval_metrics': multitask_auc,
-    'criterion': MultitaskLoss(ignore_index=999, n_tasks=12).cuda(),
+    'criterion': MultitaskLoss(ignore_index=9, n_tasks=12).cuda(),
     'optimizer': RMSprop,
     'optimizer_params': {
         'lr': 0.001,

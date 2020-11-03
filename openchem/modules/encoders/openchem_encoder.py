@@ -1,4 +1,3 @@
-
 import torch
 from torch import nn
 
@@ -9,8 +8,7 @@ class OpenChemEncoder(nn.Module):
     """Base class for embedding module"""
     def __init__(self, params, use_cuda=None):
         super(OpenChemEncoder, self).__init__()
-        check_params(params, self.get_required_params(),
-                     self.get_required_params())
+        check_params(params, self.get_required_params(), self.get_required_params())
         self.params = params
         if use_cuda is None:
             use_cuda = torch.cuda.is_available()
@@ -20,10 +18,7 @@ class OpenChemEncoder(nn.Module):
 
     @staticmethod
     def get_required_params():
-        return {
-            'input_size': int,
-            'encoder_dim': int
-        }
+        return {'input_size': int, 'encoder_dim': int}
 
     @staticmethod
     def get_optional_params():

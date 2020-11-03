@@ -23,6 +23,7 @@ Check out OpenChem documentation [here](https://mariewelt.github.io/OpenChem/).
 * Classification (binary or multi-class)
 * Regression
 * Multi-task (such as N binary classification tasks)
+* Generative models
 
 ## Data types
 * Sequences of characters such as SMILES strings or amino-acid sequences
@@ -41,24 +42,21 @@ We are working on populating OpenChem with more models and other building blocks
 ## Requirements
 In order to get started you need:
 * Modern NVIDIA GPU, [compute capability 3.5](https://developer.nvidia.com/cuda-gpus) or newer.
-* Python 3.6 (we recommend [Anaconda](https://www.continuum.io/downloads) distribution)
-* [CUDA 9.0](https://developer.nvidia.com/cuda-downloads)
-* [Pytorch 0.4.1](https://pytorch.org)
-* [Tensorflow 1.8.0](https://www.tensorflow.org/install/) with GPU support 
-* [RDKit](https://www.rdkit.org/docs/Install.html)
-* [Scikit-learn](http://scikit-learn.org/)
-* [Numpy](http://www.numpy.org/)
+* Python 3.5 or newer (we recommend [Anaconda](https://www.continuum.io/downloads) distribution)
+* [CUDA 9.0 or newer](https://developer.nvidia.com/cuda-downloads)
 
 ## General installation
 
-If you installed your Python with Anacoda you can run the following commands to get started:
+If you installed your Python with Anaconda you can run the following commands to get started:
 ```bash
 git clone https://github.com/Mariewelt/OpenChem.git
 cd Openchem
+conda create --name OpenChem python=3.7
+conda activate OpenChem
 conda install --yes --file requirements.txt
 conda install -c rdkit rdkit nox cairo
 conda install pytorch torchvision -c pytorch
-pip install tensorflow-gpu
+pip install -e .
 ```
 If your CUDA version is other than 9.0, check [Pytorch](https://pytorch.org) and [Tensorflow](https://www.tensorflow.org/install/) websites for different installation instructions. 
 
