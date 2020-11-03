@@ -2,12 +2,15 @@ import torch
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
 import torch.distributed as dist
+import logging
 
 from openchem.utils.utils import check_params
 
 import time
+from tqdm import tqdm
 
-from openchem.utils.logger import Logger
+from openchem.utils import comm
+from tensorboardX import SummaryWriter
 from openchem.utils.utils import time_since, calculate_metrics
 from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
 from openchem.optimizer.openchem_lr_scheduler import OpenChemLRScheduler
@@ -22,18 +25,19 @@ class OpenChemModel(nn.Module):
     """
     def __init__(self, params):
         super(OpenChemModel, self).__init__()
-        check_params(params, self.get_required_params(),
-                     self.get_optional_params())
+        check_params(params, self.get_required_params(), self.get_optional_params())
         self.params = params
         self.use_cuda = self.params['use_cuda']
         self.batch_size = self.params['batch_size']
         self.eval_metrics = self.params['eval_metrics']
         self.task = self.params['task']
         self.logdir = self.params['logdir']
-        self.world_size = self.params['world_size']
 
         self.num_epochs = self.params['num_epochs']
-        self.use_clip_grad = self.params['use_clip_grad']
+        if 'use_clip_grad' in self.params.keys():
+            self.use_clip_grad = self.params['use_clip_grad']
+        else:
+            self.use_clip_grad = False
         if self.use_clip_grad:
             self.max_grad_norm = self.params['max_grad_norm']
         else:
@@ -44,7 +48,7 @@ class OpenChemModel(nn.Module):
 
     @staticmethod
     def get_required_params():
-        return{
+        return {
             'task': str,
             'batch_size': int,
             'num_epochs': int,
@@ -54,7 +58,7 @@ class OpenChemModel(nn.Module):
 
     @staticmethod
     def get_optional_params():
-        return{
+        return {
             'use_cuda': bool,
             'use_clip_grad': bool,
             'max_grad_norm': float,
@@ -70,7 +74,8 @@ class OpenChemModel(nn.Module):
     def forward(self, inp, eval=False):
         raise NotImplementedError
 
-    def cast_inputs(self, sample):
+    @staticmethod
+    def cast_inputs(sample, task, use_cuda):
         raise NotImplementedError
 
     def load_model(self, path):
@@ -80,135 +85,136 @@ class OpenChemModel(nn.Module):
     def save_model(self, path):
         torch.save(self.state_dict(), path)
 
-        
+
 def build_training(model, params):
 
-    optimizer = OpenChemOptimizer([params['optimizer'],
-                                   params['optimizer_params']],
-                                  model.parameters())
-    lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'],
-                                        params['lr_scheduler_params']],
-                                       optimizer.optimizer)
+    optimizer = OpenChemOptimizer([params['optimizer'], params['optimizer_params']], model.parameters())
+    lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'], params['lr_scheduler_params']], optimizer.optimizer)
     use_cuda = params['use_cuda']
     criterion = params['criterion']
     if use_cuda:
         criterion = criterion.cuda()
-    # train_loader = params['train_loader']
-    # val_loader = params['val_loader']
-    return criterion, optimizer, lr_scheduler #, train_loader, val_loader
+    return criterion, optimizer, lr_scheduler
 
 
 def train_step(model, optimizer, criterion, inp, target):
-    optimizer.zero_grad()
-    output = model.forward(inp, eval=False)
-    loss = criterion(output, target)
-    loss.backward()
-    optimizer.step()
-    has_module = False
-    if hasattr(model, 'module'):
-        has_module = True
-    if has_module:
-        use_clip_grad = model.module.use_clip_grad
-        max_grad_norm = model.module.max_grad_norm
-    else:
-        use_clip_grad = model.use_clip_grad
-        max_grad_norm = model.max_grad_norm
-    if use_clip_grad:
-        clip_grad_norm_(model.parameters(), max_grad_norm)
+    with torch.autograd.set_detect_anomaly(True):
+        optimizer.zero_grad()
+        output = model(inp, eval=False)
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
+        has_module = False
+        if hasattr(model, 'module'):
+            has_module = True
+        if has_module:
+            use_clip_grad = model.module.use_clip_grad
+            max_grad_norm = model.module.max_grad_norm
+        else:
+            use_clip_grad = model.use_clip_grad
+            max_grad_norm = model.max_grad_norm
+        if use_clip_grad:
+            clip_grad_norm_(model.parameters(), max_grad_norm)
 
     return loss
 
 
-def print_logs(world_size):
-    if world_size == 1:
-        return True
-    elif torch.distributed.get_rank() == 0:
-        return True
-    else:
-        return False
-
-
-def fit(model, scheduler, train_loader, optimizer, criterion, params,
-        eval=False, val_loader=None):
-    cur_epoch = 0
+def fit(model, scheduler, train_loader, optimizer, criterion, params, eval=False, val_loader=None, cur_epoch=0):
+    textlogger = logging.getLogger("openchem.fit")
     logdir = params['logdir']
     print_every = params['print_every']
     save_every = params['save_every']
     n_epochs = params['num_epochs']
-    logger = Logger(logdir + '/tensorboard_log/')
+    writer = SummaryWriter()
     start = time.time()
     loss_total = 0
     n_batches = 0
+    schedule_by_iter = scheduler.by_iteration
     scheduler = scheduler.scheduler
     all_losses = []
     val_losses = []
     has_module = False
     if hasattr(model, 'module'):
         has_module = True
-    if has_module:
-        world_size = model.module.world_size
-    else:
-        world_size = model.world_size     
+    world_size = comm.get_world_size()
 
-    for epoch in range(cur_epoch, n_epochs + cur_epoch):
+    for epoch in tqdm(range(cur_epoch, n_epochs + cur_epoch)):
+        model.train()
         for i_batch, sample_batched in enumerate(train_loader):
+
             if has_module:
-                batch_input, batch_target = model.module.cast_inputs(sample_batched)
+                task = model.module.task
+                use_cuda = model.module.use_cuda
+                batch_input, batch_target = model.module.cast_inputs(sample_batched, task, use_cuda)
             else:
-                batch_input, batch_target = model.cast_inputs(sample_batched)
-            loss = train_step(model, optimizer, criterion,
-                              batch_input, batch_target)
+                task = model.task
+                use_cuda = model.use_cuda
+                batch_input, batch_target = model.cast_inputs(sample_batched, task, use_cuda)
+            loss = train_step(model, optimizer, criterion, batch_input, batch_target)
+            if schedule_by_iter:
+                # steps are in iters
+                scheduler.step()
             if world_size > 1:
-                reduced_loss = reduce_tensor(loss, world_size)
+                reduced_loss = reduce_tensor(loss, world_size).item()
             else:
-                reduced_loss = loss.clone()
-            loss_total += reduced_loss.item()
+                reduced_loss = loss.item()
+            loss_total += reduced_loss
             n_batches += 1
         cur_loss = loss_total / n_batches
         all_losses.append(cur_loss)
 
         if epoch % print_every == 0:
-            if print_logs(world_size):
-                print('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
-                      'Loss: %.4f]' % (time_since(start), epoch,
-                                       epoch / n_epochs * 100, cur_loss))
+            if comm.is_main_process():
+                textlogger.info('TRAINING: [Time: %s, Epoch: %d, Progress: %d%%, '
+                                'Loss: %.4f]' % (time_since(start), epoch, epoch / n_epochs * 100, cur_loss))
             if eval:
                 assert val_loader is not None
-                val_loss, metrics = evaluate(model, val_loader, criterion)
+                val_loss, metrics = evaluate(model, val_loader, criterion, epoch=epoch)
                 val_losses.append(val_loss)
-                info = {'Train loss': cur_loss, 'Validation loss': val_loss,
-                        'Validation metrics': metrics,
-                        'LR': optimizer.param_groups[0]['lr']}
+                info = {
+                    'Train loss': cur_loss,
+                    'Validation loss': val_loss,
+                    'Validation metrics': metrics,
+                    'LR': optimizer.param_groups[0]['lr']
+                }
             else:
-                info = {'Train loss': cur_loss,
-                        'LR': optimizer.param_groups[0]['lr']}
+                info = {'Train loss': cur_loss, 'LR': optimizer.param_groups[0]['lr']}
 
-            if print_logs(world_size):
+            if comm.is_main_process():
                 for tag, value in info.items():
-                    logger.scalar_summary(tag, value, epoch + 1)
+                    writer.add_scalar(tag, value, epoch + 1)
 
                 for tag, value in model.named_parameters():
                     tag = tag.replace('.', '/')
-                    try:
-                        logger.histo_summary(tag, value.detach().cpu().numpy(),
-                                         epoch + 1)
-                        logger.histo_summary(tag + '/grad',
-                                         value.grad.detach().cpu().numpy(),
-                                         epoch + 1)
-                    except:
-                        pass
+                    if torch.std(value).item() < 1e-3 or \
+                            torch.isnan(torch.std(value)).item():
+                        textlogger.warning("Warning: {} has zero variance ".format(tag) + "(i.e. constant vector)")
+                    else:
+                        log_value = value.detach().cpu().numpy()
+                        writer.add_histogram(tag, log_value, epoch + 1)
+                        #logger.histo_summary(
+                        #    tag, log_value, epoch + 1)
+                        if value.grad is None:
+                            print("Warning: {} grad is undefined".format(tag))
+                        else:
+                            log_value_grad = value.grad.detach().cpu().numpy()
+                            writer.add_histogram(tag + "/grad", log_value_grad, epoch + 1)
 
-        if epoch % save_every == 0 and print_logs(world_size):
+        if epoch % save_every == 0 and comm.is_main_process():
             torch.save(model.state_dict(), logdir + '/checkpoint/epoch_' + str(epoch))
 
         loss_total = 0
         n_batches = 0
-        scheduler.step()
+        if not schedule_by_iter:
+            # steps are in epochs
+            scheduler.step()
 
     return all_losses, val_losses
 
 
-def evaluate(model, val_loader, criterion):
+def evaluate(model, data_loader, criterion=None, epoch=None):
+    textlogger = logging.getLogger("openchem.evaluate")
+    model.eval()
     loss_total = 0
     n_batches = 0
     start = time.time()
@@ -220,32 +226,116 @@ def evaluate(model, val_loader, criterion):
     if has_module:
         task = model.module.task
         eval_metrics = model.module.eval_metrics
-        world_size = model.module.world_size
+        logdir = model.module.logdir
     else:
         task = model.task
         eval_metrics = model.eval_metrics
-        world_size = model.world_size
-    for i_batch, sample_batched in enumerate(val_loader):
-        if has_module:
-            batch_input, batch_target = model.module.cast_inputs(sample_batched)
-        else:
-            batch_input, batch_target = model.cast_inputs(sample_batched)
-        predicted = model.forward(batch_input, eval=True)
-        prediction += list(predicted.detach().cpu().numpy())
-        ground_truth += list(batch_target.cpu().numpy())
-        loss = criterion(predicted, batch_target)
-        loss_total += loss.item()
-        n_batches += 1
+        logdir = model.logdir
 
+    for i_batch, sample_batched in enumerate(data_loader):
+        if has_module:
+            task = model.module.task
+            use_cuda = model.module.use_cuda
+            batch_input, batch_target = model.module.cast_inputs(sample_batched,
+                                                                 task,
+                                                                 use_cuda)
+        else:
+            task = model.task
+            use_cuda = model.use_cuda
+            batch_input, batch_target = model.cast_inputs(sample_batched, task, use_cuda)
+        predicted = model(batch_input, eval=True)
+        try:
+            loss = criterion(predicted, batch_target)
+        except TypeError:
+            loss = 0.0
+        if hasattr(predicted, 'detach'):
+            predicted = predicted.detach().cpu().numpy()
+        if hasattr(batch_target, 'cpu'):
+            batch_target = batch_target.cpu().numpy()
+        if hasattr(loss, 'item'):
+            loss = loss.item()
+        if isinstance(loss, list):
+            loss = 0.0
+        prediction += list(predicted)
+        ground_truth += list(batch_target)
+        loss_total += loss
+        n_batches += 1
+    
     cur_loss = loss_total / n_batches
     if task == 'classification':
         prediction = np.argmax(prediction, axis=1)
-    metrics = calculate_metrics(prediction, ground_truth,
-                                eval_metrics)
-    if print_logs(world_size):
-        print('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' %
-              (time_since(start), cur_loss, metrics))
+    if task == "graph_generation":
+        f = open(logdir + "debug_smiles_epoch_" + str(epoch) + ".smi", "w")
+        if isinstance(metrics, list) and len(metrics) == len(prediction):
+            for i in range(len(prediction)):
+                f.writelines(str(prediction[i]) + "," + str(metrics[i]) + "\n")
+        else:
+            for i in range(len(prediction)):
+                f.writelines(str(prediction[i]) + "\n")
+            f.close()
+            
+    metrics = calculate_metrics(prediction, ground_truth, eval_metrics)
+    metrics = np.mean(metrics)
+
+    if comm.is_main_process():
+        textlogger.info('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' % (time_since(start), cur_loss, metrics))
+
     return cur_loss, metrics
+
+
+def predict(model, data_loader, eval=True):
+    textlogger = logging.getLogger("openchem.predict")
+    model.eval()
+    start = time.time()
+    prediction = []
+    samples = []
+    has_module = False
+    if hasattr(model, 'module'):
+        has_module = True
+    if has_module:
+        task = model.module.task
+        logdir = model.module.logdir
+    else:
+        task = model.task
+        logdir = model.logdir
+
+    for i_batch, sample_batched in enumerate(data_loader):
+        if has_module:
+            task = model.module.task
+            use_cuda = model.module.use_cuda
+            batch_input, batch_object = model.module.cast_inputs(sample_batched,
+                                                                 task,
+                                                                 use_cuda,
+                                                                 for_prediction=True)
+        else:
+            task = model.task
+            use_cuda = model.use_cuda
+            batch_input, batch_object = model.cast_inputs(sample_batched,
+                                                          task,
+                                                          use_cuda,
+                                                          for_predction=True)
+        predicted = model(batch_input, eval=True)
+        if hasattr(predicted, 'detach'):
+            predicted = predicted.detach().cpu().numpy()
+        prediction += list(predicted)
+        samples += list(batch_object)
+
+    if task == 'classification':
+        prediction = np.argmax(prediction, axis=1)
+    f = open(logdir + "/predictions.txt", "w")
+    assert len(prediction) == len(samples)
+    for i in range(len(prediction)):
+        tmp = [chr(c) for c in samples[i]]
+        tmp = ''.join(tmp)
+        if " " in tmp:
+            tmp = tmp[:tmp.index(" ")]
+        f.writelines(tmp + "," + str(prediction[i]) + "\n")
+    f.close()
+
+    if comm.is_main_process():
+        textlogger.info(
+            'PREDICTION: [Time: %s, Number of samples: %d]' % (time_since(start), len(prediction))
+        )
 
 
 def reduce_tensor(tensor, world_size):
@@ -257,6 +347,6 @@ def reduce_tensor(tensor, world_size):
         world_size (int): number of processes.
     """
     rt = tensor.clone()
-    dist.all_reduce(rt, op=dist.reduce_op.SUM)
+    dist.all_reduce(rt, op=dist.ReduceOp.SUM)
     rt /= world_size
     return rt
