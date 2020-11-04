@@ -96,6 +96,13 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="blocks.html">Tutorials and Recipes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#loading-data">Loading data</a></li>
@@ -315,17 +322,19 @@
 <span class="n">model_params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;use_cuda&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="s1">&#39;task&#39;</span><span class="p">:</span> <span class="s1">&#39;multitask&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;random_seed&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
     <span class="s1">&#39;use_clip_grad&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="s1">&#39;max_grad_norm&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
-    <span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
-    <span class="s1">&#39;num_epochs&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
-    <span class="s1">&#39;logdir&#39;</span><span class="p">:</span> <span class="s1">&#39;./tox21_log&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;print_every&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="s1">&#39;num_epochs&#39;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+    <span class="s1">&#39;logdir&#39;</span><span class="p">:</span> <span class="s1">&#39;./logs/tox21_rnn_log&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;print_every&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
     <span class="s1">&#39;save_every&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
     <span class="s1">&#39;train_data_layer&#39;</span><span class="p">:</span> <span class="n">train_dataset</span><span class="p">,</span>
     <span class="s1">&#39;val_data_layer&#39;</span><span class="p">:</span> <span class="n">test_dataset</span><span class="p">,</span>
+    <span class="s1">&#39;predict_data_layer&#39;</span><span class="p">:</span> <span class="n">predict_dataset</span><span class="p">,</span>
     <span class="s1">&#39;eval_metrics&#39;</span><span class="p">:</span> <span class="n">multitask_auc</span><span class="p">,</span>
-    <span class="s1">&#39;criterion&#39;</span><span class="p">:</span> <span class="n">MultitaskLoss</span><span class="p">(</span><span class="n">ignore_index</span><span class="o">=</span><span class="mi">999</span><span class="p">,</span> <span class="n">n_tasks</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
+    <span class="s1">&#39;criterion&#39;</span><span class="p">:</span> <span class="n">MultitaskLoss</span><span class="p">(</span><span class="n">ignore_index</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">n_tasks</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
     <span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="n">RMSprop</span><span class="p">,</span>
     <span class="s1">&#39;optimizer_params&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
@@ -355,12 +364,12 @@
         <span class="s1">&#39;input_size&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
         <span class="s1">&#39;n_layers&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
         <span class="s1">&#39;hidden_size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
-        <span class="s1">&#39;activation&#39;</span><span class="p">:</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
+        <span class="s1">&#39;activation&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">],</span>
         <span class="s1">&#39;dropout&#39;</span><span class="p">:</span> <span class="mf">0.0</span>
     <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>}</p>
 <p>All of the above code should be saved in a python file. We will call it <code class="docutils literal notranslate"><span class="pre">tox21_rnn_config.py</span></code>.</p>
 </div>
 <div class="section" id="training-and-evaluating-the-model">

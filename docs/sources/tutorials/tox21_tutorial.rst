@@ -84,17 +84,19 @@ This model consists of Embedding block, Recurrent Encoder with 4 LSTM layers and
     model_params = {
         'use_cuda': True,
         'task': 'multitask',
+        'random_seed': 5,
         'use_clip_grad': True,
         'max_grad_norm': 10.0,
-        'batch_size': 128,
-        'num_epochs': 100,
-        'logdir': './tox21_log',
-        'print_every': 10,
+        'batch_size': 256,
+        'num_epochs': 21,
+        'logdir': './logs/tox21_rnn_log',
+        'print_every': 5,
         'save_every': 5,
         'train_data_layer': train_dataset,
         'val_data_layer': test_dataset,
+        'predict_data_layer': predict_dataset,
         'eval_metrics': multitask_auc,
-        'criterion': MultitaskLoss(ignore_index=999, n_tasks=12).cuda(),
+        'criterion': MultitaskLoss(ignore_index=9, n_tasks=12).cuda(),
         'optimizer': RMSprop,
         'optimizer_params': {
             'lr': 0.001,
@@ -124,10 +126,10 @@ This model consists of Embedding block, Recurrent Encoder with 4 LSTM layers and
             'input_size': 128,
             'n_layers': 2,
             'hidden_size': [128, 12],
-            'activation': F.relu,
+            'activation': [F.relu, torch.sigmoid],
             'dropout': 0.0
         }
-}
+    }
 
 All of the above code should be saved in a python file. We will call it ``tox21_rnn_config.py``.
 
