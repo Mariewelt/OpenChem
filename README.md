@@ -42,7 +42,7 @@ We are working on populating OpenChem with more models and other building blocks
 ## Requirements
 In order to get started you need:
 * Modern NVIDIA GPU, [compute capability 3.5](https://developer.nvidia.com/cuda-gpus) or newer.
-* Python 3.5 or newer (we recommend [Anaconda](https://www.continuum.io/downloads) distribution)
+* Python 3.5 or newer (we recommend [Anaconda](https://www.anaconda.com/) distribution)
 * [CUDA 9.0 or newer](https://developer.nvidia.com/cuda-downloads)
 
 ## General installation
@@ -50,7 +50,7 @@ In order to get started you need:
 If you installed your Python with Anaconda you can run the following commands to get started:
 ```bash
 git clone https://github.com/Mariewelt/OpenChem.git
-cd Openchem
+cd OpenChem
 conda create --name OpenChem python=3.7
 conda activate OpenChem
 conda install --yes --file requirements.txt
@@ -58,7 +58,7 @@ conda install -c rdkit rdkit nox cairo
 conda install pytorch torchvision -c pytorch
 pip install -e .
 ```
-If your CUDA version is other than 9.0, check [Pytorch](https://pytorch.org) and [Tensorflow](https://www.tensorflow.org/install/) websites for different installation instructions. 
+If your CUDA version is older than 9.0, check [Pytorch](https://pytorch.org) website for different installation instructions. 
 
 ## Installation with Docker
 Alternative way of installation is with Docker. We provide a Dockerfile, so you can run your models in a container that already has all the necessary packages installed. You will also need nvidia-docker in order to run models on GPU.
