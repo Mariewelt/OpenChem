@@ -88,66 +88,49 @@ which is a multilayer perceptron model, that predicts labels from feature vector
 Model parameter are specified as a dictionary ``model_params``. There are some essential parameters, that
 are required for every model. Such parameters are:
 
-* ``task`` -- the problem to be solved. Can be ``classification``, ``regression``, ``multitask`` or
-``graph_generation``. In this example we are building model for prediction of continuous logP values, that
-is why ``task`` here is ``regression``.
+* ``task`` -- the problem to be solved. Can be ``classification``, ``regression``, ``multitask`` or ``graph_generation``. In this example we are building model for prediction of continuous logP values, that is why ``task`` here is ``regression``.
 
-* ``random_seed`` -- random seed for running the experiment. Used to enforce reproducibility of the
-experiments.
+* ``random_seed`` -- random seed for running the experiment. Used to enforce reproducibility of the experiments.
 
 * ``batch_size`` -- how many samples are included in each training batch. In this example we are using ``256``.
 
 * ``num_epochs`` -- how many passes over the training dataset to do. In this example we are making ``101`` epochs.
 
-* ``print_every`` -- how often intermediate training-evaluation results will be printed to standard
-output and log file.
+* ``print_every`` -- how often intermediate training-evaluation results will be printed to standard output and log file.
 
 * ``save_every`` -- how often intermediate model checkpoints will be saved during training.
 
-* ``train_data_layer`` and ``val_data_layer`` -- PyTorch datasets that are used for training and
-evaluation. In this example we are using ``train_dataset`` and ``test_dataset`` objects of
-``FeatureDataset`` type that were defined above.
+* ``train_data_layer`` and ``val_data_layer`` -- PyTorch datasets that are used for training and evaluation. In this example we are using ``train_dataset`` and ``test_dataset`` objects of ``FeatureDataset`` type that were defined above.
 
 * ``predict_data_layer`` -- also a PyTorch dataset, but this parameter is not needed if the model
 won't be used for making predictions for new samples.
 
-* ``eval_metrics`` -- a user-provided function, that is used to calculated validation metrics during
-evaluation process. This function must follow scikit-learn defined signature ``fun(y_true, y_pred)``.
-In this example we are using r2_ score.
+* ``eval_metrics`` -- a user-provided function, that is used to calculated validation metrics during evaluation process. This function must follow scikit-learn defined signature ``fun(y_true, y_pred)``. In this example we are using r2_ score.
 
 .. _r2: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html
 
-* ``criterion`` -- loss function to be optimized during the training. In this case we are using
-``torch.nn.MSELoss()`` which is the mean squared error often used for regression problems.
+* ``criterion`` -- loss function to be optimized during the training. In this case we are using MSELoss_ which is the mean squared error often used for regression problems.
 
-* ``optimizer`` -- optimization algorithm to be used for model training. In this case we are using Adam_
-optimizer.
+.. _MSELoss: https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html?highlight=mseloss#torch.nn.MSELoss
+
+* ``optimizer`` -- optimization algorithm to be used for model training. In this case we are using Adam_ optimizer.
 
 .. _Adam: https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam
 
-* ``optimizer_params`` -- dictionary of parameters for optimization algorithms. In this case we only
-specify learning rate. Full list of possible parameters can be looked up on PyTorch documentation
-page for the optimization algorithm.
+* ``optimizer_params`` -- dictionary of parameters for optimization algorithms. In this case we only specify learning rate. Full list of possible parameters can be looked up on PyTorch documentation page for the optimization algorithm.
 
-* ``lr_scheduler`` -- learning rate decay policy. In this case we use StepLR_.
-This policy decreases the learning rate by a fixed decay factor every specified number of steps.
+* ``lr_scheduler`` -- learning rate decay policy. In this case we use StepLR_. This policy decreases the learning rate by a fixed decay factor every specified number of steps.
 
 .. _StepLR: https://pytorch.org/docs/stable/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR
 
-* ``lr_scheduler_params`` -- dictionary of parameters for learning rate decay policy. Full list of
-possible parameters can be looked up on PyTorch documentation page for the chosen decay policy.
-In this example we decreasing the learning rate by a factor ``gamma=0.9`` every ``step_size=15`` epochs.
+* ``lr_scheduler_params`` -- dictionary of parameters for learning rate decay policy. Full list of possible parameters can be looked up on PyTorch documentation page for the chosen decay policy. In this example we decreasing the learning rate by a factor ``gamma=0.9`` every ``step_size=15`` epochs.
 
 Next set of parameters define the model architecture. They are different from model to model.
 In this example we use a multiplayer perceptron and we only need to specify a few parameters:
 
 * ``mlp`` -- type of multilayer perceptron. OpenChem has MLP with and without Batch Normalization.
 
-* ``mlp_params`` -- dictionary of parameters for the MLP. ``input_size`` should be equal to
-the number of features in the data. In our example we are using fingerprints with ``n_bits=2048``, so
-``input_size=248``. ``n_layers`` -- number of layers in MLP (we are using 4). ``hidden_size`` -- list of
-dimensions for each of ``n_layers``. ``dropout`` -- probability value for dropout. If this parameter is not
-specified, dropout is not used. ``activation`` -- list of activation function for each layer.
+* ``mlp_params`` -- dictionary of parameters for the MLP. ``input_size`` should be equal to the number of features in the data. In our example we are using fingerprints with ``n_bits=2048``, so ``input_size=248``. ``n_layers`` -- number of layers in MLP (we are using 4). ``hidden_size`` -- list of dimensions for each of ``n_layers``. ``dropout`` -- probability value for dropout. If this parameter is not specified, dropout is not used. ``activation`` -- list of activation functions for each layer.
 
 Training the model
 ------------------

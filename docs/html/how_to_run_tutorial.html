@@ -96,6 +96,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/getting_started.html">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
@@ -242,9 +249,9 @@
 <h1>How to define and train models<a class="headerlink" href="#how-to-define-and-train-models" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we will discuss how to construct and run models in OpenChem
 without writing any code.</p>
-<p>Models in Openchem are defined in Python configuration file as a dictionary of parameters.
+<p>Models in OpenChem are defined in Python configuration file as a dictionary of parameters.
 The dictionary must contain parameters that define how to run/train/evaluate
-a model as well as parameters defining model architecture. Openchem also contains
+a model as well as parameters defining model architecture. OpenChem also contains
 2 Python files run.py and launch.py that handle model creation and launching
 distributed processes.</p>
 <div class="section" id="arguments-for-launch-py">

@@ -6,9 +6,9 @@ How to define and train models
 In this tutorial we will discuss how to construct and run models in OpenChem
 without writing any code.
 
-Models in Openchem are defined in Python configuration file as a dictionary of parameters.
+Models in OpenChem are defined in Python configuration file as a dictionary of parameters.
 The dictionary must contain parameters that define how to run/train/evaluate
-a model as well as parameters defining model architecture. Openchem also contains
+a model as well as parameters defining model architecture. OpenChem also contains
 2 Python files run.py and launch.py that handle model creation and launching
 distributed processes.
 

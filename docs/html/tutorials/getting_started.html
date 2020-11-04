@@ -327,67 +327,38 @@ which is a multilayer perceptron model, that predicts labels from feature vector
 <p>Model parameter are specified as a dictionary <code class="docutils literal notranslate"><span class="pre">model_params</span></code>. There are some essential parameters, that
 are required for every model. Such parameters are:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">task</span></code> – the problem to be solved. Can be <code class="docutils literal notranslate"><span class="pre">classification</span></code>, <code class="docutils literal notranslate"><span class="pre">regression</span></code>, <code class="docutils literal notranslate"><span class="pre">multitask</span></code> or</p></li>
-</ul>
-<p><code class="docutils literal notranslate"><span class="pre">graph_generation</span></code>. In this example we are building model for prediction of continuous logP values, that
-is why <code class="docutils literal notranslate"><span class="pre">task</span></code> here is <code class="docutils literal notranslate"><span class="pre">regression</span></code>.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">random_seed</span></code> – random seed for running the experiment. Used to enforce reproducibility of the</p></li>
-</ul>
-<p>experiments.</p>
-<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">task</span></code> – the problem to be solved. Can be <code class="docutils literal notranslate"><span class="pre">classification</span></code>, <code class="docutils literal notranslate"><span class="pre">regression</span></code>, <code class="docutils literal notranslate"><span class="pre">multitask</span></code> or <code class="docutils literal notranslate"><span class="pre">graph_generation</span></code>. In this example we are building model for prediction of continuous logP values, that is why <code class="docutils literal notranslate"><span class="pre">task</span></code> here is <code class="docutils literal notranslate"><span class="pre">regression</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">random_seed</span></code> – random seed for running the experiment. Used to enforce reproducibility of the experiments.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">batch_size</span></code> – how many samples are included in each training batch. In this example we are using <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">num_epochs</span></code> – how many passes over the training dataset to do. In this example we are making <code class="docutils literal notranslate"><span class="pre">101</span></code> epochs.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">print_every</span></code> – how often intermediate training-evaluation results will be printed to standard</p></li>
-</ul>
-<p>output and log file.</p>
-<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">print_every</span></code> – how often intermediate training-evaluation results will be printed to standard output and log file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">save_every</span></code> – how often intermediate model checkpoints will be saved during training.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">train_data_layer</span></code> and <code class="docutils literal notranslate"><span class="pre">val_data_layer</span></code> – PyTorch datasets that are used for training and</p></li>
-</ul>
-<p>evaluation. In this example we are using <code class="docutils literal notranslate"><span class="pre">train_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">test_dataset</span></code> objects of
-<code class="docutils literal notranslate"><span class="pre">FeatureDataset</span></code> type that were defined above.</p>
-<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">train_data_layer</span></code> and <code class="docutils literal notranslate"><span class="pre">val_data_layer</span></code> – PyTorch datasets that are used for training and evaluation. In this example we are using <code class="docutils literal notranslate"><span class="pre">train_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">test_dataset</span></code> objects of <code class="docutils literal notranslate"><span class="pre">FeatureDataset</span></code> type that were defined above.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">predict_data_layer</span></code> – also a PyTorch dataset, but this parameter is not needed if the model</p></li>
 </ul>
 <p>won’t be used for making predictions for new samples.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">eval_metrics</span></code> – a user-provided function, that is used to calculated validation metrics during</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">eval_metrics</span></code> – a user-provided function, that is used to calculated validation metrics during evaluation process. This function must follow scikit-learn defined signature <code class="docutils literal notranslate"><span class="pre">fun(y_true,</span> <span class="pre">y_pred)</span></code>. In this example we are using <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html">r2</a> score.</p></li>
 </ul>
-<p>evaluation process. This function must follow scikit-learn defined signature <code class="docutils literal notranslate"><span class="pre">fun(y_true,</span> <span class="pre">y_pred)</span></code>.
-In this example we are using <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html">r2</a> score.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">criterion</span></code> – loss function to be optimized during the training. In this case we are using</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">criterion</span></code> – loss function to be optimized during the training. In this case we are using <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html?highlight=mseloss#torch.nn.MSELoss">MSELoss</a> which is the mean squared error often used for regression problems.</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">torch.nn.MSELoss()</span></code> which is the mean squared error often used for regression problems.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">optimizer</span></code> – optimization algorithm to be used for model training. In this case we are using <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam">Adam</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimizer</span></code> – optimization algorithm to be used for model training. In this case we are using <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam">Adam</a> optimizer.</p></li>
 </ul>
-<p>optimizer.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">optimizer_params</span></code> – dictionary of parameters for optimization algorithms. In this case we only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimizer_params</span></code> – dictionary of parameters for optimization algorithms. In this case we only specify learning rate. Full list of possible parameters can be looked up on PyTorch documentation page for the optimization algorithm.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler</span></code> – learning rate decay policy. In this case we use <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR">StepLR</a>. This policy decreases the learning rate by a fixed decay factor every specified number of steps.</p></li>
 </ul>
-<p>specify learning rate. Full list of possible parameters can be looked up on PyTorch documentation
-page for the optimization algorithm.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler</span></code> – learning rate decay policy. In this case we use <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR">StepLR</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler_params</span></code> – dictionary of parameters for learning rate decay policy. Full list of possible parameters can be looked up on PyTorch documentation page for the chosen decay policy. In this example we decreasing the learning rate by a factor <code class="docutils literal notranslate"><span class="pre">gamma=0.9</span></code> every <code class="docutils literal notranslate"><span class="pre">step_size=15</span></code> epochs.</p></li>
 </ul>
-<p>This policy decreases the learning rate by a fixed decay factor every specified number of steps.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler_params</span></code> – dictionary of parameters for learning rate decay policy. Full list of</p></li>
-</ul>
-<p>possible parameters can be looked up on PyTorch documentation page for the chosen decay policy.
-In this example we decreasing the learning rate by a factor <code class="docutils literal notranslate"><span class="pre">gamma=0.9</span></code> every <code class="docutils literal notranslate"><span class="pre">step_size=15</span></code> epochs.</p>
 <p>Next set of parameters define the model architecture. They are different from model to model.
 In this example we use a multiplayer perceptron and we only need to specify a few parameters:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">mlp</span></code> – type of multilayer perceptron. OpenChem has MLP with and without Batch Normalization.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mlp_params</span></code> – dictionary of parameters for the MLP. <code class="docutils literal notranslate"><span class="pre">input_size</span></code> should be equal to</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlp_params</span></code> – dictionary of parameters for the MLP. <code class="docutils literal notranslate"><span class="pre">input_size</span></code> should be equal to the number of features in the data. In our example we are using fingerprints with <code class="docutils literal notranslate"><span class="pre">n_bits=2048</span></code>, so <code class="docutils literal notranslate"><span class="pre">input_size=248</span></code>. <code class="docutils literal notranslate"><span class="pre">n_layers</span></code> – number of layers in MLP (we are using 4). <code class="docutils literal notranslate"><span class="pre">hidden_size</span></code> – list of dimensions for each of <code class="docutils literal notranslate"><span class="pre">n_layers</span></code>. <code class="docutils literal notranslate"><span class="pre">dropout</span></code> – probability value for dropout. If this parameter is not specified, dropout is not used. <code class="docutils literal notranslate"><span class="pre">activation</span></code> – list of activation functions for each layer.</p></li>
 </ul>
-<p>the number of features in the data. In our example we are using fingerprints with <code class="docutils literal notranslate"><span class="pre">n_bits=2048</span></code>, so
-<code class="docutils literal notranslate"><span class="pre">input_size=248</span></code>. <code class="docutils literal notranslate"><span class="pre">n_layers</span></code> – number of layers in MLP (we are using 4). <code class="docutils literal notranslate"><span class="pre">hidden_size</span></code> – list of
-dimensions for each of <code class="docutils literal notranslate"><span class="pre">n_layers</span></code>. <code class="docutils literal notranslate"><span class="pre">dropout</span></code> – probability value for dropout. If this parameter is not
-specified, dropout is not used. <code class="docutils literal notranslate"><span class="pre">activation</span></code> – list of activation function for each layer.</p>
 </div>
 <div class="section" id="training-the-model">
 <h2>Training the model<a class="headerlink" href="#training-the-model" title="Permalink to this headline">¶</a></h2>
