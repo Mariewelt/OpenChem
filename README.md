@@ -42,7 +42,7 @@ We are working on populating OpenChem with more models and other building blocks
 ## Requirements
 In order to get started you need:
 * Modern NVIDIA GPU, [compute capability 3.5](https://developer.nvidia.com/cuda-gpus) or newer.
-* Python 3.5 or newer (we recommend [Anaconda](https://www.continuum.io/downloads) distribution)
+* Python 3.5 or newer (we recommend [Anaconda](https://www.anaconda.com/) distribution)
 * [CUDA 9.0 or newer](https://developer.nvidia.com/cuda-downloads)
 
 ## General installation
