@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation instructions &mdash; OpenChem 0.1 documentation</title>
+  <title>&lt;no title&gt; &mdash; OpenChem 0.1 documentation</title>
   
 
   
@@ -35,9 +35,7 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="How to define and train models" href="how_to_run_tutorial.html" />
-    <link rel="prev" title="OpenChem" href="index.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -81,11 +79,11 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation instructions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#general-installation">General installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation-with-docker">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="how_to_run_tutorial.html">How to define and train models</a><ul>
@@ -215,24 +213,19 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Installation instructions</li>
+      <li>&lt;no title&gt;</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            
-              <!-- User defined GitHub URL -->
-              <a href="https://github.com/Mariewelt/OpenChem" class="fa fa-github"> Edit on GitHub</a>
-            
+            <a href="_sources/dl_glossary.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -245,63 +238,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation-instructions">
-<h1>Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="general-installation">
-<h2>General installation<a class="headerlink" href="#general-installation" title="Permalink to this headline">¶</a></h2>
-<p>In order to get started you need to clone the repository to your local folder and install the requirements.
-We recommend installation using <a class="reference external" href="https://www.anaconda.com/">Anaconda</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Mariewelt</span><span class="o">/</span><span class="n">OpenChem</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">OpenChem</span>
-<span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">OpenChem</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.7</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="n">OpenChem</span>
-<span class="n">conda</span> <span class="n">install</span> <span class="o">--</span><span class="n">yes</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">rdkit</span> <span class="n">rdkit</span> <span class="n">nox</span> <span class="n">cairo</span>
-<span class="n">conda</span> <span class="n">install</span> <span class="n">pytorch</span> <span class="n">torchvision</span> <span class="o">-</span><span class="n">c</span> <span class="n">pytorch</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="installation-with-docker">
-<h2>Installation with Docker<a class="headerlink" href="#installation-with-docker" title="Permalink to this headline">¶</a></h2>
-<p>Alternative way of installation is with Docker. We provide a <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>, so that you can run your models in a container that already has all the necessary packages installed. You will also need nvidia-docker in order to run models on GPU.
-If you are new to Docker, you could checkout this <a class="reference external" href="https://opensource.com/business/14/7/guide-docker">tutorial</a>.</p>
-<p>First you need to install docker and nvidia-docker. Follow <a class="reference external" href="https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce">docker</a> and <a class="reference external" href="https://github.com/NVIDIA/nvidia-docker">nvidia-docker</a> instructions.</p>
-<p>Then you need to clone the OpenChem repository to your desired local folder by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Mariewelt</span><span class="o">/</span><span class="n">OpenChem</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">OpenChem</span>
-</pre></div>
-</div>
-<p>Then run the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">build</span> <span class="o">.</span> <span class="o">-</span><span class="n">f</span> <span class="n">Dockerfile</span>
-</pre></div>
-</div>
-<p>Execution of this command may take some time. After it’s finished you will see a message similar to this one:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Successfully</span> <span class="n">built</span> <span class="n">a40247366e78</span>
-</pre></div>
-</div>
-<p>Now you can start you docker container with nvidia-docker by running:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nvidia</span><span class="o">-</span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">t</span> <span class="n">a40247366e78</span>
-</pre></div>
-</div>
-<p>Inside you docker container you will have everything you need to start building models with OpenChem.</p>
-</div>
-</div>
-
+  
 
            </div>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="how_to_run_tutorial.html" class="btn btn-neutral float-right" title="How to define and train models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="OpenChem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

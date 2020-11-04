@@ -6,6 +6,7 @@
 
    Introduction <self>
    installation_instructions
+   dl_glossary
    how_to_run_tutorial
    tutorials/blocks
    api-docs/blocks

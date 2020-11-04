@@ -33,7 +33,7 @@ First you need to install docker and nvidia-docker. Follow docker_ and nvidia-do
 .. _docker: https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce
 .. _nvidia-docker: https://github.com/NVIDIA/nvidia-docker
 
-Then you need to clone the Openchem repository to your desired local folder by::
+Then you need to clone the OpenChem repository to your desired local folder by::
 
     git clone https://github.com/Mariewelt/OpenChem.git
     cd OpenChem
