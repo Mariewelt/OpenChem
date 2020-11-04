@@ -58,7 +58,7 @@ conda install -c rdkit rdkit nox cairo
 conda install pytorch torchvision -c pytorch
 pip install -e .
 ```
-If your CUDA version is other than 10.0, check [Pytorch](https://pytorch.org) website for different installation instructions. 
+If your CUDA version is older than 9.0, check [Pytorch](https://pytorch.org) website for different installation instructions. 
 
 ## Installation with Docker
 Alternative way of installation is with Docker. We provide a Dockerfile, so you can run your models in a container that already has all the necessary packages installed. You will also need nvidia-docker in order to run models on GPU.
