@@ -46,6 +46,8 @@ class FeatureDataset(Dataset):
         self.target = target
         features, valid_idx, invalid_idx = get_features(smiles, **get_features_args)
         self.objects = [smiles[i] for i in valid_idx]
+        length = [len(sm) for sm in self.objects]
+        self.max_len = max(length)
         self.data = features
 
     def __len__(self):
@@ -55,6 +57,7 @@ class FeatureDataset(Dataset):
         sample = {}
         if self.return_smiles:
             object = self.objects[index]
+            object = object + " " * (self.max_len - len(object) + 1)
             sample['object'] = np.array([ord(c) for c in object])
         sample['features'] = self.data[index]
         if self.target is not None:

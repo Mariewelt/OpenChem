@@ -1,4 +1,5 @@
 # This config file provides an example of building a 2-layer perceptron for prediction of logP values
+import numpy as np
 
 from openchem.models.MLP2Label import MLP2Label
 from openchem.data.feature_data_layer import FeatureDataset
@@ -12,7 +13,30 @@ import torch.nn as nn
 from torch.optim import RMSprop, SGD, Adam
 from torch.optim.lr_scheduler import ExponentialLR, StepLR
 import torch.nn.functional as F
-from sklearn.metrics import r2_score, mean_squared_error
+
+from sklearn.metrics import r2_score
+from sklearn.model_selection import train_test_split
+
+
+from openchem.data.utils import read_smiles_property_file
+from openchem.data.utils import save_smiles_property_file
+
+
+data = read_smiles_property_file('./benchmark_datasets/logp_dataset/logP_labels.csv',
+                                 cols_to_read=[1, 2],
+                                 keep_header=False)
+
+smiles = data[0]
+labels = np.array(data[1:])
+labels = labels.T
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(smiles, labels, test_size=0.2,
+                                                    random_state=42)
+
+
+save_smiles_property_file('./benchmark_datasets/logp_dataset/train.smi', X_train, y_train)
+save_smiles_property_file('./benchmark_datasets/logp_dataset/test.smi', X_test, y_test)
 
 train_dataset = FeatureDataset(filename='./benchmark_datasets/logp_dataset/train.smi',
                                delimiter=',', cols_to_read=[0, 1],
@@ -22,8 +46,9 @@ test_dataset = FeatureDataset(filename='./benchmark_datasets/logp_dataset/test.s
                               get_features=get_fp, get_features_args={"n_bits": 2048})
 
 predict_dataset = FeatureDataset(filename='./benchmark_datasets/logp_dataset/test.smi',
-                                delimiter=',', cols_to_read=[0, 1],
-                                get_features=get_fp, get_features_args={"n_bits": 2048})
+                                delimiter=',', cols_to_read=[0],
+                                get_features=get_fp, get_features_args={"n_bits": 2048},
+                                return_smiles=True)
 
 model = MLP2Label
 
