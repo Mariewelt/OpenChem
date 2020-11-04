@@ -324,15 +324,20 @@ def predict(model, data_loader, eval=True):
         prediction = np.argmax(prediction, axis=1)
     f = open(logdir + "/predictions.txt", "w")
     assert len(prediction) == len(samples)
-    for i in range(len(prediction)):
-        tmp = [chr(c) for c in samples[i]]
-        tmp = ''.join(tmp)
-        if " " in tmp:
-            tmp = tmp[:tmp.index(" ")]
-        f.writelines(tmp + "," + str(prediction[i]) + "\n")
-    f.close()
 
     if comm.is_main_process():
+        for i in range(len(prediction)):
+            tmp = [chr(c) for c in samples[i]]
+            tmp = ''.join(tmp)
+            if " " in tmp:
+                tmp = tmp[:tmp.index(" ")]
+                to_write = [str(pred) for pred in prediction[i]]
+                to_write = ",".join(to_write)
+            f.writelines(tmp + "," + to_write + "\n")
+        f.close()
+
+    if comm.is_main_process():
+        textlogger.info('Predictions saved to ' + logdir + "/predictions.txt")
         textlogger.info(
             'PREDICTION: [Time: %s, Number of samples: %d]' % (time_since(start), len(prediction))
         )

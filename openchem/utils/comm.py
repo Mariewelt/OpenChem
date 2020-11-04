@@ -12,7 +12,7 @@ def get_world_size():
 
 def mkdir(path):
     if is_main_process():
-        os.mkdir(path)
+        os.makedirs(path)
     synchronize()
 
 
