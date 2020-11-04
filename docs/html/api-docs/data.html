@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="criterion" href="criterion.html" />
     <link rel="prev" title="layers" href="layers.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -142,7 +145,7 @@
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -236,94 +239,86 @@
 <span id="data"></span><h1>data<a class="headerlink" href="#module-data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-data.smiles_data_layer">
 <span id="smiles-data-layer"></span><h2>smiles_data_layer<a class="headerlink" href="#module-data.smiles_data_layer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="data.smiles_data_layer.SmilesDataset">
-<em class="property">class </em><code class="descclassname">data.smiles_data_layer.</code><code class="descname">SmilesDataset</code><span class="sig-paren">(</span><em>filename</em>, <em>cols_to_read</em>, <em>delimiter='</em>, <em>'</em>, <em>tokens=None</em>, <em>pad=True</em>, <em>tokenize=True</em>, <em>augment=False</em>, <em>flip=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_data_layer.html#SmilesDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_data_layer.SmilesDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">data.smiles_data_layer.</code><code class="sig-name descname">SmilesDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwds</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_data_layer.html#SmilesDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_data_layer.SmilesDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code></p>
 <p>Creates dataset for SMILES-property data.
 :param filename: string with full path to dataset file. Dataset file</p>
 <blockquote>
-<div>must be csv file.</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>cols_to_read</strong> (<em>list</em>) – list specifying columns to read from dataset file.
+<div><p>must be csv file.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cols_to_read</strong> (<em>list</em>) – list specifying columns to read from dataset file.
 Could be of various length, <cite>cols_to_read[0]</cite> will be used as index
 as index for column with SMILES, <cite>cols_to_read[1:]</cite> will be used as
-indices for labels values.</li>
-<li><strong>delimiter</strong> (<em>str</em>) – columns delimiter in <cite>filename</cite>. <cite>default</cite> is <cite>,</cite>.</li>
-<li><strong>tokens</strong> (<em>list</em>) – list of unique tokens from SMILES. If not specified, will
-be extracted from provided dataset.</li>
-<li><strong>pad</strong> (<em>bool</em>) – argument specifying whether to pad SMILES. If <cite>true</cite> SMILES
-will be padded from right and the flipped. <cite>default</cite> is <cite>True</cite>.</li>
-<li><strong>augment</strong> (<em>bool</em>) – argument specifying whether to augment SMILES.</li>
+indices for labels values.</p></li>
+<li><p><strong>delimiter</strong> (<em>str</em>) – columns delimiter in <cite>filename</cite>. <cite>default</cite> is <cite>,</cite>.</p></li>
+<li><p><strong>tokens</strong> (<em>list</em>) – list of unique tokens from SMILES. If not specified, will
+be extracted from provided dataset.</p></li>
+<li><p><strong>pad</strong> (<em>bool</em>) – argument specifying whether to pad SMILES. If <cite>true</cite> SMILES
+will be padded from right and the flipped. <cite>default</cite> is <cite>True</cite>.</p></li>
+<li><p><strong>augment</strong> (<em>bool</em>) – argument specifying whether to augment SMILES.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
-<div class="section" id="module-data.graph_data_layer">
-<span id="graph-data-layer"></span><h2>graph_data_layer<a class="headerlink" href="#module-data.graph_data_layer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="data.graph_data_layer.GraphDataset">
-<em class="property">class </em><code class="descclassname">data.graph_data_layer.</code><code class="descname">GraphDataset</code><span class="sig-paren">(</span><em>get_atomic_attributes</em>, <em>node_attributes</em>, <em>filename</em>, <em>cols_to_read</em>, <em>delimiter='</em>, <em>'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/graph_data_layer.html#GraphDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.graph_data_layer.GraphDataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code></p>
-</dd></dl>
-
+<div class="section" id="graph-data-layer">
+<h2>graph_data_layer<a class="headerlink" href="#graph-data-layer" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-data.smiles_protein_data_layer">
 <span id="smiles-protein-data-layer"></span><h2>smiles_protein_data_layer<a class="headerlink" href="#module-data.smiles_protein_data_layer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="data.smiles_protein_data_layer.SmilesProteinDataset">
-<em class="property">class </em><code class="descclassname">data.smiles_protein_data_layer.</code><code class="descname">SmilesProteinDataset</code><span class="sig-paren">(</span><em>filename</em>, <em>tokenized=False</em>, <em>cols_to_read=None</em>, <em>delimiter='</em>, <em>'</em>, <em>mol_tokens=None</em>, <em>prot_tokens=None</em>, <em>pad=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_protein_data_layer.html#SmilesProteinDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_protein_data_layer.SmilesProteinDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">data.smiles_protein_data_layer.</code><code class="sig-name descname">SmilesProteinDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwds</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_protein_data_layer.html#SmilesProteinDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_protein_data_layer.SmilesProteinDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code></p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-data.vanilla_data_layer">
 <span id="vanilla-data-layer"></span><h2>vanilla_data_layer<a class="headerlink" href="#module-data.vanilla_data_layer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="data.vanilla_data_layer.VanillaDataset">
-<em class="property">class </em><code class="descclassname">data.vanilla_data_layer.</code><code class="descname">VanillaDataset</code><span class="sig-paren">(</span><em>filename</em>, <em>cols_to_read</em>, <em>features</em>, <em>delimiter='</em>, <em>'</em>, <em>tokens=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/vanilla_data_layer.html#VanillaDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.vanilla_data_layer.VanillaDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">data.vanilla_data_layer.</code><code class="sig-name descname">VanillaDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">cols_to_read</span></em>, <em class="sig-param"><span class="n">features</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">','</span></em>, <em class="sig-param"><span class="n">tokens</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/vanilla_data_layer.html#VanillaDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.vanilla_data_layer.VanillaDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-data.smiles_enumerator">
 <span id="smiles-enumerator"></span><h2>smiles_enumerator<a class="headerlink" href="#module-data.smiles_enumerator" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="data.smiles_enumerator.Iterator">
-<em class="property">class </em><code class="descclassname">data.smiles_enumerator.</code><code class="descname">Iterator</code><span class="sig-paren">(</span><em>n</em>, <em>batch_size</em>, <em>shuffle</em>, <em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#Iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.Iterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">data.smiles_enumerator.</code><code class="sig-name descname">Iterator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">shuffle</span></em>, <em class="sig-param"><span class="n">seed</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#Iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.Iterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Abstract base class for data iterators.
 # Arguments</p>
 <blockquote>
-<div>n: Integer, total number of samples in the dataset to loop over.
+<div><p>n: Integer, total number of samples in the dataset to loop over.
 batch_size: Integer, size of a batch.
 shuffle: Boolean, whether to shuffle the data between epochs.
-seed: Random seeding for data shuffling.</div></blockquote>
-<dl class="method">
+seed: Random seeding for data shuffling.</p>
+</div></blockquote>
+<dl class="py method">
 <dt id="data.smiles_enumerator.Iterator.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#Iterator.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.Iterator.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#Iterator.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.Iterator.reset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="data.smiles_enumerator.SmilesEnumerator">
-<em class="property">class </em><code class="descclassname">data.smiles_enumerator.</code><code class="descname">SmilesEnumerator</code><span class="sig-paren">(</span><em>charset='&#64;C)(=cOn1S2/H[N]\'</em>, <em>pad=120</em>, <em>leftpad=True</em>, <em>isomericSmiles=True</em>, <em>enum=True</em>, <em>canonical=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">data.smiles_enumerator.</code><code class="sig-name descname">SmilesEnumerator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">charset</span><span class="o">=</span><span class="default_value">'&#64;C)(=cOn1S2/H[N]\\'</span></em>, <em class="sig-param"><span class="n">pad</span><span class="o">=</span><span class="default_value">120</span></em>, <em class="sig-param"><span class="n">leftpad</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">isomericSmiles</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">enum</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">canonical</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>SMILES Enumerator, vectorizer and devectorizer
 #Arguments</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>charset: string containing the characters for the vectorization</dt>
-<dd>can also be generated via the .fit() method</dd>
+<div><dl class="simple">
+<dt>charset: string containing the characters for the vectorization</dt><dd><p>can also be generated via the .fit() method</p>
+</dd>
 </dl>
 <p>pad: Length of the vectorization
 leftpad: Add spaces to the left of the SMILES
@@ -331,57 +326,60 @@ isomericSmiles: Generate SMILES containing information about stereogenic centers
 enum: Enumerate the SMILES during transform
 canonical: use canonical SMILES during transform (overrides enum)</p>
 </div></blockquote>
-<dl class="attribute">
+<dl class="py method">
 <dt id="data.smiles_enumerator.SmilesEnumerator.charset">
-<code class="descname">charset</code><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.charset" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">charset</code><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.charset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="data.smiles_enumerator.SmilesEnumerator.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>smiles</em>, <em>extra_chars=[]</em>, <em>extra_pad=5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">extra_chars</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">extra_pad</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs extraction of the charset and length of a SMILES datasets
 and sets self.pad and self.charset
 #Arguments</p>
 <blockquote>
-<div>smiles: Numpy array or Pandas series containing smiles as strings
+<div><p>smiles: Numpy array or Pandas series containing smiles as strings
 extra_chars: List of extra chars to add to the charset
-(e.g. “&quot; when “/” is present)
+(e.g. “\” when “/” is present)
 extra_pad: Extra padding to add before or after the
-SMILES vectorization</div></blockquote>
+SMILES vectorization</p>
+</div></blockquote>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="data.smiles_enumerator.SmilesEnumerator.randomize_smiles">
-<code class="descname">randomize_smiles</code><span class="sig-paren">(</span><em>smiles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.randomize_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.randomize_smiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">randomize_smiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.randomize_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.randomize_smiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a randomization of a SMILES string
 must be RDKit sanitizable</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="data.smiles_enumerator.SmilesEnumerator.reverse_transform">
-<code class="descname">reverse_transform</code><span class="sig-paren">(</span><em>vect</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.reverse_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.reverse_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reverse_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vect</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.reverse_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.reverse_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a conversion of a vectorized SMILES to a smiles strings
 charset must be the same as used for vectorization.
 #Arguments</p>
 <blockquote>
-<div>vect: Numpy array of vectorized SMILES.</div></blockquote>
+<div><p>vect: Numpy array of vectorized SMILES.</p>
+</div></blockquote>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="data.smiles_enumerator.SmilesEnumerator.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>smiles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesEnumerator.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesEnumerator.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform an enumeration (randomization) and vectorization of
 a Numpy array of smiles strings
 #Arguments</p>
 <blockquote>
-<div>smiles: Numpy array or Pandas series containing smiles as strings</div></blockquote>
+<div><p>smiles: Numpy array or Pandas series containing smiles as strings</p>
+</div></blockquote>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="data.smiles_enumerator.SmilesIterator">
-<em class="property">class </em><code class="descclassname">data.smiles_enumerator.</code><code class="descname">SmilesIterator</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>smiles_data_generator</em>, <em>batch_size=32</em>, <em>shuffle=False</em>, <em>seed=None</em>, <em>dtype=&lt;class 'numpy.float32'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">data.smiles_enumerator.</code><code class="sig-name descname">SmilesIterator</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">smiles_data_generator</em>, <em class="sig-param">batch_size=32</em>, <em class="sig-param">shuffle=False</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">dtype=&lt;class 'numpy.float32'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data.smiles_enumerator.Iterator" title="data.smiles_enumerator.Iterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">data.smiles_enumerator.Iterator</span></code></a></p>
 <p>Iterator yielding data from a SMILES array.
 # Arguments</p>
@@ -390,20 +388,22 @@ a Numpy array of smiles strings
 y: Numpy array of targets data.
 smiles_data_generator: Instance of <cite>SmilesEnumerator</cite></p>
 <blockquote>
-<div>to use for random SMILES generation.</div></blockquote>
+<div><p>to use for random SMILES generation.</p>
+</div></blockquote>
 <p>batch_size: Integer, size of a batch.
 shuffle: Boolean, whether to shuffle the data between epochs.
 seed: Random seed for data shuffling.
 dtype: dtype to use for returned batch.
 Set to keras.backend.floatx if using Keras</p>
 </div></blockquote>
-<dl class="method">
+<dl class="py method">
 <dt id="data.smiles_enumerator.SmilesIterator.next">
-<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesIterator.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesIterator.next" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/smiles_enumerator.html#SmilesIterator.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.smiles_enumerator.SmilesIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>For python 2.x.
 # Returns</p>
 <blockquote>
-<div>The next batch.</div></blockquote>
+<div><p>The next batch.</p>
+</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -411,47 +411,63 @@ Set to keras.backend.floatx if using Keras</p>
 </div>
 <div class="section" id="module-data.utils">
 <span id="utils"></span><h2>utils<a class="headerlink" href="#module-data.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py class">
+<dt id="data.utils.DummyDataLoader">
+<em class="property">class </em><code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">DummyDataLoader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#DummyDataLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.DummyDataLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="data.utils.DummyDataset">
+<em class="property">class </em><code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">DummyDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwds</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#DummyDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.DummyDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code></p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="data.utils.augment_smiles">
-<code class="descclassname">data.utils.</code><code class="descname">augment_smiles</code><span class="sig-paren">(</span><em>smiles</em>, <em>labels</em>, <em>n_augment=5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#augment_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.augment_smiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">augment_smiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">n_augment</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#augment_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.augment_smiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="data.utils.canonize_smiles">
-<code class="descclassname">data.utils.</code><code class="descname">canonize_smiles</code><span class="sig-paren">(</span><em>smiles</em>, <em>sanitize=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#canonize_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.canonize_smiles" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Takes list of SMILES strings and returns list of their canonical SMILES.</dt>
-<dd><dl class="first docutils">
-<dt>Args:</dt>
-<dd>smiles (list): list of SMILES strings
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">canonize_smiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">sanitize</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#canonize_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.canonize_smiles" title="Permalink to this definition">¶</a></dt>
+<dd><dl>
+<dt>Takes list of SMILES strings and returns list of their canonical SMILES.</dt><dd><dl class="simple">
+<dt>Args:</dt><dd><p>smiles (list): list of SMILES strings
 sanitize (bool): parameter specifying whether to sanitize
 SMILES or not.
 For definition of sanitized SMILES check
-www.rdkit.org/docs/api/rdkit.Chem.rdmolops-module.html#SanitizeMol</dd>
-<dt>Output:</dt>
-<dd>new_smiles (list): list of canonical SMILES and NaNs
+www.rdkit.org/docs/api/rdkit.Chem.rdmolops-module.html#SanitizeMol</p>
+</dd>
+<dt>Output:</dt><dd><p>new_smiles (list): list of canonical SMILES and NaNs
 if SMILES string is invalid or unsanitized
-(when ‘sanitize = True’)</dd>
+(when ‘sanitize = True’)</p>
+</dd>
 </dl>
-<p class="last">When ‘sanitize = True’ the function is analogous to:
+<p>When ‘sanitize = True’ the function is analogous to:
 sanitize_smiles(smiles, canonize=True).</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="data.utils.create_loader">
-<code class="descclassname">data.utils.</code><code class="descname">create_loader</code><span class="sig-paren">(</span><em>dataset</em>, <em>batch_size</em>, <em>shuffle=True</em>, <em>num_workers=1</em>, <em>pin_memory=False</em>, <em>sampler=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#create_loader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.create_loader" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">create_loader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">shuffle</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">num_workers</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pin_memory</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sampler</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#create_loader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.create_loader" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="data.utils.cut_padding">
-<code class="descclassname">data.utils.</code><code class="descname">cut_padding</code><span class="sig-paren">(</span><em>samples</em>, <em>lengths</em>, <em>padding='left'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#cut_padding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.cut_padding" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">cut_padding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">samples</span></em>, <em class="sig-param"><span class="n">lengths</span></em>, <em class="sig-param"><span class="n">padding</span><span class="o">=</span><span class="default_value">'left'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#cut_padding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.cut_padding" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
+<dt id="data.utils.get_fp">
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">get_fp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">n_bits</span><span class="o">=</span><span class="default_value">2048</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#get_fp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.get_fp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="data.utils.get_tokens">
-<code class="descclassname">data.utils.</code><code class="descname">get_tokens</code><span class="sig-paren">(</span><em>smiles</em>, <em>tokens=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#get_tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.get_tokens" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">get_tokens</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">tokens</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#get_tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.get_tokens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns list of unique tokens, token-2-index dictionary and
 number of unique tokens from the list of SMILES
 :param smiles: list of SMILES strings to tokenize.
@@ -459,106 +475,125 @@ number of unique tokens from the list of SMILES
 :param tokens: string of tokens or None.
 :type tokens: string
 :param If none will be extracted from dataset.:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of unique tokens/SMILES alphabet.
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of unique tokens/SMILES alphabet.
 token2idx (dict): dictionary mapping token to its index.
-num_tokens (int): number of unique tokens.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tokens (list)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="data.utils.pad_sequences">
-<code class="descclassname">data.utils.</code><code class="descname">pad_sequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>max_length=None</em>, <em>pad_symbol=' '</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#pad_sequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.pad_sequences" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="data.utils.read_smi_file">
-<code class="descclassname">data.utils.</code><code class="descname">read_smi_file</code><span class="sig-paren">(</span><em>filename</em>, <em>unique=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#read_smi_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.read_smi_file" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div>Reads SMILES from file. File must contain one SMILES string per line
-with</div></blockquote>
-<dl class="docutils">
-<dt>token in the end of the line.</dt>
-<dd><dl class="first docutils">
-<dt>Args:</dt>
-<dd>filename (str): path to the file
-unique (bool): return only unique SMILES</dd>
-<dt>Returns:</dt>
-<dd>smiles (list): list of SMILES strings from specified file.
-success (bool): defines whether operation
-was successfully completed or not.</dd>
-</dl>
-<p class="last">If ‘unique=True’ this list contains only unique copies.</p>
+num_tokens (int): number of unique tokens.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tokens (list)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="data.utils.read_smiles_property_file">
-<code class="descclassname">data.utils.</code><code class="descname">read_smiles_property_file</code><span class="sig-paren">(</span><em>path</em>, <em>cols_to_read</em>, <em>delimiter='</em>, <em>'</em>, <em>keep_header=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#read_smiles_property_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.read_smiles_property_file" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt id="data.utils.mol2image">
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">mol2image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">2048</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#mol2image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.mol2image" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
+<dt id="data.utils.pad_sequences">
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">pad_sequences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seqs</span></em>, <em class="sig-param"><span class="n">max_length</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pad_symbol</span><span class="o">=</span><span class="default_value">' '</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#pad_sequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.pad_sequences" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data.utils.process_graphs">
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">process_graphs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">node_attributes</span></em>, <em class="sig-param"><span class="n">get_atomic_attributes</span></em>, <em class="sig-param"><span class="n">edge_attributes</span></em>, <em class="sig-param"><span class="n">get_bond_attributes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kekulize</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#process_graphs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.process_graphs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data.utils.process_smiles">
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">process_smiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">sanitized</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">augment</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pad</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tokenize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">tokens</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flip</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">allowed_tokens</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#process_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.process_smiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data.utils.read_smi_file">
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">read_smi_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">unique</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#read_smi_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.read_smi_file" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Reads SMILES from file. File must contain one SMILES string per line
+with</p>
+</div></blockquote>
+<dl>
+<dt>token in the end of the line.</dt><dd><dl class="simple">
+<dt>Args:</dt><dd><p>filename (str): path to the file
+unique (bool): return only unique SMILES</p>
+</dd>
+<dt>Returns:</dt><dd><p>smiles (list): list of SMILES strings from specified file.
+success (bool): defines whether operation
+was successfully completed or not.</p>
+</dd>
+</dl>
+<p>If ‘unique=True’ this list contains only unique copies.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data.utils.read_smiles_property_file">
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">read_smiles_property_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">cols_to_read</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">','</span></em>, <em class="sig-param"><span class="n">keep_header</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#read_smiles_property_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.read_smiles_property_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="data.utils.sanitize_smiles">
-<code class="descclassname">data.utils.</code><code class="descname">sanitize_smiles</code><span class="sig-paren">(</span><em>smiles</em>, <em>canonize=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#sanitize_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.sanitize_smiles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">sanitize_smiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">canonize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">min_atoms</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">max_atoms</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">return_num_atoms</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">allowed_tokens</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">allow_charges</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">return_max_len</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">logging</span><span class="o">=</span><span class="default_value">'warn'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#sanitize_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.sanitize_smiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes list of SMILES strings and returns list of their sanitized versions.
 For definition of sanitized SMILES check
 <a class="reference external" href="http://www.rdkit.org/docs/api/rdkit.Chem.rdmolops-module.html#SanitizeMol">http://www.rdkit.org/docs/api/rdkit.Chem.rdmolops-module.html#SanitizeMol</a></p>
 <blockquote>
-<div><dl class="docutils">
-<dt>Args:</dt>
-<dd>smiles (list): list of SMILES strings
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>smiles (list): list of SMILES strings
 canonize (bool): parameter specifying whether to return
-canonical SMILES or not.</dd>
-<dt>Output:</dt>
-<dd>new_smiles (list): list of SMILES and NaNs if SMILES string is
+canonical SMILES or not.
+min_atoms (int): minimum allowed number of atoms
+max_atoms (int): maxumum allowed number of atoms
+return_num_atoms (bool): return additional array of atom numbers
+allowed_tokens (iterable, optional): allowed tokens set
+allow_charges (bool): allow nonzero charges of atoms
+logging (“warn”, “info”, “none”): logging level</p>
+</dd>
+<dt>Output:</dt><dd><p>new_smiles (list): list of SMILES and NaNs if SMILES string is
 invalid or unsanitized.
-If ‘canonize = True’, return list of canonical SMILES.</dd>
+If ‘canonize = True’, return list of canonical SMILES.</p>
+</dd>
 </dl>
 <p>When ‘canonize = True’ the function is analogous to:
 canonize_smiles(smiles, sanitize=True).</p>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="data.utils.save_smi_to_file">
-<code class="descclassname">data.utils.</code><code class="descname">save_smi_to_file</code><span class="sig-paren">(</span><em>filename</em>, <em>smiles</em>, <em>unique=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#save_smi_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.save_smi_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">save_smi_to_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">unique</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#save_smi_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.save_smi_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes path to file and list of SMILES strings and writes SMILES
 to the specified file.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>Args:</dt>
-<dd>filename (str): path to the file
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>filename (str): path to the file
 smiles (list): list of SMILES strings
 unique (bool): parameter specifying whether to write
-only unique copies or not.</dd>
-<dt>Output:</dt>
-<dd>success (bool): defines whether operation
-was successfully completed or not.</dd>
+only unique copies or not.</p>
+</dd>
+<dt>Output:</dt><dd><p>success (bool): defines whether operation
+was successfully completed or not.</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="data.utils.save_smiles_property_file">
-<code class="descclassname">data.utils.</code><code class="descname">save_smiles_property_file</code><span class="sig-paren">(</span><em>path</em>, <em>smiles</em>, <em>labels</em>, <em>delimiter='</em>, <em>'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#save_smiles_property_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.save_smiles_property_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">save_smiles_property_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">','</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#save_smiles_property_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.save_smiles_property_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="data.utils.seq2tensor">
-<code class="descclassname">data.utils.</code><code class="descname">seq2tensor</code><span class="sig-paren">(</span><em>seqs</em>, <em>tokens</em>, <em>flip=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#seq2tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.seq2tensor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">seq2tensor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seqs</span></em>, <em class="sig-param"><span class="n">tokens</span></em>, <em class="sig-param"><span class="n">flip</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#seq2tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.seq2tensor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="data.utils.time_since">
-<code class="descclassname">data.utils.</code><code class="descname">time_since</code><span class="sig-paren">(</span><em>since</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#time_since"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.time_since" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">data.utils.</code><code class="sig-name descname">time_since</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">since</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/data/utils.html#time_since"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.utils.time_since" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -575,7 +610,7 @@ was successfully completed or not.</dd>
         <a href="criterion.html" class="btn btn-neutral float-right" title="criterion" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="layers.html" class="btn btn-neutral" title="layers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="layers.html" class="btn btn-neutral float-left" title="layers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -584,7 +619,7 @@ was successfully completed or not.</dd>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -601,33 +636,16 @@ was successfully completed or not.</dd>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

@@ -17,32 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -140,7 +143,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -159,7 +162,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -228,18 +231,21 @@
             
   <h1>Source code for models.openchem_model</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.nn.utils</span> <span class="k">import</span> <span class="n">clip_grad_norm_</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn.utils</span> <span class="kn">import</span> <span class="n">clip_grad_norm_</span>
 <span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">openchem.utils.utils</span> <span class="k">import</span> <span class="n">check_params</span>
+<span class="kn">from</span> <span class="nn">openchem.utils.utils</span> <span class="kn">import</span> <span class="n">check_params</span>
 
 <span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">openchem.utils.logger</span> <span class="k">import</span> <span class="n">Logger</span>
-<span class="kn">from</span> <span class="nn">openchem.utils.utils</span> <span class="k">import</span> <span class="n">time_since</span><span class="p">,</span> <span class="n">calculate_metrics</span>
-<span class="kn">from</span> <span class="nn">openchem.optimizer.openchem_optimizer</span> <span class="k">import</span> <span class="n">OpenChemOptimizer</span>
-<span class="kn">from</span> <span class="nn">openchem.optimizer.openchem_lr_scheduler</span> <span class="k">import</span> <span class="n">OpenChemLRScheduler</span>
+<span class="kn">from</span> <span class="nn">openchem.utils</span> <span class="kn">import</span> <span class="n">comm</span>
+<span class="kn">from</span> <span class="nn">tensorboardX</span> <span class="kn">import</span> <span class="n">SummaryWriter</span>
+<span class="kn">from</span> <span class="nn">openchem.utils.utils</span> <span class="kn">import</span> <span class="n">time_since</span><span class="p">,</span> <span class="n">calculate_metrics</span>
+<span class="kn">from</span> <span class="nn">openchem.optimizer.openchem_optimizer</span> <span class="kn">import</span> <span class="n">OpenChemOptimizer</span>
+<span class="kn">from</span> <span class="nn">openchem.optimizer.openchem_lr_scheduler</span> <span class="kn">import</span> <span class="n">OpenChemLRScheduler</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -249,56 +255,59 @@
 <span class="sd">    :func:&#39;cast&#39; inputs must be overridden for every class, that inherits from</span>
 <span class="sd">    OpenChemModel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">OpenChemModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">check_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_params</span><span class="p">(),</span>
-                     <span class="bp">self</span><span class="o">.</span><span class="n">get_optional_params</span><span class="p">())</span>
+        <span class="n">check_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_params</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_optional_params</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;use_cuda&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;eval_metrics&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">eval_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;eval_metrics&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">eval_metrics</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;eval_metrics&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;task&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;logdir&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">world_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;world_size&#39;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_epochs&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">use_clip_grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;use_clip_grad&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;use_clip_grad&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_clip_grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;use_clip_grad&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_clip_grad</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_clip_grad</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">max_grad_norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_grad_norm&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">max_grad_norm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;random_seed&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">print_every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;print_every&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;save_every&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="OpenChemModel.get_required_params"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.get_required_params">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_required_params</span><span class="p">():</span>
-        <span class="k">return</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;task&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="s1">&#39;num_epochs&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s1">&#39;train_data_layer&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;val_data_layer&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="OpenChemModel.get_optional_params"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.get_optional_params">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_optional_params</span><span class="p">():</span>
-        <span class="k">return</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;use_cuda&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
             <span class="s1">&#39;use_clip_grad&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
             <span class="s1">&#39;max_grad_norm&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s1">&#39;random_seed&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="s1">&#39;print_every&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="s1">&#39;save_every&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
             <span class="s1">&#39;lr_scheduler&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;lr_scheduler_params&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
             <span class="s1">&#39;eval_metrics&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s1">&#39;logdir&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;logdir&#39;</span><span class="p">:</span> <span class="nb">str</span>
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="OpenChemModel.forward"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inp</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="OpenChemModel.cast_inputs"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.cast_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">cast_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+<div class="viewcode-block" id="OpenChemModel.cast_inputs"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.cast_inputs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cast_inputs</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">use_cuda</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="OpenChemModel.load_model"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.load_model">[docs]</a>    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
@@ -308,145 +317,262 @@
 <div class="viewcode-block" id="OpenChemModel.save_model"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.OpenChemModel.save_model">[docs]</a>    <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">path</span><span class="p">)</span></div></div>
 
-        
+
 <div class="viewcode-block" id="build_training"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.build_training">[docs]</a><span class="k">def</span> <span class="nf">build_training</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
-    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">OpenChemOptimizer</span><span class="p">([</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">],</span>
-                                   <span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer_params&#39;</span><span class="p">]],</span>
-                                  <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-    
-    <span class="k">if</span> <span class="s1">&#39;lr_scheduler&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">OpenChemLRScheduler</span><span class="p">([</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;lr_scheduler&#39;</span><span class="p">],</span>
-                                            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;lr_scheduler_params&#39;</span><span class="p">]],</span>
-                                            <span class="n">optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">OpenChemOptimizer</span><span class="p">([</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;optimizer_params&#39;</span><span class="p">]],</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+    <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">OpenChemLRScheduler</span><span class="p">([</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;lr_scheduler&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;lr_scheduler_params&#39;</span><span class="p">]],</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
     <span class="n">use_cuda</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;use_cuda&#39;</span><span class="p">]</span>
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;criterion&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">use_cuda</span><span class="p">:</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-    <span class="c1"># train_loader = params[&#39;train_loader&#39;]</span>
-    <span class="c1"># val_loader = params[&#39;val_loader&#39;]</span>
-    <span class="k">return</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_scheduler</span> <span class="c1">#, train_loader, val_loader</span></div>
+    <span class="k">return</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">lr_scheduler</span></div>
 
 
 <div class="viewcode-block" id="train_step"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.train_step">[docs]</a><span class="k">def</span> <span class="nf">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">inp</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">use_clip_grad</span><span class="p">:</span>
-        <span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">max_grad_norm</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">set_detect_anomaly</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">has_module</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">):</span>
+            <span class="n">has_module</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">has_module</span><span class="p">:</span>
+            <span class="n">use_clip_grad</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">use_clip_grad</span>
+            <span class="n">max_grad_norm</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">max_grad_norm</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">use_clip_grad</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">use_clip_grad</span>
+            <span class="n">max_grad_norm</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">max_grad_norm</span>
+        <span class="k">if</span> <span class="n">use_clip_grad</span><span class="p">:</span>
+            <span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">max_grad_norm</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">loss</span></div>
 
 
-<div class="viewcode-block" id="print_logs"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.print_logs">[docs]</a><span class="k">def</span> <span class="nf">print_logs</span><span class="p">(</span><span class="n">world_size</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">world_size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="fit"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.fit">[docs]</a><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span>
-        <span class="nb">eval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">val_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">cur_epoch</span> <span class="o">=</span> <span class="mi">0</span>
+<div class="viewcode-block" id="fit"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.fit">[docs]</a><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">val_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cur_epoch</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">textlogger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;openchem.fit&quot;</span><span class="p">)</span>
     <span class="n">logdir</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;logdir&#39;</span><span class="p">]</span>
     <span class="n">print_every</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;print_every&#39;</span><span class="p">]</span>
     <span class="n">save_every</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;save_every&#39;</span><span class="p">]</span>
     <span class="n">n_epochs</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_epochs&#39;</span><span class="p">]</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">logdir</span> <span class="o">+</span> <span class="s1">&#39;/tensorboard_log/&#39;</span><span class="p">)</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">()</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">loss_total</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">n_batches</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">scheduler</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">scheduler</span>
+    <span class="n">schedule_by_iter</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">by_iteration</span>
+    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">scheduler</span>
     <span class="n">all_losses</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">val_losses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">has_module</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">):</span>
+        <span class="n">has_module</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">world_size</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cur_epoch</span><span class="p">,</span> <span class="n">n_epochs</span> <span class="o">+</span> <span class="n">cur_epoch</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">cur_epoch</span><span class="p">,</span> <span class="n">n_epochs</span> <span class="o">+</span> <span class="n">cur_epoch</span><span class="p">)):</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">):</span>
-            <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">)</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span>
-                              <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">reduced_loss</span> <span class="o">=</span> <span class="n">reduce_tensor</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">world_size</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">has_module</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">task</span>
+                <span class="n">use_cuda</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">use_cuda</span>
+                <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">use_cuda</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">reduced_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-            <span class="n">loss_total</span> <span class="o">+=</span> <span class="n">reduced_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">task</span>
+                <span class="n">use_cuda</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">use_cuda</span>
+                <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">use_cuda</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">schedule_by_iter</span><span class="p">:</span>
+                <span class="c1"># steps are in iters</span>
+                <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">reduced_loss</span> <span class="o">=</span> <span class="n">reduce_tensor</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reduced_loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">loss_total</span> <span class="o">+=</span> <span class="n">reduced_loss</span>
             <span class="n">n_batches</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">cur_loss</span> <span class="o">=</span> <span class="n">loss_total</span> <span class="o">/</span> <span class="n">n_batches</span>
         <span class="n">all_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_loss</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">print_logs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">world_size</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TRAINING: [Time: </span><span class="si">%s</span><span class="s1">, Epoch: </span><span class="si">%d</span><span class="s1">, Progress: </span><span class="si">%d%%</span><span class="s1">, &#39;</span>
-                      <span class="s1">&#39;Loss: </span><span class="si">%.4f</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_since</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">epoch</span><span class="p">,</span>
-                                       <span class="n">epoch</span> <span class="o">/</span> <span class="n">n_epochs</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">cur_loss</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">is_main_process</span><span class="p">():</span>
+                <span class="n">textlogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;TRAINING: [Time: </span><span class="si">%s</span><span class="s1">, Epoch: </span><span class="si">%d</span><span class="s1">, Progress: </span><span class="si">%d%%</span><span class="s1">, &#39;</span>
+                                <span class="s1">&#39;Loss: </span><span class="si">%.4f</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_since</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">epoch</span> <span class="o">/</span> <span class="n">n_epochs</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">cur_loss</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">eval</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">val_loader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                <span class="n">val_loss</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">)</span>
+                <span class="n">val_loss</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
                 <span class="n">val_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_loss</span><span class="p">)</span>
-                <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Train loss&#39;</span><span class="p">:</span> <span class="n">cur_loss</span><span class="p">,</span> <span class="s1">&#39;Validation loss&#39;</span><span class="p">:</span> <span class="n">val_loss</span><span class="p">,</span>
-                        <span class="s1">&#39;Validation metrics&#39;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">,</span>
-                        <span class="s1">&#39;LR&#39;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">]}</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;Train loss&#39;</span><span class="p">:</span> <span class="n">cur_loss</span><span class="p">,</span>
+                    <span class="s1">&#39;Validation loss&#39;</span><span class="p">:</span> <span class="n">val_loss</span><span class="p">,</span>
+                    <span class="s1">&#39;Validation metrics&#39;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">,</span>
+                    <span class="s1">&#39;LR&#39;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">]</span>
+                <span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Train loss&#39;</span><span class="p">:</span> <span class="n">cur_loss</span><span class="p">,</span>
-                        <span class="s1">&#39;LR&#39;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">]}</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Train loss&#39;</span><span class="p">:</span> <span class="n">cur_loss</span><span class="p">,</span> <span class="s1">&#39;LR&#39;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">]}</span>
 
-            <span class="k">if</span> <span class="n">print_logs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">world_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">is_main_process</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">scalar_summary</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
                     <span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">histo_summary</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-                                         <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">histo_summary</span><span class="p">(</span><span class="n">tag</span> <span class="o">+</span> <span class="s1">&#39;/grad&#39;</span><span class="p">,</span>
-                                         <span class="n">value</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-                                         <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="k">except</span><span class="p">:</span>
-                        <span class="k">pass</span>
+                    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-3</span> <span class="ow">or</span> \
+                            <span class="n">torch</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">():</span>
+                        <span class="n">textlogger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning: </span><span class="si">{}</span><span class="s2"> has zero variance &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;(i.e. constant vector)&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">log_value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+                        <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">log_value</span><span class="p">,</span> <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="c1">#logger.histo_summary(</span>
+                        <span class="c1">#    tag, log_value, epoch + 1)</span>
+                        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: </span><span class="si">{}</span><span class="s2"> grad is undefined&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">log_value_grad</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+                            <span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="n">tag</span> <span class="o">+</span> <span class="s2">&quot;/grad&quot;</span><span class="p">,</span> <span class="n">log_value_grad</span><span class="p">,</span> <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">save_every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">print_logs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">world_size</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">save_every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">comm</span><span class="o">.</span><span class="n">is_main_process</span><span class="p">():</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">logdir</span> <span class="o">+</span> <span class="s1">&#39;/checkpoint/epoch_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
 
         <span class="n">loss_total</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">n_batches</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">schedule_by_iter</span><span class="p">:</span>
+            <span class="c1"># steps are in epochs</span>
             <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">all_losses</span><span class="p">,</span> <span class="n">val_losses</span></div>
 
 
-<div class="viewcode-block" id="evaluate"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.evaluate">[docs]</a><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">):</span>
+<div class="viewcode-block" id="evaluate"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.evaluate">[docs]</a><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">textlogger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;openchem.evaluate&quot;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">loss_total</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">n_batches</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">prediction</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">ground_truth</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">val_loader</span><span class="p">):</span>
-        <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">)</span>
-        <span class="n">predicted</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">batch_input</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">prediction</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">predicted</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-        <span class="n">ground_truth</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch_target</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="n">batch_target</span><span class="p">)</span>
-        <span class="n">loss_total</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="n">n_batches</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">has_module</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">):</span>
+        <span class="n">has_module</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">has_module</span><span class="p">:</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">task</span>
+        <span class="n">eval_metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">eval_metrics</span>
+        <span class="n">logdir</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">logdir</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">task</span>
+        <span class="n">eval_metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval_metrics</span>
+        <span class="n">logdir</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">logdir</span>
 
+    <span class="k">for</span> <span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_loader</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">has_module</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">task</span>
+            <span class="n">use_cuda</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">use_cuda</span>
+            <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">,</span>
+                                                                 <span class="n">task</span><span class="p">,</span>
+                                                                 <span class="n">use_cuda</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">task</span>
+            <span class="n">use_cuda</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">use_cuda</span>
+            <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_target</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">use_cuda</span><span class="p">)</span>
+        <span class="n">predicted</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_input</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="n">batch_target</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="s1">&#39;detach&#39;</span><span class="p">):</span>
+            <span class="n">predicted</span> <span class="o">=</span> <span class="n">predicted</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">batch_target</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+            <span class="n">batch_target</span> <span class="o">=</span> <span class="n">batch_target</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="s1">&#39;item&#39;</span><span class="p">):</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">prediction</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span>
+        <span class="n">ground_truth</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch_target</span><span class="p">)</span>
+        <span class="n">loss_total</span> <span class="o">+=</span> <span class="n">loss</span>
+        <span class="n">n_batches</span> <span class="o">+=</span> <span class="mi">1</span>
+    
     <span class="n">cur_loss</span> <span class="o">=</span> <span class="n">loss_total</span> <span class="o">/</span> <span class="n">n_batches</span>
-    <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
         <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">calculate_metrics</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">ground_truth</span><span class="p">,</span>
-                                <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">eval_metrics</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">print_logs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">world_size</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;EVALUATION: [Time: </span><span class="si">%s</span><span class="s1">, Loss: </span><span class="si">%.4f</span><span class="s1">, Metrics: </span><span class="si">%.4f</span><span class="s1">]&#39;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="n">time_since</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">cur_loss</span><span class="p">,</span> <span class="n">metrics</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;graph_generation&quot;</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">logdir</span> <span class="o">+</span> <span class="s2">&quot;debug_smiles_epoch_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.smi&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">metrics</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">calculate_metrics</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">ground_truth</span><span class="p">,</span> <span class="n">eval_metrics</span><span class="p">)</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">is_main_process</span><span class="p">():</span>
+        <span class="n">textlogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;EVALUATION: [Time: </span><span class="si">%s</span><span class="s1">, Loss: </span><span class="si">%.4f</span><span class="s1">, Metrics: </span><span class="si">%.4f</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_since</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">cur_loss</span><span class="p">,</span> <span class="n">metrics</span><span class="p">))</span>
+
     <span class="k">return</span> <span class="n">cur_loss</span><span class="p">,</span> <span class="n">metrics</span></div>
+
+
+<div class="viewcode-block" id="predict"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.predict">[docs]</a><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">textlogger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;openchem.predict&quot;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">has_module</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">):</span>
+        <span class="n">has_module</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">has_module</span><span class="p">:</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">task</span>
+        <span class="n">logdir</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">logdir</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">task</span>
+        <span class="n">logdir</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">logdir</span>
+
+    <span class="k">for</span> <span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_loader</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">has_module</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">task</span>
+            <span class="n">use_cuda</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">use_cuda</span>
+            <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">,</span>
+                                                                 <span class="n">task</span><span class="p">,</span>
+                                                                 <span class="n">use_cuda</span><span class="p">,</span>
+                                                                 <span class="n">for_prediction</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">task</span>
+            <span class="n">use_cuda</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">use_cuda</span>
+            <span class="n">batch_input</span><span class="p">,</span> <span class="n">batch_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cast_inputs</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">,</span>
+                                                          <span class="n">task</span><span class="p">,</span>
+                                                          <span class="n">use_cuda</span><span class="p">,</span>
+                                                          <span class="n">for_predction</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">predicted</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_input</span><span class="p">,</span> <span class="nb">eval</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="s1">&#39;detach&#39;</span><span class="p">):</span>
+            <span class="n">predicted</span> <span class="o">=</span> <span class="n">predicted</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">prediction</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch_object</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">logdir</span> <span class="o">+</span> <span class="s2">&quot;/predictions.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">is_main_process</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)):</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[:</span><span class="n">tmp</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)]</span>
+                <span class="n">to_write</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">prediction</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+                <span class="n">to_write</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">to_write</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">tmp</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">to_write</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">is_main_process</span><span class="p">():</span>
+        <span class="n">textlogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Predictions saved to &#39;</span> <span class="o">+</span> <span class="n">logdir</span> <span class="o">+</span> <span class="s2">&quot;/predictions.txt&quot;</span><span class="p">)</span>
+        <span class="n">textlogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;PREDICTION: [Time: </span><span class="si">%s</span><span class="s1">, Number of samples: </span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_since</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">))</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="reduce_tensor"><a class="viewcode-back" href="../../api-docs/models.html#models.openchem_model.reduce_tensor">[docs]</a><span class="k">def</span> <span class="nf">reduce_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">world_size</span><span class="p">):</span>
@@ -458,7 +584,7 @@
 <span class="sd">        world_size (int): number of processes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rt</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-    <span class="n">dist</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">reduce_op</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+    <span class="n">dist</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
     <span class="n">rt</span> <span class="o">/=</span> <span class="n">world_size</span>
     <span class="k">return</span> <span class="n">rt</span></div>
 </pre></div>
@@ -473,7 +599,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -490,33 +616,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

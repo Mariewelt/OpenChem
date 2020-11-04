@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="optimizer" href="optimizer.html" />
     <link rel="prev" title="data" href="data.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -142,7 +145,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -236,9 +239,9 @@
 <span id="criterion"></span><h1>criterion<a class="headerlink" href="#module-openchem.criterion" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-openchem.criterion.multitask_loss">
 <span id="multitask-loss"></span><h2>multitask_loss<a class="headerlink" href="#module-openchem.criterion.multitask_loss" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="openchem.criterion.multitask_loss.MultitaskLoss">
-<em class="property">class </em><code class="descclassname">openchem.criterion.multitask_loss.</code><code class="descname">MultitaskLoss</code><span class="sig-paren">(</span><em>ignore_index</em>, <em>n_tasks</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/criterion/multitask_loss.html#MultitaskLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.criterion.multitask_loss.MultitaskLoss" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openchem.criterion.multitask_loss.</code><code class="sig-name descname">MultitaskLoss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ignore_index</span></em>, <em class="sig-param"><span class="n">n_tasks</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/criterion/multitask_loss.html#MultitaskLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.criterion.multitask_loss.MultitaskLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.loss._WeightedLoss</span></code></p>
 <p>Creates a criterion that calculated binary cross-entropy loss over
 <cite>n_tasks</cite> tasks given input tensors <cite>input</cite> and <cite>target</cite>. Returns loss
@@ -246,50 +249,50 @@ averaged across number of samples in every task and across <cite>n_tasks</cite>.
 It is useful when training a classification model with <cite>n_tasks</cite>
 separate binary classes.</p>
 <p>The loss can be described as:</p>
-<dl class="docutils">
-<dt>..math::</dt>
-<dd>text{loss}(y, t) = -frac{1}{n_tasks}sum_{i=1}^{n_tasks}frac{1}{N_i}
+<dl class="simple">
+<dt>..math::</dt><dd><p>text{loss}(y, t) = -frac{1}{n_tasks}sum_{i=1}^{n_tasks}frac{1}{N_i}
 sum_{j=1}^{N_i} left(t[i, j]log(1-y[i, j])
-+ (1-t[i, j])log(1-y[i, j])right).</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ignore_index</strong> (<em>int</em>) – specifies a target value that is ignored
-and does not contribute to the gradient. For every task losses are
-averaged only across non-ignored targets.</li>
-<li><strong>n_tasks</strong> (<em>int</em>) – specifies number of tasks.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Shape:</dt>
-<dd><dl class="first docutils">
-<dt>-Input: :math: <cite>(N, n_tasks)</cite>. Values should be in <span class="math notranslate nohighlight">\([0, 1]\)</span> range,</dt>
-<dd>corresponding to probability of class :math:‘1’.</dd>
-<dt>-Target: :math: <cite>(N, n_tasks)</cite>. Values should be binary: either</dt>
-<dd><span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span>, corresponding to class labels.</dd>
-</dl>
-<p class="last">-Output: scalar.</p>
++ (1-t[i, j])log(1-y[i, j])right).</p>
 </dd>
 </dl>
-<dl class="method">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ignore_index</strong> (<em>int</em>) – specifies a target value that is ignored
+and does not contribute to the gradient. For every task losses are
+averaged only across non-ignored targets.</p></li>
+<li><p><strong>n_tasks</strong> (<em>int</em>) – specifies number of tasks.</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Shape:</dt><dd><dl class="simple">
+<dt>-Input: :math: <cite>(N, n_tasks)</cite>. Values should be in <span class="math notranslate nohighlight">\([0, 1]\)</span> range,</dt><dd><p>corresponding to probability of class :math:’1’.</p>
+</dd>
+<dt>-Target: :math: <cite>(N, n_tasks)</cite>. Values should be binary: either</dt><dd><p><span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span>, corresponding to class labels.</p>
+</dd>
+</dl>
+<p>-Output: scalar.</p>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="openchem.criterion.multitask_loss.MultitaskLoss.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>input</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/criterion/multitask_loss.html#MultitaskLoss.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.criterion.multitask_loss.MultitaskLoss.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/criterion/multitask_loss.html#MultitaskLoss.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.criterion.multitask_loss.MultitaskLoss.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
+
+<dl class="py attribute">
+<dt id="openchem.criterion.multitask_loss.MultitaskLoss.reduction">
+<code class="sig-name descname">reduction</code><em class="property">: str</em><a class="headerlink" href="#openchem.criterion.multitask_loss.MultitaskLoss.reduction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -307,7 +310,7 @@ registered hooks while the latter silently ignores them.</p>
         <a href="optimizer.html" class="btn btn-neutral float-right" title="optimizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="data.html" class="btn btn-neutral" title="data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="data.html" class="btn btn-neutral float-left" title="data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -316,7 +319,7 @@ registered hooks while the latter silently ignores them.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -333,33 +336,16 @@ registered hooks while the latter silently ignores them.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

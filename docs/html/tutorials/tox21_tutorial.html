@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API documentation" href="../api-docs/blocks.html" />
     <link rel="prev" title="GraphCNN for predicting logP" href="gcnn_tutorial.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -142,7 +145,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api-docs/data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api-docs/utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -257,25 +260,25 @@
 </pre></div>
 </div>
 <p>We will also extract unique tokens from the whole dataset before splitting it into train and test in order to avoid the situation, when some of the tokens will not be present in one of the pieces of the dataset:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="k">import</span> <span class="n">get_tokens</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="kn">import</span> <span class="n">get_tokens</span>
 <span class="n">tokens</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_tokens</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
 <span class="n">tokens</span> <span class="o">=</span> <span class="n">tokens</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
 </pre></div>
 </div>
 <p>Now we will split data into training and test:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
                                                     <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>And save train and test splits to new files with OpenChem <code class="docutils literal notranslate"><span class="pre">save_smiles_property_file</span></code> utility:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="k">import</span> <span class="n">save_smiles_property_file</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="kn">import</span> <span class="n">save_smiles_property_file</span>
 <span class="n">save_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/tox21/train.smi&#39;</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 <span class="n">save_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/tox21/test.smi&#39;</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now you can create SMILES data layer from input files. We will pass tokens as an argument for data layer. We will also use data augmentation by SMILES <a class="reference external" href="https://arxiv.org/abs/1703.07076">enumeration</a>. The idea behind it is to include non-canonical notation for SMILES. Augmentation is enabled by setting the argument <code class="docutils literal notranslate"><span class="pre">augment=True</span></code> when creating an object of class <code class="xref py py-class docutils literal notranslate"><span class="pre">SmilesDataset</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.graph_data_layer</span> <span class="k">import</span> <span class="n">SmilesDataset</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.graph_data_layer</span> <span class="kn">import</span> <span class="n">SmilesDataset</span>
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">SmilesDataset</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/tox21/train.smi&#39;</span><span class="p">,</span>
                               <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">13</span><span class="p">)),</span>
                               <span class="n">tokens</span><span class="o">=</span><span class="n">tokens</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -290,7 +293,7 @@
 <h2>Defining evaluation function<a class="headerlink" href="#defining-evaluation-function" title="Permalink to this headline">¶</a></h2>
 <p>We will also need to implement our own evaluation function for calculating classification accuracy separately for each task. As an accuracy metrics we will use AUC:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">multitask_auc</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">predicted</span><span class="p">):</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">ground_truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">)</span>
 <span class="n">predicted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span>
@@ -419,18 +422,18 @@
 <p>So, we trained a Multi-task Recurrent Neural Network for predicting biological activity for 12 receptors from tox21 challenge with mean AUC of ~0.84.</p>
 <p>If we want to calculate per target AUC, we will need to change the external metrics function a little bit – for example, by just adding the print statement to print per target AUCs. So, with this model we obtain the following per target AUCs on test set:</p>
 <ul class="simple">
-<li>NR-AR 0.85</li>
-<li>NR-AR-LBD 0.90</li>
-<li>NR-AhR 0.87</li>
-<li>NR-Aromatase 0.84</li>
-<li>NR-ER 0.76</li>
-<li>NR-ER-LBD 0.82</li>
-<li>NR-PPAR-gamma 0.80</li>
-<li>SR-ARE 0.78</li>
-<li>SR-ATAD5 0.85</li>
-<li>SR-HSE 0.84</li>
-<li>SR-MMP 0.87</li>
-<li>SR-p53 0.86</li>
+<li><p>NR-AR 0.85</p></li>
+<li><p>NR-AR-LBD 0.90</p></li>
+<li><p>NR-AhR 0.87</p></li>
+<li><p>NR-Aromatase 0.84</p></li>
+<li><p>NR-ER 0.76</p></li>
+<li><p>NR-ER-LBD 0.82</p></li>
+<li><p>NR-PPAR-gamma 0.80</p></li>
+<li><p>SR-ARE 0.78</p></li>
+<li><p>SR-ATAD5 0.85</p></li>
+<li><p>SR-HSE 0.84</p></li>
+<li><p>SR-MMP 0.87</p></li>
+<li><p>SR-p53 0.86</p></li>
 </ul>
 </div>
 </div>
@@ -446,7 +449,7 @@
         <a href="../api-docs/blocks.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="gcnn_tutorial.html" class="btn btn-neutral" title="GraphCNN for predicting logP" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="gcnn_tutorial.html" class="btn btn-neutral float-left" title="GraphCNN for predicting logP" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -455,7 +458,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -472,33 +475,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

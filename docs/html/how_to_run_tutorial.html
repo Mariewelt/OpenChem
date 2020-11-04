@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Tutorials and Recipes" href="tutorials/blocks.html" />
     <link rel="prev" title="Installation instructions" href="installation_instructions.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -142,7 +145,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-docs/data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="api-docs/utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-docs/utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -247,15 +250,15 @@ distributed processes.</p>
 <div class="section" id="arguments-for-launch-py">
 <h2>Arguments for launch.py<a class="headerlink" href="#arguments-for-launch-py" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">--nproc_per_node</span></code> — number of processes per node. This should be equal to the number of GPUs on the node.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--nproc_per_node</span></code> — number of processes per node. This should be equal to the number of GPUs on the node.</p></li>
 </ul>
 </div>
 <div class="section" id="arguments-for-run-py">
 <h2>Arguments for run.py<a class="headerlink" href="#arguments-for-run-py" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">--config_gile</span></code> — path to python configuration file where model is defined.</li>
-<li><code class="docutils literal notranslate"><span class="pre">--mode</span></code> — “train”, “train_eval” or “eval”.</li>
-<li><code class="docutils literal notranslate"><span class="pre">--continue_learning</span></code> — if this argument is specified, training will be resumed from the latest checkpoint.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--config_gile</span></code> — path to python configuration file where model is defined.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--mode</span></code> — “train”, “train_eval” or “eval”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--continue_learning</span></code> — if this argument is specified, training will be resumed from the latest checkpoint.</p></li>
 </ul>
 </div>
 <div class="section" id="configuration-file">
@@ -263,19 +266,19 @@ distributed processes.</p>
 <p>Configuration file must contain <code class="docutils literal notranslate"><span class="pre">model</span></code>, which should be any class derived from <code class="xref py py-class docutils literal notranslate"><span class="pre">OpenChemModel</span></code> and <code class="docutils literal notranslate"><span class="pre">dictionary</span></code> <code class="docutils literal notranslate"><span class="pre">model_params</span></code>.</p>
 <p>Below is description of common parameters for all models that are not related to model architechture:</p>
 <ul class="simple">
-<li>task — <code class="docutils literal notranslate"><span class="pre">string</span></code>, specifies the task to be solved by the model. Could be <code class="docutils literal notranslate"><span class="pre">classification</span></code>, <code class="docutils literal notranslate"><span class="pre">regression</span></code> or <code class="docutils literal notranslate"><span class="pre">multitask</span></code>.</li>
-<li>train_data_layer — pytorch dataset for training data. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code>. OpenChem currently provides utilities for creating SMILES, Graph and MoleculeProtein datasets.</li>
-<li>val_data_layer — pytorch dataset for validation data. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> of <code class="docutils literal notranslate"><span class="pre">--mode=train</span></code>.</li>
-<li>print_every — <code class="docutils literal notranslate"><span class="pre">int</span></code>, how often logs will be printed.</li>
-<li>save_every — <code class="docutils literal notranslate"><span class="pre">int</span></code>, how often model will be saved to checkpoints.</li>
-<li>logdir — <code class="docutils literal notranslate"><span class="pre">string</span></code>, path to folder where model checkpoints and tensorboard log will be saved.</li>
-<li>use_clip_grad — <code class="docutils literal notranslate"><span class="pre">bool</span></code>, whether to use gradient clipping.</li>
-<li>max_grad_norm — <code class="docutils literal notranslate"><span class="pre">float</span></code>, maximum norm of parameters, if gradient clipping is used.</li>
-<li>batch_size — <code class="docutils literal notranslate"><span class="pre">int</span></code>, batch size.</li>
-<li>num_epochs — <code class="docutils literal notranslate"><span class="pre">int</span></code>, number of epochs for training. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code>.</li>
-<li>eval_metrics — user defined function, metrics for evaluation. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=train</span></code>. Python scikit learn package contains majority of the evaluation metrics you would probably like to use.</li>
-<li>criterion — pytorch loss, model loss.</li>
-<li>optimizer — pytorch optimizer, optimizer for training the model. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code></li>
+<li><p>task — <code class="docutils literal notranslate"><span class="pre">string</span></code>, specifies the task to be solved by the model. Could be <code class="docutils literal notranslate"><span class="pre">classification</span></code>, <code class="docutils literal notranslate"><span class="pre">regression</span></code> or <code class="docutils literal notranslate"><span class="pre">multitask</span></code>.</p></li>
+<li><p>train_data_layer — pytorch dataset for training data. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code>. OpenChem currently provides utilities for creating SMILES, Graph and MoleculeProtein datasets.</p></li>
+<li><p>val_data_layer — pytorch dataset for validation data. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> of <code class="docutils literal notranslate"><span class="pre">--mode=train</span></code>.</p></li>
+<li><p>print_every — <code class="docutils literal notranslate"><span class="pre">int</span></code>, how often logs will be printed.</p></li>
+<li><p>save_every — <code class="docutils literal notranslate"><span class="pre">int</span></code>, how often model will be saved to checkpoints.</p></li>
+<li><p>logdir — <code class="docutils literal notranslate"><span class="pre">string</span></code>, path to folder where model checkpoints and tensorboard log will be saved.</p></li>
+<li><p>use_clip_grad — <code class="docutils literal notranslate"><span class="pre">bool</span></code>, whether to use gradient clipping.</p></li>
+<li><p>max_grad_norm — <code class="docutils literal notranslate"><span class="pre">float</span></code>, maximum norm of parameters, if gradient clipping is used.</p></li>
+<li><p>batch_size — <code class="docutils literal notranslate"><span class="pre">int</span></code>, batch size.</p></li>
+<li><p>num_epochs — <code class="docutils literal notranslate"><span class="pre">int</span></code>, number of epochs for training. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code>.</p></li>
+<li><p>eval_metrics — user defined function, metrics for evaluation. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=train</span></code>. Python scikit learn package contains majority of the evaluation metrics you would probably like to use.</p></li>
+<li><p>criterion — pytorch loss, model loss.</p></li>
+<li><p>optimizer — pytorch optimizer, optimizer for training the model. Could be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">--mode=eval</span></code></p></li>
 </ul>
 <p>Other parameters are specific to model architecture. Check out <a class="reference internal" href="tutorials/blocks.html#api-docs"><span class="std std-ref">API documentation</span></a> and other tutorials.</p>
 </div>
@@ -308,7 +311,7 @@ distributed processes.</p>
         <a href="tutorials/blocks.html" class="btn btn-neutral float-right" title="Tutorials and Recipes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="installation_instructions.html" class="btn btn-neutral" title="Installation instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="installation_instructions.html" class="btn btn-neutral float-left" title="Installation instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -317,7 +320,7 @@ distributed processes.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -334,33 +337,16 @@ distributed processes.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

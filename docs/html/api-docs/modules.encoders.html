@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="embeddings" href="modules.embeddings.html" />
     <link rel="prev" title="modules" href="modules.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -142,7 +145,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -238,33 +241,38 @@
 <span id="encoders"></span><h1>encoders<a class="headerlink" href="#module-modules.encoders" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-modules.encoders.openchem_encoder">
 <span id="openchem-encoder"></span><h2>openchem_encoder<a class="headerlink" href="#module-modules.encoders.openchem_encoder" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="modules.encoders.openchem_encoder.OpenChemEncoder">
-<em class="property">class </em><code class="descclassname">modules.encoders.openchem_encoder.</code><code class="descname">OpenChemEncoder</code><span class="sig-paren">(</span><em>params</em>, <em>use_cuda=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">modules.encoders.openchem_encoder.</code><code class="sig-name descname">OpenChemEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>Base class for embedding module</p>
-<dl class="method">
+<dl class="py method">
 <dt id="modules.encoders.openchem_encoder.OpenChemEncoder.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="modules.encoders.openchem_encoder.OpenChemEncoder.get_optional_params">
-<em class="property">static </em><code class="descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder.get_optional_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder.get_optional_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="modules.encoders.openchem_encoder.OpenChemEncoder.get_required_params">
-<em class="property">static </em><code class="descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder.get_required_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/openchem_encoder.html#OpenChemEncoder.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder.get_required_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="modules.encoders.openchem_encoder.OpenChemEncoder.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#modules.encoders.openchem_encoder.OpenChemEncoder.training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -272,39 +280,45 @@ registered hooks while the latter silently ignores them.</p>
 </div>
 <div class="section" id="module-modules.encoders.rnn_encoder">
 <span id="rnn-encoder"></span><h2>rnn_encoder<a class="headerlink" href="#module-modules.encoders.rnn_encoder" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="modules.encoders.rnn_encoder.RNNEncoder">
-<em class="property">class </em><code class="descclassname">modules.encoders.rnn_encoder.</code><code class="descname">RNNEncoder</code><span class="sig-paren">(</span><em>params</em>, <em>use_cuda</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">modules.encoders.rnn_encoder.</code><code class="sig-name descname">RNNEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">use_cuda</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openchem.modules.encoders.openchem_encoder.OpenChemEncoder</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="modules.encoders.rnn_encoder.RNNEncoder.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>previous_hidden=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em>, <em class="sig-param"><span class="n">previous_hidden</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pack</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>inp: shape batch_size, seq_len, input_size
 previous_hidden: if given shape n_layers * num_directions,
 batch_size, embedding_dim.</p>
 <blockquote>
-<div>Initialized automatically if None</div></blockquote>
+<div><p>Initialized automatically if None</p>
+</div></blockquote>
 <p>return: embedded</p>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="modules.encoders.rnn_encoder.RNNEncoder.get_optional_params">
-<em class="property">static </em><code class="descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.get_optional_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.get_optional_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="modules.encoders.rnn_encoder.RNNEncoder.get_required_params">
-<em class="property">static </em><code class="descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.get_required_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.get_required_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="modules.encoders.rnn_encoder.RNNEncoder.init_cell">
-<code class="descname">init_cell</code><span class="sig-paren">(</span><em>batch_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.init_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.init_cell" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.init_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.init_cell" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="modules.encoders.rnn_encoder.RNNEncoder.init_hidden">
-<code class="descname">init_hidden</code><span class="sig-paren">(</span><em>batch_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.init_hidden"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.init_hidden" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_hidden</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/encoders/rnn_encoder.html#RNNEncoder.init_hidden"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.init_hidden" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="modules.encoders.rnn_encoder.RNNEncoder.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#modules.encoders.rnn_encoder.RNNEncoder.training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -329,7 +343,7 @@ batch_size, embedding_dim.</p>
         <a href="modules.embeddings.html" class="btn btn-neutral float-right" title="embeddings" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="modules.html" class="btn btn-neutral" title="modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-left" title="modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -338,7 +352,7 @@ batch_size, embedding_dim.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -355,33 +369,16 @@ batch_size, embedding_dim.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

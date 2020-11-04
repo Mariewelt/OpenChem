@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="mlp" href="modules.mlp.html" />
     <link rel="prev" title="encoders" href="modules.encoders.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -142,7 +145,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -238,32 +241,37 @@
 <span id="embeddings"></span><h1>embeddings<a class="headerlink" href="#module-modules.embeddings" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-modules.embeddings.openchem_embedding">
 <span id="openchem-embedding"></span><h2>openchem_embedding<a class="headerlink" href="#module-modules.embeddings.openchem_embedding" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="modules.embeddings.openchem_embedding.OpenChemEmbedding">
-<em class="property">class </em><code class="descclassname">modules.embeddings.openchem_embedding.</code><code class="descname">OpenChemEmbedding</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">modules.embeddings.openchem_embedding.</code><code class="sig-name descname">OpenChemEmbedding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="modules.embeddings.openchem_embedding.OpenChemEmbedding.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="modules.embeddings.openchem_embedding.OpenChemEmbedding.get_optional_params">
-<em class="property">static </em><code class="descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding.get_optional_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding.get_optional_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="modules.embeddings.openchem_embedding.OpenChemEmbedding.get_required_params">
-<em class="property">static </em><code class="descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding.get_required_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/openchem_embedding.html#OpenChemEmbedding.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding.get_required_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="modules.embeddings.openchem_embedding.OpenChemEmbedding.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#modules.embeddings.openchem_embedding.OpenChemEmbedding.training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -271,23 +279,33 @@ registered hooks while the latter silently ignores them.</p>
 </div>
 <div class="section" id="module-modules.embeddings.basic_embedding">
 <span id="basic-embedding"></span><h2>basic_embedding<a class="headerlink" href="#module-modules.embeddings.basic_embedding" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="modules.embeddings.basic_embedding.Embedding">
-<em class="property">class </em><code class="descclassname">modules.embeddings.basic_embedding.</code><code class="descname">Embedding</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/basic_embedding.html#Embedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.basic_embedding.Embedding" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">modules.embeddings.basic_embedding.</code><code class="sig-name descname">Embedding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/basic_embedding.html#Embedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.basic_embedding.Embedding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openchem.modules.embeddings.openchem_embedding.OpenChemEmbedding</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="modules.embeddings.basic_embedding.Embedding.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/basic_embedding.html#Embedding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.basic_embedding.Embedding.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/basic_embedding.html#Embedding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.basic_embedding.Embedding.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
+
+<dl class="py method">
+<dt id="modules.embeddings.basic_embedding.Embedding.get_required_params">
+<em class="property">static </em><code class="sig-name descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/modules/embeddings/basic_embedding.html#Embedding.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.embeddings.basic_embedding.Embedding.get_required_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="modules.embeddings.basic_embedding.Embedding.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#modules.embeddings.basic_embedding.Embedding.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -308,7 +326,7 @@ registered hooks while the latter silently ignores them.</p>
         <a href="modules.mlp.html" class="btn btn-neutral float-right" title="mlp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="modules.encoders.html" class="btn btn-neutral" title="encoders" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="modules.encoders.html" class="btn btn-neutral float-left" title="encoders" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -317,7 +335,7 @@ registered hooks while the latter silently ignores them.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -334,33 +352,16 @@ registered hooks while the latter silently ignores them.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */
