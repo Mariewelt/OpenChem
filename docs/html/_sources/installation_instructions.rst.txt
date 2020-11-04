@@ -6,15 +6,19 @@ Installation instructions
 General installation
 --------------------
 
-In order to get started you need to clone the repository to your local folder and install the requirements::
+In order to get started you need to clone the repository to your local folder and install the requirements.
+We recommend installation using Anaconda_::
 
     git clone https://github.com/Mariewelt/OpenChem.git
-    cd Openchem
+    cd OpenChem
+    conda create --name OpenChem python=3.7
+    conda activate OpenChem
     conda install --yes --file requirements.txt
     conda install -c rdkit rdkit nox cairo
     conda install pytorch torchvision -c pytorch
-    pip install tensorflow-gpu
+    pip install -e
 
+.. _Anaconda: https://www.anaconda.com/
 Installation with Docker
 -------------------------
 
@@ -32,7 +36,7 @@ First you need to install docker and nvidia-docker. Follow docker_ and nvidia-do
 Then you need to clone the Openchem repository to your desired local folder by::
 
     git clone https://github.com/Mariewelt/OpenChem.git
-    cd Openchem
+    cd OpenChem
 
 Then run the following command::
 

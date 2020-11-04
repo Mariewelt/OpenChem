@@ -113,21 +113,26 @@ won't be used for making predictions for new samples.
 
 * ``eval_metrics`` -- a user-provided function, that is used to calculated validation metrics during
 evaluation process. This function must follow scikit-learn defined signature ``fun(y_true, y_pred)``.
-In this example we are using ``sklearn.metrics.r2_score``
-https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html
+In this example we are using r2_ score.
+
+.. _r2: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html
 
 * ``criterion`` -- loss function to be optimized during the training. In this case we are using
 ``torch.nn.MSELoss()`` which is the mean squared error often used for regression problems.
 
-* ``optimizer`` -- optimization algorithm to be used for model training. In this case we are using
-``torch.optim.Adam`` https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam
+* ``optimizer`` -- optimization algorithm to be used for model training. In this case we are using Adam_
+optimizer.
+
+.. _Adam: https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam
 
 * ``optimizer_params`` -- dictionary of parameters for optimization algorithms. In this case we only
 specify learning rate. Full list of possible parameters can be looked up on PyTorch documentation
 page for the optimization algorithm.
 
-* ``lr_scheduler`` -- learning rate decay policy. In this case we use ``torch.optim.lr_scheduler.StepLR``.
+* ``lr_scheduler`` -- learning rate decay policy. In this case we use StepLR_.
 This policy decreases the learning rate by a fixed decay factor every specified number of steps.
+
+.. _StepLR: https://pytorch.org/docs/stable/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR
 
 * ``lr_scheduler_params`` -- dictionary of parameters for learning rate decay policy. Full list of
 possible parameters can be looked up on PyTorch documentation page for the chosen decay policy.

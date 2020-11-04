@@ -96,6 +96,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/getting_started.html">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/getting_started.html#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
@@ -242,13 +249,16 @@
 <h1>Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="general-installation">
 <h2>General installation<a class="headerlink" href="#general-installation" title="Permalink to this headline">¶</a></h2>
-<p>In order to get started you need to clone the repository to your local folder and install the requirements:</p>
+<p>In order to get started you need to clone the repository to your local folder and install the requirements.
+We recommend installation using <a class="reference external" href="https://www.anaconda.com/">Anaconda</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Mariewelt</span><span class="o">/</span><span class="n">OpenChem</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">Openchem</span>
+<span class="n">cd</span> <span class="n">OpenChem</span>
+<span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">OpenChem</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.7</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">OpenChem</span>
 <span class="n">conda</span> <span class="n">install</span> <span class="o">--</span><span class="n">yes</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 <span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">rdkit</span> <span class="n">rdkit</span> <span class="n">nox</span> <span class="n">cairo</span>
 <span class="n">conda</span> <span class="n">install</span> <span class="n">pytorch</span> <span class="n">torchvision</span> <span class="o">-</span><span class="n">c</span> <span class="n">pytorch</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">tensorflow</span><span class="o">-</span><span class="n">gpu</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span>
 </pre></div>
 </div>
 </div>
@@ -259,7 +269,7 @@ If you are new to Docker, you could checkout this <a class="reference external" 
 <p>First you need to install docker and nvidia-docker. Follow <a class="reference external" href="https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce">docker</a> and <a class="reference external" href="https://github.com/NVIDIA/nvidia-docker">nvidia-docker</a> instructions.</p>
 <p>Then you need to clone the Openchem repository to your desired local folder by:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Mariewelt</span><span class="o">/</span><span class="n">OpenChem</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">Openchem</span>
+<span class="n">cd</span> <span class="n">OpenChem</span>
 </pre></div>
 </div>
 <p>Then run the following command:</p>

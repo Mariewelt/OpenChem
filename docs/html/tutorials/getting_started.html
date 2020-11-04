@@ -35,7 +35,9 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GraphCNN for predicting logP" href="gcnn_tutorial.html" />
+    <link rel="prev" title="Tutorials and Recipes" href="blocks.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -79,7 +81,7 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation_instructions.html">Installation instructions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../installation_instructions.html#general-installation">General installation</a></li>
@@ -93,7 +95,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="blocks.html">Tutorials and Recipes</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#loading-data">Loading data</a></li>
@@ -213,6 +222,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="blocks.html">Tutorials and Recipes</a> &raquo;</li>
         
       <li>Getting started with building models in OpenChem</li>
     
@@ -344,23 +355,22 @@ is why <code class="docutils literal notranslate"><span class="pre">task</span><
 <li><p><code class="docutils literal notranslate"><span class="pre">eval_metrics</span></code> – a user-provided function, that is used to calculated validation metrics during</p></li>
 </ul>
 <p>evaluation process. This function must follow scikit-learn defined signature <code class="docutils literal notranslate"><span class="pre">fun(y_true,</span> <span class="pre">y_pred)</span></code>.
-In this example we are using <code class="docutils literal notranslate"><span class="pre">sklearn.metrics.r2_score</span></code>
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html">https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html</a></p>
+In this example we are using <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html">r2</a> score.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">criterion</span></code> – loss function to be optimized during the training. In this case we are using</p></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">torch.nn.MSELoss()</span></code> which is the mean squared error often used for regression problems.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">optimizer</span></code> – optimization algorithm to be used for model training. In this case we are using</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimizer</span></code> – optimization algorithm to be used for model training. In this case we are using <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam">Adam</a></p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">torch.optim.Adam</span></code> <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam">https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam</a></p>
+<p>optimizer.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">optimizer_params</span></code> – dictionary of parameters for optimization algorithms. In this case we only</p></li>
 </ul>
 <p>specify learning rate. Full list of possible parameters can be looked up on PyTorch documentation
 page for the optimization algorithm.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler</span></code> – learning rate decay policy. In this case we use <code class="docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler.StepLR</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler</span></code> – learning rate decay policy. In this case we use <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR">StepLR</a>.</p></li>
 </ul>
 <p>This policy decreases the learning rate by a fixed decay factor every specified number of steps.</p>
 <ul class="simple">
@@ -484,6 +494,15 @@ following command should be run from the command line:</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gcnn_tutorial.html" class="btn btn-neutral float-right" title="GraphCNN for predicting logP" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="blocks.html" class="btn btn-neutral float-left" title="Tutorials and Recipes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
