@@ -15,33 +15,32 @@ OpenChem also provides utilities for converting SMILES data into graphs. Check :
 
 Here is an examples of how attributes are defined::
 
-    from openchem.utils.graph import Attribute
+    def get_atomic_attributes(atom):
+    attr_dict = {}
+
+    atomic_num = atom.GetAtomicNum()
+    atomic_mapping = {5: 0, 7: 1, 6: 2, 8: 3, 9: 4, 15: 5, 16: 6, 17: 7, 35: 8,
+                      53: 9}
+    if atomic_num in atomic_mapping.keys():
+        attr_dict['atom_element'] = atomic_mapping[atomic_num]
+    else:
+        attr_dict['atom_element'] = 10
+    attr_dict['valence'] = atom.GetTotalValence()
+    attr_dict['charge'] = atom.GetFormalCharge()
+    attr_dict['hybridization'] = atom.GetHybridization().real
+    attr_dict['aromatic'] = int(atom.GetIsAromatic())
+    return attr_dict
+
     node_attributes = {}
     node_attributes['valence'] = Attribute('node', 'valence', one_hot=True, values=[1, 2, 3, 4, 5, 6])
     node_attributes['charge'] = Attribute('node', 'charge', one_hot=True, values=[-1, 0, 1, 2, 3, 4])
     node_attributes['hybridization'] = Attribute('node', 'hybridization',
-                                                  one_hot=True, values=[0, 1, 2, 3, 4, 5, 6, 7])
+                                                 one_hot=True, values=[0, 1, 2, 3, 4, 5, 6, 7])
     node_attributes['aromatic'] = Attribute('node', 'aromatic', one_hot=True,
-                                             values=[0, 1])
+                                            values=[0, 1])
     node_attributes['atom_element'] = Attribute('node', 'atom_element',
                                                 one_hot=True,
                                                 values=list(range(11)))
-
-    def get_atomic_attributes(atom):
-        attr_dict = {}
-        atomic_num = atom.GetAtomicNum()
-        atomic_mapping = {5: 0, 7: 1, 6: 2, 8: 3, 9: 4, 15: 5, 16: 6, 17: 7, 35: 8,
-                          53: 9}
-        if atomic_num in atomic_mapping.keys():
-            attr_dict['atom_element'] = atomic_mapping[atomic_num]
-        else:
-            attr_dict['atom_element'] = 10
-        attr_dict['valence'] = atom.GetTotalValence()
-        attr_dict['charge'] = atom.GetFormalCharge()
-        attr_dict['hybridization'] = atom.GetHybridization().real
-        attr_dict['aromatic'] = int(atom.GetIsAromatic())
-        return attr_dict
-
 
 
 Loading data
@@ -67,14 +66,12 @@ And save train and test splits to new files with OpenChem save_smiles_property_f
 
 Now you can create graph data layer from input files with SMILES and labels::
 
-    from openchem.data.graph_data_layer import GraphDataset
     train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-                           './benchmark_datasets/logp_dataset/train.csv',
-                           delimiter=',', cols_to_read=[0, 1])
+                                 './benchmark_datasets/logp_dataset/train.smi',
+                                 delimiter=',', cols_to_read=[0, 1])
     test_dataset = GraphDataset(get_atomic_attributes, node_attributes,
-                       './benchmark_datasets/logp_dataset/test.csv',
-                       delimiter=',', cols_to_read=[0, 1])
-
+                                 './benchmark_datasets/logp_dataset/test.smi',
+                                 delimiter=',', cols_to_read=[0, 1])
 
 Defining model architechture
 -----------------------------
@@ -99,11 +96,11 @@ This model consists of 5 layers of Graph Convolutions with the size of hidden la
 
     model_params = {
         'task': 'regression',
-        'data_layer': GraphDataset,
+        'random_seed': 42,
         'use_clip_grad': False,
-        'batch_size': 128,
-        'num_epochs': 200,
-        'logdir': './logs',
+        'batch_size': 256,
+        'num_epochs': 101,
+        'logdir': 'logs/logp_gcnn_logs',
         'print_every': 10,
         'save_every': 5,
         'train_data_layer': train_dataset,
@@ -112,29 +109,28 @@ This model consists of 5 layers of Graph Convolutions with the size of hidden la
         'criterion': nn.MSELoss(),
         'optimizer': Adam,
         'optimizer_params': {
-            'lr': 0.001,
+            'lr': 0.0005,
         },
         'lr_scheduler': StepLR,
         'lr_scheduler_params': {
             'step_size': 15,
-            'gamma': 0.5
+            'gamma': 0.8
         },
         'encoder': GraphCNNEncoder,
         'encoder_params': {
-            'input_size': train_dataset.num_features,
+            'input_size': train_dataset[0]["node_feature_matrix"].shape[1],
             'encoder_dim': 128,
             'n_layers': 5,
-            'hidden_size': [128, 128, 128, 128, 128],
+            'hidden_size': [128]*5,
         },
         'mlp': OpenChemMLP,
         'mlp_params': {
             'input_size': 128,
             'n_layers': 2,
             'hidden_size': [128, 1],
-            'activation': F.relu,
+            'activation': [F.relu, identity]
         }
     }
-
 
 All of the above code should be saved in a python file. We will call it ``logP_gcnn_config.py``.
 
