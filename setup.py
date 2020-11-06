@@ -21,7 +21,7 @@ setup_attrs = {
     'use_scm_version': True,
     'setup_requires': ['setuptools_scm'],
     'install_requires': [
-        'tensorboardX',
+        'tensorboard',
         'networkx',
         'tqdm',
         'torchani'
