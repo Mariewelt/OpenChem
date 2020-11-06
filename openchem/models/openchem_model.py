@@ -10,7 +10,7 @@ import time
 from tqdm import tqdm
 
 from openchem.utils import comm
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from openchem.utils.utils import time_since, calculate_metrics
 from openchem.optimizer.openchem_optimizer import OpenChemOptimizer
 from openchem.optimizer.openchem_lr_scheduler import OpenChemLRScheduler
