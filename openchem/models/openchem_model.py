@@ -26,6 +26,9 @@ class OpenChemModel(nn.Module):
     def __init__(self, params):
         super(OpenChemModel, self).__init__()
         check_params(params, self.get_required_params(), self.get_optional_params())
+        if 'lr_scheduler' not in params.keys():
+            params['lr_scheduler'] = None
+            params['lr_scheduler_params'] = None
         self.params = params
         self.use_cuda = self.params['use_cuda']
         self.batch_size = self.params['batch_size']
@@ -87,7 +90,6 @@ class OpenChemModel(nn.Module):
 
 
 def build_training(model, params):
-
     optimizer = OpenChemOptimizer([params['optimizer'], params['optimizer_params']], model.parameters())
     lr_scheduler = OpenChemLRScheduler([params['lr_scheduler'], params['lr_scheduler_params']], optimizer.optimizer)
     use_cuda = params['use_cuda']
@@ -205,9 +207,10 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params, eval=False
 
         loss_total = 0
         n_batches = 0
-        if not schedule_by_iter:
-            # steps are in epochs
-            scheduler.step()
+        if scheduler is not None:
+            if not schedule_by_iter:
+                # steps are in epochs
+                scheduler.step()
 
     return all_losses, val_losses
 

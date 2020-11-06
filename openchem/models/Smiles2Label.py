@@ -27,10 +27,6 @@ class Smiles2Label(OpenChemModel):
         self.mlp = self.params['mlp']
         self.mlp_params = self.params['mlp_params']
         self.MLP = self.mlp(self.mlp_params)
-        self.optimizer = OpenChemOptimizer([self.params['optimizer'], self.params['optimizer_params']],
-                                           self.parameters())
-        self.scheduler = OpenChemLRScheduler([self.params['lr_scheduler'], self.params['lr_scheduler_params']],
-                                             self.optimizer.optimizer)
 
     def forward(self, inp, eval=False):
         if eval:
