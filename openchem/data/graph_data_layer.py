@@ -11,7 +11,7 @@ from openchem.utils.graph import Graph
 
 from torch.utils.data import Dataset
 from openchem.data.utils import read_smiles_property_file, sanitize_smiles
-from openchem.utils.utils_3d import calculate_xyz, calculate_zmat
+#`from openchem.utils.utils_3d import calculate_xyz, calculate_zmat
 from rdkit import Chem
 
 from .graph_utils import bfs_seq, encode_adj
