@@ -136,10 +136,14 @@ class Graph:
             cur_features = []
             for attr_name in node.attributes_dict.keys():
                 cur_attr = all_atr_dict[attr_name]
-                if cur_attr.one_hot:
-                    cur_features += list(cur_attr.one_hot_dict[node.attributes_dict[cur_attr.name]])
-                else:
-                    cur_features += [node.attributes_dict[cur_attr.name]]
+                try:
+                    if cur_attr.one_hot:
+                        cur_features += list(cur_attr.one_hot_dict[node.attributes_dict[cur_attr.name]])
+                    else:
+                        cur_features += [node.attributes_dict[cur_attr.name]]
+                except:
+                    raise ValueError("Attribute name " + cur_attr.name + " encountered an invalid value: " +
+                          str(node.attributes_dict[cur_attr.name]) + " for molecule " + self.smiles)
             features.append(cur_features)
 
         features = np.array(features)
