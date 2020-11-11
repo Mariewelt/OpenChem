@@ -1,13 +1,13 @@
-# This config file provides an example of building a 2-layer perceptron for prediction of logP values
+# This config file provides an example of building a multi-layer perceptron for prediction of logP values
 import numpy as np
 
 from openchem.models.MLP2Label import MLP2Label
 from openchem.data.feature_data_layer import FeatureDataset
-
 from openchem.modules.mlp.openchem_mlp import OpenChemMLP
-
 from openchem.data.utils import get_fp
 from openchem.utils.utils import identity
+from openchem.data.utils import read_smiles_property_file
+from openchem.data.utils import save_smiles_property_file
 
 import torch.nn as nn
 from torch.optim import RMSprop, SGD, Adam
@@ -18,10 +18,6 @@ from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
 
 
-from openchem.data.utils import read_smiles_property_file
-from openchem.data.utils import save_smiles_property_file
-
-
 data = read_smiles_property_file('./benchmark_datasets/logp_dataset/logP_labels.csv',
                                  cols_to_read=[1, 2],
                                  keep_header=False)
@@ -30,10 +26,8 @@ smiles = data[0]
 labels = np.array(data[1:])
 labels = labels.T
 
-from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(smiles, labels, test_size=0.2,
                                                     random_state=42)
-
 
 save_smiles_property_file('./benchmark_datasets/logp_dataset/train.smi', X_train, y_train)
 save_smiles_property_file('./benchmark_datasets/logp_dataset/test.smi', X_test, y_test)
@@ -44,7 +38,6 @@ train_dataset = FeatureDataset(filename='./benchmark_datasets/logp_dataset/train
 test_dataset = FeatureDataset(filename='./benchmark_datasets/logp_dataset/test.smi',
                               delimiter=',', cols_to_read=[0, 1],
                               get_features=get_fp, get_features_args={"n_bits": 2048})
-
 predict_dataset = FeatureDataset(filename='./benchmark_datasets/logp_dataset/test.smi',
                                 delimiter=',', cols_to_read=[0],
                                 get_features=get_fp, get_features_args={"n_bits": 2048},
@@ -58,7 +51,7 @@ model_params = {
     'batch_size': 256,
     'num_epochs': 101,
     'logdir': 'logs/logp_mlp_logs',
-    'print_every': 10,
+    'print_every': 20,
     'save_every': 5,
     'train_data_layer': train_dataset,
     'val_data_layer': test_dataset,
