@@ -287,7 +287,7 @@
 <div class="section" id="loading-data">
 <h2>Loading data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
 <p>OpenChem provides log P dataset as a benchmark dataset, so you can load it from benchmark datasets folder with OpenChem <code class="docutils literal notranslate"><span class="pre">read_smiles_property_file</span></code> function:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="n">load</span> <span class="n">read_smiles_property_file</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="k">import</span> <span class="n">read_smiles_property_file</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">read_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/logP_labels.csv&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 <span class="n">smiles</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -299,9 +299,9 @@
 </pre></div>
 </div>
 <p>And save train and test splits to new files with OpenChem save_smiles_property_file utility:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="kn">import</span> <span class="n">save_smiles_property_file</span>
-<span class="n">save_smiles_property</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/train.smi&#39;</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">save_smiles_property</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/test.smi&#39;</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.utils</span> <span class="k">import</span> <span class="n">save_smiles_property_file</span>
+<span class="n">save_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/train.smi&#39;</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">save_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/test.smi&#39;</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now you can create graph data layer from input files with SMILES and labels:</p>
