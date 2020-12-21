@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="modules" href="modules.html" />
     <link rel="prev" title="API documentation" href="blocks.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -93,6 +96,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting_started.html">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
@@ -142,7 +152,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +171,7 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -236,77 +246,82 @@
 <span id="models"></span><h1>models<a class="headerlink" href="#module-models" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-models.openchem_model">
 <span id="openchem-model"></span><h2>openchem_model<a class="headerlink" href="#module-models.openchem_model" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="models.openchem_model.OpenChemModel">
-<em class="property">class </em><code class="descclassname">models.openchem_model.</code><code class="descname">OpenChemModel</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">models.openchem_model.</code><code class="sig-name descname">OpenChemModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>Base class for all OpenChem models. Function :func:’forward’ and
 :func:’cast’ inputs must be overridden for every class, that inherits from
 OpenChemModel.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="models.openchem_model.OpenChemModel.cast_inputs">
-<code class="descname">cast_inputs</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.cast_inputs" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">cast_inputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em>, <em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">use_cuda</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.cast_inputs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="models.openchem_model.OpenChemModel.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>eval=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em>, <em class="sig-param"><span class="n">eval</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="models.openchem_model.OpenChemModel.get_optional_params">
-<em class="property">static </em><code class="descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.get_optional_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_optional_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.get_optional_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.get_optional_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="models.openchem_model.OpenChemModel.get_required_params">
-<em class="property">static </em><code class="descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.get_required_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_required_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.get_required_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.get_required_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="models.openchem_model.OpenChemModel.load_model">
-<code class="descname">load_model</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.load_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.load_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.load_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="models.openchem_model.OpenChemModel.save_model">
-<code class="descname">save_model</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.save_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.save_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">save_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#OpenChemModel.save_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.OpenChemModel.save_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="models.openchem_model.OpenChemModel.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.openchem_model.OpenChemModel.training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="models.openchem_model.build_training">
-<code class="descclassname">models.openchem_model.</code><code class="descname">build_training</code><span class="sig-paren">(</span><em>model</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#build_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.build_training" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">models.openchem_model.</code><code class="sig-name descname">build_training</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#build_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.build_training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="models.openchem_model.evaluate">
-<code class="descclassname">models.openchem_model.</code><code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>val_loader</em>, <em>criterion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">models.openchem_model.</code><code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">data_loader</span></em>, <em class="sig-param"><span class="n">criterion</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">epoch</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="models.openchem_model.fit">
-<code class="descclassname">models.openchem_model.</code><code class="descname">fit</code><span class="sig-paren">(</span><em>model</em>, <em>scheduler</em>, <em>train_loader</em>, <em>optimizer</em>, <em>criterion</em>, <em>params</em>, <em>eval=False</em>, <em>val_loader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">models.openchem_model.</code><code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">scheduler</span></em>, <em class="sig-param"><span class="n">train_loader</span></em>, <em class="sig-param"><span class="n">optimizer</span></em>, <em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">eval</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">val_loader</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cur_epoch</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
-<dt id="models.openchem_model.print_logs">
-<code class="descclassname">models.openchem_model.</code><code class="descname">print_logs</code><span class="sig-paren">(</span><em>world_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#print_logs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.print_logs" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt id="models.openchem_model.predict">
+<code class="sig-prename descclassname">models.openchem_model.</code><code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">data_loader</span></em>, <em class="sig-param"><span class="n">eval</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.predict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="models.openchem_model.reduce_tensor">
-<code class="descclassname">models.openchem_model.</code><code class="descname">reduce_tensor</code><span class="sig-paren">(</span><em>tensor</em>, <em>world_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#reduce_tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.reduce_tensor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">models.openchem_model.</code><code class="sig-name descname">reduce_tensor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tensor</span></em>, <em class="sig-param"><span class="n">world_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#reduce_tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.reduce_tensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reduces input ‘’tensor’’ across all processes in such a way that everyone
 gets the sum of ‘’tensor’’ from all of the processes.
 :param tensor: data to be reduced.
@@ -315,57 +330,59 @@ gets the sum of ‘’tensor’’ from all of the processes.
 :type world_size: int</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="models.openchem_model.train_step">
-<code class="descclassname">models.openchem_model.</code><code class="descname">train_step</code><span class="sig-paren">(</span><em>model</em>, <em>optimizer</em>, <em>criterion</em>, <em>inp</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#train_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.train_step" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">models.openchem_model.</code><code class="sig-name descname">train_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">optimizer</span></em>, <em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">inp</span></em>, <em class="sig-param"><span class="n">target</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/openchem_model.html#train_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.openchem_model.train_step" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-models.Smiles2Label">
 <span id="smiles2label"></span><h2>Smiles2Label<a class="headerlink" href="#module-models.Smiles2Label" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="models.Smiles2Label.Smiles2Label">
-<em class="property">class </em><code class="descclassname">models.Smiles2Label.</code><code class="descname">Smiles2Label</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">models.Smiles2Label.</code><code class="sig-name descname">Smiles2Label</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openchem.models.openchem_model.OpenChemModel</span></code></p>
 <p>Creates a model that predicts one or multiple labels given string of
 characters as input. Embeddings for input sequences are extracted with
 Embedding layer, followed by encoder (could be RNN or CNN encoder).
 Last layer of the model is multi-layer perceptron.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>dict</em>) – dictionary describing model architecture.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em>) – dictionary describing model architecture.</p>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="models.Smiles2Label.Smiles2Label.cast_inputs">
-<code class="descname">cast_inputs</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">cast_inputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em>, <em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">use_cuda</span></em>, <em class="sig-param"><span class="n">for_prediction</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="models.Smiles2Label.Smiles2Label.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>eval=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em>, <em class="sig-param"><span class="n">eval</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Smiles2Label.html#Smiles2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Smiles2Label.Smiles2Label.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="models.Smiles2Label.Smiles2Label.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.Smiles2Label.Smiles2Label.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
 <div class="section" id="module-models.Graph2Label">
 <span id="graph2label"></span><h2>Graph2Label<a class="headerlink" href="#module-models.Graph2Label" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="models.Graph2Label.Graph2Label">
-<em class="property">class </em><code class="descclassname">models.Graph2Label.</code><code class="descname">Graph2Label</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Graph2Label.html#Graph2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Graph2Label.Graph2Label" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">models.Graph2Label.</code><code class="sig-name descname">Graph2Label</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Graph2Label.html#Graph2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Graph2Label.Graph2Label" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openchem.models.openchem_model.OpenChemModel</span></code></p>
 <p>Creates a model that predicts one or multiple labels given object of
 class graph as input. Consists of ‘graph convolution neural network
@@ -373,73 +390,77 @@ encoder’__, followed by ‘graph max pooling layer’__ and
 multilayer perceptron.</p>
 <p>__https://arxiv.org/abs/1609.02907
 __https://pubs.acs.org/doi/full/10.1021/acscentsci.6b00367</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>dict</em>) – dictionary of parameters describing the model
-architecture.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em>) – dictionary of parameters describing the model
+architecture.</p>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="models.Graph2Label.Graph2Label.cast_inputs">
-<code class="descname">cast_inputs</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Graph2Label.html#Graph2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Graph2Label.Graph2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">cast_inputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em>, <em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">use_cuda</span></em>, <em class="sig-param"><span class="n">for_prediction</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Graph2Label.html#Graph2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Graph2Label.Graph2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="models.Graph2Label.Graph2Label.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>eval=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Graph2Label.html#Graph2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Graph2Label.Graph2Label.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em>, <em class="sig-param"><span class="n">eval</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/Graph2Label.html#Graph2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.Graph2Label.Graph2Label.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
+
+<dl class="py attribute">
+<dt id="models.Graph2Label.Graph2Label.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.Graph2Label.Graph2Label.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
 </div>
 <div class="section" id="module-models.MoleculeProtein2Label">
 <span id="moleculeprotein2label"></span><h2>MoleculeProtein2Label<a class="headerlink" href="#module-models.MoleculeProtein2Label" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="models.MoleculeProtein2Label.MoleculeProtein2Label">
-<em class="property">class </em><code class="descclassname">models.MoleculeProtein2Label.</code><code class="descname">MoleculeProtein2Label</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">models.MoleculeProtein2Label.</code><code class="sig-name descname">MoleculeProtein2Label</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openchem.models.openchem_model.OpenChemModel</span></code></p>
 <p>Creates a model that predicts one or multiple labels given two sequences as
 input. Embeddings for each input are extracted separately with Embedding
 layer, followed by encoder (could be RNN or CNN encoder) and then merged
 together. Last layer of the model is multi-layer perceptron.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>dict</em>) – dictionary describing model architecture.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em>) – dictionary describing model architecture.</p>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="models.MoleculeProtein2Label.MoleculeProtein2Label.cast_inputs">
-<code class="descname">cast_inputs</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cast_inputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label.cast_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label.cast_inputs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="models.MoleculeProtein2Label.MoleculeProtein2Label.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>inp</em>, <em>eval=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em>, <em class="sig-param"><span class="n">eval</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/models/MoleculeProtein2Label.html#MoleculeProtein2Label.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although the recipe for forward pass needs to be defined within
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
 this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
 instead of this since the former takes care of running the
 registered hooks while the latter silently ignores them.</p>
 </div>
 </dd></dl>
+
+<dl class="py attribute">
+<dt id="models.MoleculeProtein2Label.MoleculeProtein2Label.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.MoleculeProtein2Label.MoleculeProtein2Label.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -460,7 +481,7 @@ registered hooks while the latter silently ignores them.</p>
         <a href="modules.html" class="btn btn-neutral float-right" title="modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="blocks.html" class="btn btn-neutral" title="API documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="blocks.html" class="btn btn-neutral float-left" title="API documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -469,7 +490,7 @@ registered hooks while the latter silently ignores them.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -486,33 +507,16 @@ registered hooks while the latter silently ignores them.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

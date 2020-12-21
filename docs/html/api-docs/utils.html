@@ -17,33 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="optimizer" href="optimizer.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -92,6 +95,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting_started.html">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting_started.html#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
@@ -141,7 +151,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -160,7 +170,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -235,140 +245,126 @@
 <span id="utils"></span><h1>utils<a class="headerlink" href="#module-openchem.utils" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-openchem.utils.graph">
 <span id="graph"></span><h2>graph<a class="headerlink" href="#module-openchem.utils.graph" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="openchem.utils.graph.Attribute">
-<em class="property">class </em><code class="descclassname">openchem.utils.graph.</code><code class="descname">Attribute</code><span class="sig-paren">(</span><em>attr_type</em>, <em>name</em>, <em>one_hot=True</em>, <em>values=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Attribute" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openchem.utils.graph.</code><code class="sig-name descname">Attribute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attr_type</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">one_hot</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Attribute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="openchem.utils.graph.Edge">
-<em class="property">class </em><code class="descclassname">openchem.utils.graph.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>rdbond</em>, <em>get_bond_attributes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Edge" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openchem.utils.graph.</code><code class="sig-name descname">Edge</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rdbond</span></em>, <em class="sig-param"><span class="n">get_bond_attributes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="openchem.utils.graph.Graph">
-<em class="property">class </em><code class="descclassname">openchem.utils.graph.</code><code class="descname">Graph</code><span class="sig-paren">(</span><em>smiles</em>, <em>max_size</em>, <em>get_atom_attributes</em>, <em>get_bond_attributes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openchem.utils.graph.</code><code class="sig-name descname">Graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mol</span></em>, <em class="sig-param"><span class="n">max_size</span></em>, <em class="sig-param"><span class="n">get_atom_attributes</span></em>, <em class="sig-param"><span class="n">get_bond_attributes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kekulize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">addHs</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">has_3D</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">from_rdmol</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Describes an undirected graph class</p>
-<dl class="method">
+<dl class="py method">
 <dt id="openchem.utils.graph.Graph.get_edge_attr_adj_matrix">
-<code class="descname">get_edge_attr_adj_matrix</code><span class="sig-paren">(</span><em>attr</em>, <em>max_size</em>, <em>max_values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.get_edge_attr_adj_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.get_edge_attr_adj_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_edge_attr_adj_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">all_atr_dict</span></em>, <em class="sig-param"><span class="n">max_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.get_edge_attr_adj_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.get_edge_attr_adj_matrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="openchem.utils.graph.Graph.get_node_attr_adj_matrix">
-<code class="descname">get_node_attr_adj_matrix</code><span class="sig-paren">(</span><em>attr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.get_node_attr_adj_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.get_node_attr_adj_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_node_attr_adj_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.get_node_attr_adj_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.get_node_attr_adj_matrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="openchem.utils.graph.Graph.get_node_feature_matrix">
-<code class="descname">get_node_feature_matrix</code><span class="sig-paren">(</span><em>all_atr_dict</em>, <em>max_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.get_node_feature_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.get_node_feature_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_node_feature_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">all_atr_dict</span></em>, <em class="sig-param"><span class="n">max_size</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.get_node_feature_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.get_node_feature_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="openchem.utils.graph.Graph.xyz_to_zmat">
+<code class="sig-name descname">xyz_to_zmat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.xyz_to_zmat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.xyz_to_zmat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="openchem.utils.graph.Graph.zmat_to_xyz">
+<code class="sig-name descname">zmat_to_xyz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Graph.zmat_to_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Graph.zmat_to_xyz" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="openchem.utils.graph.Node">
-<em class="property">class </em><code class="descclassname">openchem.utils.graph.</code><code class="descname">Node</code><span class="sig-paren">(</span><em>idx</em>, <em>rdatom</em>, <em>get_atom_attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Node" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">openchem.utils.graph.</code><code class="sig-name descname">Node</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx</span></em>, <em class="sig-param"><span class="n">rdmol</span></em>, <em class="sig-param"><span class="n">get_atom_attributes</span></em>, <em class="sig-param"><span class="n">has_3D</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/graph.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.graph.Node" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
 <div class="section" id="id1">
 <h2>utils<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-openchem.utils.utils"></span><dl class="function">
+<span class="target" id="module-openchem.utils.utils"></span><dl class="py function">
 <dt id="openchem.utils.utils.calculate_metrics">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">calculate_metrics</code><span class="sig-paren">(</span><em>predicted</em>, <em>ground_truth</em>, <em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#calculate_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.calculate_metrics" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">calculate_metrics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicted</span></em>, <em class="sig-param"><span class="n">ground_truth</span></em>, <em class="sig-param"><span class="n">metrics</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#calculate_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.calculate_metrics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.check_params">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">check_params</code><span class="sig-paren">(</span><em>config</em>, <em>required_dict</em>, <em>optional_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#check_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.check_params" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">check_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">required_dict</span></em>, <em class="sig-param"><span class="n">optional_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#check_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.check_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.cross_validation_split">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">cross_validation_split</code><span class="sig-paren">(</span><em>data</em>, <em>targets</em>, <em>n_folds=5</em>, <em>split='random'</em>, <em>stratified=True</em>, <em>folds=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#cross_validation_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.cross_validation_split" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">cross_validation_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">n_folds</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">split</span><span class="o">=</span><span class="default_value">'random'</span></em>, <em class="sig-param"><span class="n">stratified</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">folds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#cross_validation_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.cross_validation_split" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.deco_print">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">deco_print</code><span class="sig-paren">(</span><em>line</em>, <em>offset=0</em>, <em>start='*** '</em>, <em>end='\n'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#deco_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.deco_print" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">deco_print</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">'*** '</span></em>, <em class="sig-param"><span class="n">end</span><span class="o">=</span><span class="default_value">'\n'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#deco_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.deco_print" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.flatten_dict">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">flatten_dict</code><span class="sig-paren">(</span><em>dct</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#flatten_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.flatten_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">flatten_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dct</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#flatten_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.flatten_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.get_latest_checkpoint">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">get_latest_checkpoint</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#get_latest_checkpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.get_latest_checkpoint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">get_latest_checkpoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#get_latest_checkpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.get_latest_checkpoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.identity">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">identity</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.identity" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">identity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.identity" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.make_positions">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">make_positions</code><span class="sig-paren">(</span><em>tensor</em>, <em>padding_idx</em>, <em>left_pad</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#make_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.make_positions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">make_positions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tensor</span></em>, <em class="sig-param"><span class="n">padding_idx</span></em>, <em class="sig-param"><span class="n">left_pad</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#make_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.make_positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace non-padding symbols with their position numbers.
 Position numbers begin at padding_idx+1.
 Padding symbols are ignored, but it is necessary to specify whether padding
 is added on the left side (left_pad=True) or right side (left_pad=False).</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.move_to_cuda">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">move_to_cuda</code><span class="sig-paren">(</span><em>sample</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#move_to_cuda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.move_to_cuda" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">move_to_cuda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#move_to_cuda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.move_to_cuda" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.nest_dict">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">nest_dict</code><span class="sig-paren">(</span><em>flat_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#nest_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.nest_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">nest_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">flat_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#nest_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.nest_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.nested_update">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">nested_update</code><span class="sig-paren">(</span><em>org_dict</em>, <em>upd_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#nested_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.nested_update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">nested_update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">org_dict</span></em>, <em class="sig-param"><span class="n">upd_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#nested_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.nested_update" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="openchem.utils.utils.time_since">
-<code class="descclassname">openchem.utils.utils.</code><code class="descname">time_since</code><span class="sig-paren">(</span><em>since</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#time_since"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.time_since" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openchem.utils.utils.</code><code class="sig-name descname">time_since</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">since</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/utils.html#time_since"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.utils.time_since" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-openchem.utils.logger">
-<span id="logger"></span><h2>logger<a class="headerlink" href="#module-openchem.utils.logger" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="openchem.utils.logger.Logger">
-<em class="property">class </em><code class="descclassname">openchem.utils.logger.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>log_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="openchem.utils.logger.Logger.histo_summary">
-<code class="descname">histo_summary</code><span class="sig-paren">(</span><em>tag</em>, <em>values</em>, <em>step</em>, <em>bins=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger.histo_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger.histo_summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log a histogram of the tensor of values.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openchem.utils.logger.Logger.image_summary">
-<code class="descname">image_summary</code><span class="sig-paren">(</span><em>tag</em>, <em>images</em>, <em>step</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger.image_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger.image_summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log a list of images.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="openchem.utils.logger.Logger.scalar_summary">
-<code class="descname">scalar_summary</code><span class="sig-paren">(</span><em>tag</em>, <em>value</em>, <em>step</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openchem/utils/logger.html#Logger.scalar_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#openchem.utils.logger.Logger.scalar_summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log a scalar variable.</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="logger">
+<h2>logger<a class="headerlink" href="#logger" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -381,7 +377,7 @@ is added on the left side (left_pad=True) or right side (left_pad=False).</p>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="optimizer.html" class="btn btn-neutral" title="optimizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="optimizer.html" class="btn btn-neutral float-left" title="optimizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -390,7 +386,7 @@ is added on the left side (left_pad=True) or right side (left_pad=False).</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -407,33 +403,16 @@ is added on the left side (left_pad=True) or right side (left_pad=False).</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

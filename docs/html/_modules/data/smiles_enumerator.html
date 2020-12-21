@@ -17,32 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -91,6 +94,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/blocks.html">Tutorials and Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/getting_started.html">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/getting_started.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/getting_started.html#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/getting_started.html#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/getting_started.html#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/gcnn_tutorial.html#loading-data">Loading data</a></li>
@@ -140,7 +150,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -159,7 +169,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api-docs/utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api-docs/utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -229,7 +239,7 @@
   <h1>Source code for data.smiles_enumerator</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Experimental Class for Smiles Enumeration, Iterator and SmilesIterator</span>
 <span class="c1"># adapted from Keras 1.2.2</span>
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="k">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 
@@ -242,8 +252,7 @@
 <span class="sd">        shuffle: Boolean, whether to shuffle the data between epochs.</span>
 <span class="sd">        seed: Random seeding for data shuffling.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
@@ -252,8 +261,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index_generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flow_index</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">batch_size</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data length is shorter than batch_size&#39;</span>
-                             <span class="s1">&#39;Adjust batch_size&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data length is shorter than batch_size&#39;</span> <span class="s1">&#39;Adjust batch_size&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Iterator.reset"><a class="viewcode-back" href="../../api-docs/data.html#data.smiles_enumerator.Iterator.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_index</span> <span class="o">=</span> <span class="mi">0</span></div>
@@ -277,16 +285,14 @@
                 <span class="n">current_batch_size</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">current_index</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">batch_index</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total_batches_seen</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">yield</span> <span class="p">(</span><span class="n">index_array</span><span class="p">[</span><span class="n">current_index</span><span class="p">:</span> <span class="n">current_index</span> <span class="o">+</span>
-                               <span class="n">current_batch_size</span><span class="p">],</span>
-                   <span class="n">current_index</span><span class="p">,</span> <span class="n">current_batch_size</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">index_array</span><span class="p">[</span><span class="n">current_index</span><span class="p">:</span><span class="n">current_index</span> <span class="o">+</span> <span class="n">current_batch_size</span><span class="p">],</span> <span class="n">current_index</span><span class="p">,</span> <span class="n">current_batch_size</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Needed if we want to do something like:</span>
         <span class="c1"># for x, y in data_gen.flow(...):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -303,16 +309,11 @@
 <span class="sd">        dtype: dtype to use for returned batch.</span>
 <span class="sd">        Set to keras.backend.floatx if using Keras</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">smiles_data_generator</span><span class="p">,</span>
-                 <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span>
-                 <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">smiles_data_generator</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;X (images tensor) and y (labels) &#39;</span>
                              <span class="s1">&#39;should have the same length. &#39;</span>
-                             <span class="s1">&#39;Found: X.shape = </span><span class="si">%s</span><span class="s1">, y.shape = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
-                             <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+                             <span class="s1">&#39;Found: X.shape = </span><span class="si">%s</span><span class="s1">, y.shape = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
@@ -322,8 +323,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">smiles_data_generator</span> <span class="o">=</span> <span class="n">smiles_data_generator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SmilesIterator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span>
-                                             <span class="n">seed</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SmilesIterator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SmilesIterator.next"><a class="viewcode-back" href="../../api-docs/data.html#data.smiles_enumerator.SmilesIterator.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;For python 2.x.</span>
@@ -337,10 +337,9 @@
                 <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index_generator</span><span class="p">)</span>
         <span class="c1"># The transformation of images is not under thread lock</span>
         <span class="c1"># so it can be done in parallel</span>
-        <span class="n">batch_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="nb">tuple</span><span class="p">([</span><span class="n">current_batch_size</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">smiles_data_generator</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span>
-                                          <span class="bp">self</span><span class="o">.</span><span class="n">smiles_data_generator</span><span class="o">.</span><span class="n">_charlen</span><span class="p">]),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">batch_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="n">current_batch_size</span><span class="p">]</span> <span class="o">+</span>
+                                 <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">smiles_data_generator</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_data_generator</span><span class="o">.</span><span class="n">_charlen</span><span class="p">]),</span>
+                           <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">index_array</span><span class="p">):</span>
             <span class="n">smiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smiles_data_generator</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
@@ -363,9 +362,12 @@
 <span class="sd">        enum: Enumerate the SMILES during transform</span>
 <span class="sd">        canonical: use canonical SMILES during transform (overrides enum)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">charset</span><span class="o">=</span><span class="s1">&#39;@C)(=cOn1S2/H[N]</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">leftpad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">isomericSmiles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enum</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">charset</span><span class="o">=</span><span class="s1">&#39;@C)(=cOn1S2/H[N]</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="n">pad</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+                 <span class="n">leftpad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">isomericSmiles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">enum</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">canonical</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_charset</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">charset</span> <span class="o">=</span> <span class="n">charset</span>
@@ -407,8 +409,7 @@
         <span class="n">ans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()))</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
         <span class="n">nm</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">RenumberAtoms</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">ans</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">nm</span><span class="p">,</span> <span class="n">canonical</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">canonical</span><span class="p">,</span>
-                                <span class="n">isomericSmiles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">isomericSmiles</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolToSmiles</span><span class="p">(</span><span class="n">nm</span><span class="p">,</span> <span class="n">canonical</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">canonical</span><span class="p">,</span> <span class="n">isomericSmiles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">isomericSmiles</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SmilesEnumerator.transform"><a class="viewcode-back" href="../../api-docs/data.html#data.smiles_enumerator.SmilesEnumerator.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smiles</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform an enumeration (randomization) and vectorization of</span>
@@ -442,9 +443,8 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">smiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;CCC(=O)O[C@@]1(CC[NH+](C[C@H]1CC=C)C)c2ccccc2&quot;</span><span class="p">,</span>
-                       <span class="s2">&quot;CCC[S@@](=O)c1ccc2c(c1)[nH]/c(=N/C(=O)OC)/[nH]2&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span>
-                      <span class="p">)</span>
+    <span class="n">smiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;CCC(=O)O[C@@]1(CC[NH+](C[C@H]1CC=C)C)c2ccccc2&quot;</span><span class="p">,</span> <span class="s2">&quot;CCC[S@@](=O)c1ccc2c(c1)[nH]/c(=N/C(=O)OC)/[nH]2&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
     <span class="c1"># Test canonical SMILES vectorization</span>
     <span class="n">sm_en</span> <span class="o">=</span> <span class="n">SmilesEnumerator</span><span class="p">(</span><span class="n">canonical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enum</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">sm_en</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">extra_chars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">])</span>
@@ -476,8 +476,7 @@
 
     <span class="c1"># BUG, when batchsize &gt; x.shape[0], then it only returns x.shape[0]!</span>
     <span class="c1"># Test batch generation</span>
-    <span class="n">sm_it</span> <span class="o">=</span> <span class="n">SmilesIterator</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">),</span> <span class="n">sm_en</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                           <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sm_it</span> <span class="o">=</span> <span class="n">SmilesIterator</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">),</span> <span class="n">sm_en</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">sm_it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unbalanced generation of batches&quot;</span><span class="p">)</span>
@@ -494,7 +493,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -511,33 +510,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

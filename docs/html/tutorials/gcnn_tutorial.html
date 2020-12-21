@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tox21 Challenge" href="tox21_tutorial.html" />
-    <link rel="prev" title="Tutorials and Recipes" href="blocks.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+    <link rel="prev" title="Getting started with building models in OpenChem" href="getting_started.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -93,6 +96,13 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="blocks.html">Tutorials and Recipes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#training-the-model">Training the model</a></li>
+</ul>
+</li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">GraphCNN for predicting logP</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#defining-node-attributes">Defining node attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#loading-data">Loading data</a></li>
@@ -142,7 +152,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api-docs/data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +171,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api-docs/utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -245,32 +255,32 @@
 <p>We’ll start with specifying atom features aka node attributes. Graph Convolution model requires user-defined function for calculating node attributes. It’s a Python function that takes <code class="docutils literal notranslate"><span class="pre">RDKit</span></code> atom object as an input and returns dictionary of atomic attributes for this atom. Examples of node attributes are atom element type, valence, charge, hybridization, aromaticity, etc.</p>
 <p>OpenChem also provides utilities for converting SMILES data into graphs. Check <a class="reference internal" href="blocks.html#api-docs"><span class="std std-ref">API documentation</span></a>.</p>
 <p>Here is an examples of how attributes are defined:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.utils.graph</span> <span class="k">import</span> <span class="n">Attribute</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_atomic_attributes</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
+<span class="n">attr_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">atomic_num</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span>
+<span class="n">atomic_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">35</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+                  <span class="mi">53</span><span class="p">:</span> <span class="mi">9</span><span class="p">}</span>
+<span class="k">if</span> <span class="n">atomic_num</span> <span class="ow">in</span> <span class="n">atomic_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;atom_element&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atomic_mapping</span><span class="p">[</span><span class="n">atomic_num</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;atom_element&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;valence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetTotalValence</span><span class="p">()</span>
+<span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetFormalCharge</span><span class="p">()</span>
+<span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;hybridization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetHybridization</span><span class="p">()</span><span class="o">.</span><span class="n">real</span>
+<span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;aromatic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIsAromatic</span><span class="p">())</span>
+<span class="k">return</span> <span class="n">attr_dict</span>
+
 <span class="n">node_attributes</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">node_attributes</span><span class="p">[</span><span class="s1">&#39;valence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;node&#39;</span><span class="p">,</span> <span class="s1">&#39;valence&#39;</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
 <span class="n">node_attributes</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;node&#39;</span><span class="p">,</span> <span class="s1">&#39;charge&#39;</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
 <span class="n">node_attributes</span><span class="p">[</span><span class="s1">&#39;hybridization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;node&#39;</span><span class="p">,</span> <span class="s1">&#39;hybridization&#39;</span><span class="p">,</span>
-                                              <span class="n">one_hot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
+                                             <span class="n">one_hot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
 <span class="n">node_attributes</span><span class="p">[</span><span class="s1">&#39;aromatic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;node&#39;</span><span class="p">,</span> <span class="s1">&#39;aromatic&#39;</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                         <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                                        <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="n">node_attributes</span><span class="p">[</span><span class="s1">&#39;atom_element&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;node&#39;</span><span class="p">,</span> <span class="s1">&#39;atom_element&#39;</span><span class="p">,</span>
                                             <span class="n">one_hot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                             <span class="n">values</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)))</span>
-
-<span class="k">def</span> <span class="nf">get_atomic_attributes</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
-    <span class="n">attr_dict</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">atomic_num</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span>
-    <span class="n">atomic_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">35</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-                      <span class="mi">53</span><span class="p">:</span> <span class="mi">9</span><span class="p">}</span>
-    <span class="k">if</span> <span class="n">atomic_num</span> <span class="ow">in</span> <span class="n">atomic_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;atom_element&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atomic_mapping</span><span class="p">[</span><span class="n">atomic_num</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;atom_element&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
-    <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;valence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetTotalValence</span><span class="p">()</span>
-    <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetFormalCharge</span><span class="p">()</span>
-    <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;hybridization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetHybridization</span><span class="p">()</span><span class="o">.</span><span class="n">real</span>
-    <span class="n">attr_dict</span><span class="p">[</span><span class="s1">&#39;aromatic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIsAromatic</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">attr_dict</span>
 </pre></div>
 </div>
 </div>
@@ -284,7 +294,7 @@
 </pre></div>
 </div>
 <p>Now we will split data into training and test:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -295,13 +305,12 @@
 </pre></div>
 </div>
 <p>Now you can create graph data layer from input files with SMILES and labels:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.data.graph_data_layer</span> <span class="k">import</span> <span class="n">GraphDataset</span>
-<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">GraphDataset</span><span class="p">(</span><span class="n">get_atomic_attributes</span><span class="p">,</span> <span class="n">node_attributes</span><span class="p">,</span>
-                       <span class="s1">&#39;./benchmark_datasets/logp_dataset/train.csv&#39;</span><span class="p">,</span>
-                       <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">GraphDataset</span><span class="p">(</span><span class="n">get_atomic_attributes</span><span class="p">,</span> <span class="n">node_attributes</span><span class="p">,</span>
+                             <span class="s1">&#39;./benchmark_datasets/logp_dataset/train.smi&#39;</span><span class="p">,</span>
+                             <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">GraphDataset</span><span class="p">(</span><span class="n">get_atomic_attributes</span><span class="p">,</span> <span class="n">node_attributes</span><span class="p">,</span>
-                   <span class="s1">&#39;./benchmark_datasets/logp_dataset/test.csv&#39;</span><span class="p">,</span>
-                   <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                             <span class="s1">&#39;./benchmark_datasets/logp_dataset/test.smi&#39;</span><span class="p">,</span>
+                             <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -309,24 +318,24 @@
 <h2>Defining model architechture<a class="headerlink" href="#defining-model-architechture" title="Permalink to this headline">¶</a></h2>
 <p>Once you created datasets, you can specify a model. We will use <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph2Label</span></code> modality which is similar to the model described in <a class="reference external" href="https://pubs.acs.org/doi/abs/10.1021/acscentsci.6b00367">this</a> paper.</p>
 <p>This model consists of 5 layers of Graph Convolutions with the size of hidden layer of 128, followed by 2 layer multilayer perceptron (MLP) with ReLU nonlinearity and hidden dimensionalities of 128 and 1. We use PyTorch Adam optimizer and MultiStepLR learning scheduler. For external evaluation we will use <code class="docutils literal notranslate"><span class="pre">r2_score</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.models.Graph2Label</span> <span class="k">import</span> <span class="n">Graph2Label</span>
-<span class="kn">from</span> <span class="nn">openchem.modules.encoders.gcn_encoder</span> <span class="k">import</span> <span class="n">GraphCNNEncoder</span>
-<span class="kn">from</span> <span class="nn">openchem.modules.mlp.openchem_mlp</span> <span class="k">import</span> <span class="n">OpenChemMLP</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openchem.models.Graph2Label</span> <span class="kn">import</span> <span class="n">Graph2Label</span>
+<span class="kn">from</span> <span class="nn">openchem.modules.encoders.gcn_encoder</span> <span class="kn">import</span> <span class="n">GraphCNNEncoder</span>
+<span class="kn">from</span> <span class="nn">openchem.modules.mlp.openchem_mlp</span> <span class="kn">import</span> <span class="n">OpenChemMLP</span>
 
-<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="k">import</span> <span class="n">Adam</span>
-<span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="k">import</span> <span class="n">StepLR</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="kn">import</span> <span class="n">StepLR</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">r2_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">r2_score</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">Graph2Label</span>
 
 <span class="n">model_params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;task&#39;</span><span class="p">:</span> <span class="s1">&#39;regression&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;data_layer&#39;</span><span class="p">:</span> <span class="n">GraphDataset</span><span class="p">,</span>
+    <span class="s1">&#39;random_seed&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
     <span class="s1">&#39;use_clip_grad&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
-    <span class="s1">&#39;num_epochs&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-    <span class="s1">&#39;logdir&#39;</span><span class="p">:</span> <span class="s1">&#39;./logs&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;batch_size&#39;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="s1">&#39;num_epochs&#39;</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span>
+    <span class="s1">&#39;logdir&#39;</span><span class="p">:</span> <span class="s1">&#39;logs/logp_gcnn_logs&#39;</span><span class="p">,</span>
     <span class="s1">&#39;print_every&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
     <span class="s1">&#39;save_every&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
     <span class="s1">&#39;train_data_layer&#39;</span><span class="p">:</span> <span class="n">train_dataset</span><span class="p">,</span>
@@ -335,26 +344,26 @@
     <span class="s1">&#39;criterion&#39;</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(),</span>
     <span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="n">Adam</span><span class="p">,</span>
     <span class="s1">&#39;optimizer_params&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
+        <span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s1">&#39;lr_scheduler&#39;</span><span class="p">:</span> <span class="n">StepLR</span><span class="p">,</span>
     <span class="s1">&#39;lr_scheduler_params&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;step_size&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
-        <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="mf">0.5</span>
+        <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="mf">0.8</span>
     <span class="p">},</span>
     <span class="s1">&#39;encoder&#39;</span><span class="p">:</span> <span class="n">GraphCNNEncoder</span><span class="p">,</span>
     <span class="s1">&#39;encoder_params&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;input_size&#39;</span><span class="p">:</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">num_features</span><span class="p">,</span>
+        <span class="s1">&#39;input_size&#39;</span><span class="p">:</span> <span class="n">train_dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;node_feature_matrix&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="s1">&#39;encoder_dim&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
         <span class="s1">&#39;n_layers&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-        <span class="s1">&#39;hidden_size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span>
+        <span class="s1">&#39;hidden_size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">]</span><span class="o">*</span><span class="mi">5</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s1">&#39;mlp&#39;</span><span class="p">:</span> <span class="n">OpenChemMLP</span><span class="p">,</span>
     <span class="s1">&#39;mlp_params&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;input_size&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
         <span class="s1">&#39;n_layers&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
         <span class="s1">&#39;hidden_size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-        <span class="s1">&#39;activation&#39;</span><span class="p">:</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
+        <span class="s1">&#39;activation&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">identity</span><span class="p">]</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -438,7 +447,7 @@
         <a href="tox21_tutorial.html" class="btn btn-neutral float-right" title="Tox21 Challenge" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="blocks.html" class="btn btn-neutral" title="Tutorials and Recipes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started with building models in OpenChem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -447,7 +456,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -464,33 +473,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

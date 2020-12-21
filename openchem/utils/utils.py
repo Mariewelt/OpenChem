@@ -19,10 +19,7 @@ def move_to_cuda(sample):
         if torch.is_tensor(maybe_tensor):
             return maybe_tensor.cuda()
         elif isinstance(maybe_tensor, dict):
-            return {
-                key: _move_to_cuda(value)
-                for key, value in maybe_tensor.items()
-            }
+            return {key: _move_to_cuda(value) for key, value in maybe_tensor.items()}
         elif isinstance(maybe_tensor, list):
             return [_move_to_cuda(x) for x in maybe_tensor]
         else:
@@ -33,7 +30,7 @@ def move_to_cuda(sample):
 
 def get_latest_checkpoint(path):
     if os.path.isdir(path) and os.listdir(path) != []:
-        list_of_files = glob.glob(path + '*')
+        list_of_files = glob.glob(os.path.join(path, '*'))
         latest_file = max(list_of_files, key=os.path.getctime)
         return latest_file
     else:
@@ -58,8 +55,7 @@ def flatten_dict(dct):
            isinstance(value, string_types) or isinstance(value, bool):
             flat_dict.update({key: value})
         elif isinstance(value, dict):
-            flat_dict.update(
-                {key + '/' + k: v for k, v in flatten_dict(dct[key]).items()})
+            flat_dict.update({key + '/' + k: v for k, v in flatten_dict(dct[key]).items()})
     return flat_dict
 
 
@@ -85,10 +81,7 @@ def nested_update(org_dict, upd_dict):
         if isinstance(value, dict):
             if key in org_dict:
                 if not isinstance(org_dict[key], dict):
-                    raise ValueError(
-                        "Mismatch between org_dict and upd_dict "
-                        "at node {}".format(key)
-                    )
+                    raise ValueError("Mismatch between org_dict and upd_dict " "at node {}".format(key))
                 nested_update(org_dict[key], value)
             else:
                 org_dict[key] = value
@@ -143,14 +136,11 @@ def check_params(config, required_dict, optional_dict):
     #         raise ValueError("Unknown parameter: {}".format(pm))
 
 
-def cross_validation_split(data, targets, n_folds=5, split='random',
-                           stratified=True, folds=None):
+def cross_validation_split(data, targets, n_folds=5, split='random', stratified=True, folds=None):
     if split not in ['random', 'fixed']:
-        raise ValueError('Invalid value for argument \'split\': '
-                         'must be either \'random\' or \'fixed\'.')
+        raise ValueError('Invalid value for argument \'split\': ' 'must be either \'random\' or \'fixed\'.')
     if split == 'fixed' and folds is None:
-        raise ValueError('When \'split\' is \'fixed\' '
-                         'argument \'folds\' must be provided.')
+        raise ValueError('When \'split\' is \'fixed\' ' 'argument \'folds\' must be provided.')
     if split == 'fixed':
         assert len(targets) == len(folds)
     raise NotImplementedError
@@ -176,5 +166,3 @@ def make_positions(tensor, padding_idx, left_pad):
         positions = positions - mask.size(1) + \
                     mask.long().sum(dim=1).unsqueeze(1)
     return tensor.clone().masked_scatter_(mask, positions[mask])
-
-

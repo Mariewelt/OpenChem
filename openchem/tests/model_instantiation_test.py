@@ -36,6 +36,7 @@ def test_openchem_model_instantiation():
     }
     new_model = OpenChemModel(sample_config)
 
+
 def test_graph2label_model_instantiation():
     sample_config = {
         'task': 'classification',
@@ -192,6 +193,7 @@ def test_molecule_protein2label_model_instantiation():
         }
     }
     new_model = MoleculeProtein2Label(sample_config)
+
 
 def test_generative_model_instantiation():
     sample_config = {

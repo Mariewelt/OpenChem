@@ -1,0 +1,520 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting started with building models in OpenChem &mdash; OpenChem 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GraphCNN for predicting logP" href="gcnn_tutorial.html" />
+    <link rel="prev" title="Tutorials and Recipes" href="blocks.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation_instructions.html">Installation instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation_instructions.html#general-installation">General installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation_instructions.html#installation-with-docker">Installation with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how_to_run_tutorial.html">How to define and train models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#arguments-for-launch-py">Arguments for launch.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#arguments-for-run-py">Arguments for run.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how_to_run_tutorial.html#launching-jobs">Launching jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="blocks.html">Tutorials and Recipes</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Getting started with building models in OpenChem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-pytorch-dataset">Creating PyTorch dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-openchem-model-and-specifying-parameters">Creating OpenChem model and specifying parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training-the-model">Training the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gcnn_tutorial.html">GraphCNN for predicting logP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#defining-node-attributes">Defining node attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gcnn_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tox21_tutorial.html">Tox21 Challenge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tox21_tutorial.html#loading-data">Loading data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tox21_tutorial.html#defining-evaluation-function">Defining evaluation function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tox21_tutorial.html#defining-model-architechture">Defining model architechture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tox21_tutorial.html#training-and-evaluating-the-model">Training and evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api-docs/blocks.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api-docs/models.html">models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.openchem_model">openchem_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.Smiles2Label">Smiles2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.Graph2Label">Graph2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#module-models.MoleculeProtein2Label">MoleculeProtein2Label</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/models.html#vanilla-model">vanilla_model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-docs/modules.html">modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/modules.encoders.html">encoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#module-modules.encoders.openchem_encoder">openchem_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#module-modules.encoders.rnn_encoder">rnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#cnn-encoder">cnn_encoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.encoders.html#gcnn-encoder">gcnn_encoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/modules.embeddings.html">embeddings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.embeddings.html#module-modules.embeddings.openchem_embedding">openchem_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.embeddings.html#module-modules.embeddings.basic_embedding">basic_embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api-docs/modules.embeddings.html#positional-embedding">positional_embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/modules.mlp.html">mlp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-docs/layers.html">layers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/layers.html#module-layers.conv_bn_relu">conv_bn_relu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/layers.html#module-layers.gcn">gcn</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-docs/data.html">data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#graph-data-layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/data.html#module-data.utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-docs/criterion.html">criterion</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/criterion.html#module-openchem.criterion.multitask_loss">multitask_loss</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-docs/optimizer.html">optimizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/optimizer.html#module-optimizer.openchem_optimizer">openchem_optimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/optimizer.html#module-optimizer.openchem_lr_scheduler">openchem_lr_scheduler</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-docs/utils.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#module-openchem.utils.graph">graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#id1">utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api-docs/utils.html#logger">logger</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenChem</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="blocks.html">Tutorials and Recipes</a> &raquo;</li>
+        
+      <li>Getting started with building models in OpenChem</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/Mariewelt/OpenChem" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started-with-building-models-in-openchem">
+<h1>Getting started with building models in OpenChem<a class="headerlink" href="#getting-started-with-building-models-in-openchem" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will cover basics of model building in OpenChem by constructing a simple
+multilayer perceptron neural network for prediction logP values from molecular fingerprints. This tutorial will
+cover the following point:</p>
+<ul class="simple">
+<li><p>Data handling (reading dataset files, splitting data into train/test)</p></li>
+<li><p>Specifying model hyperparmeters as a dictionary</p></li>
+<li><p>Running model training</p></li>
+<li><p>Monitoring training process wiht Tensorboard</p></li>
+<li><p>Evaluated of the trained model</p></li>
+<li><p>Running trained model for prediction on new data examples</p></li>
+</ul>
+<div class="section" id="loading-data">
+<h2>Loading data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
+<p>First we need to read data from file. In this example, data is located in file <code class="docutils literal notranslate"><span class="pre">./benchmark_datasets/logp_dataset/logP_labels.csv</span></code>.
+OpenChem can process text file with multiple columns. Users can specify which columns should be read and what is the delimiter.
+Important to note, that the first column is <code class="docutils literal notranslate"><span class="pre">cols_to_read</span></code> argument must specify column with SMILES strings.
+Next columns must have labels:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">read_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/logP_labels.csv&#39;</span><span class="p">,</span>
+                                 <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+                                 <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                 <span class="n">keep_header</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Variable <code class="docutils literal notranslate"><span class="pre">data</span></code> is a list with as many objects as columns were read from the file. <code class="docutils literal notranslate"><span class="pre">data[0]</span></code> contains
+smiles and all the rest are labels:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">smiles</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<p>After reading the data, we can split in into train and test sets using scikit-learn utility and then
+save it to new files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">save_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/train.smi&#39;</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">save_smiles_property_file</span><span class="p">(</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/test.smi&#39;</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-pytorch-dataset">
+<h2>Creating PyTorch dataset<a class="headerlink" href="#creating-pytorch-dataset" title="Permalink to this headline">¶</a></h2>
+<p>OpenChem has multiple utilities for creating PyTorch dataset based on the data type. In this example
+we are using <code class="docutils literal notranslate"><span class="pre">FeatureDataset</span></code> that convert SMILES strings to vectors of features with a user-defined
+function, that is passed to <code class="docutils literal notranslate"><span class="pre">FeatureDataset</span></code> as an argument <code class="docutils literal notranslate"><span class="pre">get_features</span></code> with any additional
+arguments passed as a dictionary in <code class="docutils literal notranslate"><span class="pre">get_features_args</span></code>. In this example we are using RDKit fingerprint as
+features, that are calculated with function <code class="docutils literal notranslate"><span class="pre">openchem.data.utils.get_fp</span></code>. This function accepts number of
+bits in fingerprint as an additional argument <code class="docutils literal notranslate"><span class="pre">n_bits</span></code>. Same as <code class="docutils literal notranslate"><span class="pre">read_smiles_property_finction</span></code>
+OpenChem datasets accept <code class="docutils literal notranslate"><span class="pre">cols_to_read</span></code> and <code class="docutils literal notranslate"><span class="pre">delimiter</span></code> arguments.</p>
+<p>We are creating 3 datasets – <code class="docutils literal notranslate"><span class="pre">train_dataset</span></code>, <code class="docutils literal notranslate"><span class="pre">test_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">predict_dataset</span></code>.
+<code class="docutils literal notranslate"><span class="pre">train_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">test_dataset</span></code> are used for training and evaluation respectively. In these datasets
+<code class="docutils literal notranslate"><span class="pre">cols_to_read</span></code> should contain indices for columnds with SMILES string and labels.
+<code class="docutils literal notranslate"><span class="pre">predict_datasets</span></code> will be used after training is completed to get prediction for new samples and labels
+are not required. Thus, <code class="docutils literal notranslate"><span class="pre">cols_to_read</span></code> argument here should only contain index of column to SMILES string.
+<code class="docutils literal notranslate"><span class="pre">predict_dataset</span></code> also must have an additional argument <code class="docutils literal notranslate"><span class="pre">return_smiles=True</span></code> to write than to a
+file with predictions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">FeatureDataset</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/train.smi&#39;</span><span class="p">,</span>
+                               <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="n">get_features</span><span class="o">=</span><span class="n">get_fp</span><span class="p">,</span> <span class="n">get_features_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_bits&quot;</span><span class="p">:</span> <span class="mi">2048</span><span class="p">})</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">FeatureDataset</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/test.smi&#39;</span><span class="p">,</span>
+                              <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                              <span class="n">get_features</span><span class="o">=</span><span class="n">get_fp</span><span class="p">,</span> <span class="n">get_features_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_bits&quot;</span><span class="p">:</span> <span class="mi">2048</span><span class="p">})</span>
+<span class="n">predict_dataset</span> <span class="o">=</span> <span class="n">FeatureDataset</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;./benchmark_datasets/logp_dataset/test.smi&#39;</span><span class="p">,</span>
+                                <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">cols_to_read</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="n">get_features</span><span class="o">=</span><span class="n">get_fp</span><span class="p">,</span> <span class="n">get_features_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_bits&quot;</span><span class="p">:</span> <span class="mi">2048</span><span class="p">},</span>
+                                <span class="n">return_smiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-openchem-model-and-specifying-parameters">
+<h2>Creating OpenChem model and specifying parameters<a class="headerlink" href="#creating-openchem-model-and-specifying-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Nex step is specifying model type and model parameters. In this example we are using <code class="docutils literal notranslate"><span class="pre">MLP2Label</span></code> model,
+which is a multilayer perceptron model, that predicts labels from feature vectors:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">MLP2Label</span>
+</pre></div>
+</div>
+<p>Model parameter are specified as a dictionary <code class="docutils literal notranslate"><span class="pre">model_params</span></code>. There are some essential parameters, that
+are required for every model. Such parameters are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">task</span></code> – the problem to be solved. Can be <code class="docutils literal notranslate"><span class="pre">classification</span></code>, <code class="docutils literal notranslate"><span class="pre">regression</span></code>, <code class="docutils literal notranslate"><span class="pre">multitask</span></code> or <code class="docutils literal notranslate"><span class="pre">graph_generation</span></code>. In this example we are building model for prediction of continuous logP values, that is why <code class="docutils literal notranslate"><span class="pre">task</span></code> here is <code class="docutils literal notranslate"><span class="pre">regression</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">random_seed</span></code> – random seed for running the experiment. Used to enforce reproducibility of the experiments.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">batch_size</span></code> – how many samples are included in each training batch. In this example we are using <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_epochs</span></code> – how many passes over the training dataset to do. In this example we are making <code class="docutils literal notranslate"><span class="pre">101</span></code> epochs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">print_every</span></code> – how often intermediate training-evaluation results will be printed to standard output and log file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_every</span></code> – how often intermediate model checkpoints will be saved during training.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train_data_layer</span></code> and <code class="docutils literal notranslate"><span class="pre">val_data_layer</span></code> – PyTorch datasets that are used for training and evaluation. In this example we are using <code class="docutils literal notranslate"><span class="pre">train_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">test_dataset</span></code> objects of <code class="docutils literal notranslate"><span class="pre">FeatureDataset</span></code> type that were defined above.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict_data_layer</span></code> – also a PyTorch dataset, but this parameter is not needed if the model</p></li>
+</ul>
+<p>won’t be used for making predictions for new samples.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">eval_metrics</span></code> – a user-provided function, that is used to calculated validation metrics during evaluation process. This function must follow scikit-learn defined signature <code class="docutils literal notranslate"><span class="pre">fun(y_true,</span> <span class="pre">y_pred)</span></code>. In this example we are using <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html">r2</a> score.</p></li>
+</ul>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">criterion</span></code> – loss function to be optimized during the training. In this case we are using <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html?highlight=mseloss#torch.nn.MSELoss">MSELoss</a> which is the mean squared error often used for regression problems.</p></li>
+</ul>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">optimizer</span></code> – optimization algorithm to be used for model training. In this case we are using <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=adam#torch.optim.Adam">Adam</a> optimizer.</p></li>
+</ul>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">optimizer_params</span></code> – dictionary of parameters for optimization algorithms. In this case we only specify learning rate. Full list of possible parameters can be looked up on PyTorch documentation page for the optimization algorithm.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler</span></code> – learning rate decay policy. In this case we use <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR">StepLR</a>. This policy decreases the learning rate by a fixed decay factor every specified number of steps.</p></li>
+</ul>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lr_scheduler_params</span></code> – dictionary of parameters for learning rate decay policy. Full list of possible parameters can be looked up on PyTorch documentation page for the chosen decay policy. In this example we decreasing the learning rate by a factor <code class="docutils literal notranslate"><span class="pre">gamma=0.9</span></code> every <code class="docutils literal notranslate"><span class="pre">step_size=15</span></code> epochs.</p></li>
+</ul>
+<p>Next set of parameters define the model architecture. They are different from model to model.
+In this example we use a multiplayer perceptron and we only need to specify a few parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mlp</span></code> – type of multilayer perceptron. OpenChem has MLP with and without Batch Normalization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mlp_params</span></code> – dictionary of parameters for the MLP. <code class="docutils literal notranslate"><span class="pre">input_size</span></code> should be equal to the number of features in the data. In our example we are using fingerprints with <code class="docutils literal notranslate"><span class="pre">n_bits=2048</span></code>, so <code class="docutils literal notranslate"><span class="pre">input_size=248</span></code>. <code class="docutils literal notranslate"><span class="pre">n_layers</span></code> – number of layers in MLP (we are using 4). <code class="docutils literal notranslate"><span class="pre">hidden_size</span></code> – list of dimensions for each of <code class="docutils literal notranslate"><span class="pre">n_layers</span></code>. <code class="docutils literal notranslate"><span class="pre">dropout</span></code> – probability value for dropout. If this parameter is not specified, dropout is not used. <code class="docutils literal notranslate"><span class="pre">activation</span></code> – list of activation functions for each layer.</p></li>
+</ul>
+</div>
+<div class="section" id="training-the-model">
+<h2>Training the model<a class="headerlink" href="#training-the-model" title="Permalink to this headline">¶</a></h2>
+<p>Defined above model configurations are saved to <code class="docutils literal notranslate"><span class="pre">logp_mlp_config.py</span></code> file located in <code class="docutils literal notranslate"><span class="pre">example_configs</span></code>
+folder. We can now launch training process by running the following command from the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">0</span> <span class="n">python</span> <span class="n">launch</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">1</span> <span class="n">run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">config_file</span><span class="o">=</span><span class="n">example_configs</span><span class="o">/</span><span class="n">getting_started</span><span class="o">.</span><span class="n">py</span>  <span class="o">--</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;train_eval&quot;</span>
+</pre></div>
+</div>
+<p>The output will be the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Distributed process with rank 1 initalized
+Distributed process with rank 0 initalized
+Directory logs/logp_mlp_logs created
+Directory logs/logp_mlp_logs/checkpoint created
+2020-11-04 12:03:29,915 openchem INFO: Running on 2 GPUs
+2020-11-04 12:03:29,915 openchem INFO: Logging directory is set to logs/logp_mlp_logs
+2020-11-04 12:03:29,915 openchem INFO: Running with config:
+batch_size:                                       256
+logdir:                                           logs/logp_mlp_logs
+lr_scheduler_params/gamma:                        0.9
+lr_scheduler_params/step_size:                    15
+mlp_params/dropout:                               0.5
+mlp_params/input_size:                            2048
+mlp_params/n_layers:                              4
+num_epochs:                                       101
+optimizer_params/lr:                              0.001
+print_every:                                      20
+random_seed:                                      42
+save_every:                                       5
+task:                                             regression
+use_cuda:                                         True
+
+2020-11-04 12:03:30,109 openchem INFO: Starting training from scratch
+2020-11-04 12:03:30,109 openchem INFO: Training is set up from epoch 0
+  0%|                                                                                                                         | 0/101 [00:00&lt;?, ?it/s]
+  2020-11-04 12:03:30,889 openchem.fit INFO: TRAINING: [Time: 0m 0s, Epoch: 0, Progress: 0%, Loss: 4.1647]
+INFO:openchem.fit:TRAINING: [Time: 0m 0s, Epoch: 0, Progress: 0%, Loss: 4.1647]
+2020-11-04 12:03:31,057 openchem.evaluate INFO: EVALUATION: [Time: 0m 0s, Loss: 3.8076, Metrics: -0.1291]
+INFO:openchem.evaluate:EVALUATION: [Time: 0m 0s, Loss: 3.8076, Metrics: -0.1291]                                              | 1/101 [00:00&lt;01:34,  1.06it/s]
+2020-11-04 12:03:31,439 openchem.fit WARNING: Warning: module/MLP/layers/3/bias has zero variance (i.e. constant vector)
+ 20%|███████████████████████▉                                                                                                 | 20/101 [00:09&lt;00:36,  2.20it/s]
+ 2020-11-04 12:03:40,331 openchem.fit INFO: TRAINING: [Time: 0m 10s, Epoch: 20, Progress: 19%, Loss: 1.0274]
+INFO:openchem.fit:TRAINING: [Time: 0m 10s, Epoch: 20, Progress: 19%, Loss: 1.0274]
+2020-11-04 12:03:40,527 openchem.evaluate INFO: EVALUATION: [Time: 0m 0s, Loss: 0.8114, Metrics: 0.7690]
+INFO:openchem.evaluate:EVALUATION: [Time: 0m 0s, Loss: 0.8114, Metrics: 0.7690]
+ 40%|███████████████████████████████████████████████▉                                                                         | 40/101 [00:19&lt;00:26,  2.28it/s]
+ 2020-11-04 12:03:49,970 openchem.fit INFO: TRAINING: [Time: 0m 19s, Epoch: 40, Progress: 39%, Loss: 0.8870]
+INFO:openchem.fit:TRAINING: [Time: 0m 19s, Epoch: 40, Progress: 39%, Loss: 0.8870]
+2020-11-04 12:03:50,208 openchem.evaluate INFO: EVALUATION: [Time: 0m 0s, Loss: 0.7198, Metrics: 0.7955]
+INFO:openchem.evaluate:EVALUATION: [Time: 0m 0s, Loss: 0.7198, Metrics: 0.7955]
+ 59%|███████████████████████████████████████████████████████████████████████▉                                                 | 60/101 [00:28&lt;00:17,  2.34it/s]
+ 2020-11-04 12:03:59,205 openchem.fit INFO: TRAINING: [Time: 0m 29s, Epoch: 60, Progress: 59%, Loss: 0.7898]
+INFO:openchem.fit:TRAINING: [Time: 0m 29s, Epoch: 60, Progress: 59%, Loss: 0.7898]
+ 60%|█████████████████████████████████████████████████████████████████████████                                                | 61/101 [00:29&lt;00:19,  2.05it/s]
+ 2020-11-04 12:03:59,421 openchem.evaluate INFO: EVALUATION: [Time: 0m 0s, Loss: 0.6628, Metrics: 0.8142]
+INFO:openchem.evaluate:EVALUATION: [Time: 0m 0s, Loss: 0.6628, Metrics: 0.8142]
+
+INFO:openchem.fit:TRAINING: [Time: 0m 38s, Epoch: 80, Progress: 79%, Loss: 0.7267]
+2020-11-04 12:04:08,692 openchem.evaluate INFO: EVALUATION: [Time: 0m 0s, Loss: 0.6504, Metrics: 0.8179]
+INFO:openchem.evaluate:EVALUATION: [Time: 0m 0s, Loss: 0.6504, Metrics: 0.8179]
+ 80%|█████████████████████████████████████████████████████████████████████████████████████████████████                       | 81/101 [00:38&lt;00:09,  2.03it/s]
+INFO:openchem.fit:TRAINING: [Time: 0m 47s, Epoch: 100, Progress: 99%, Loss: 0.6791]
+2020-11-04 12:04:17,926 openchem.evaluate INFO: EVALUATION: [Time: 0m 0s, Loss: 0.6523, Metrics: 0.8189]
+INFO:openchem.evaluate:EVALUATION: [Time: 0m 0s, Loss: 0.6523, Metrics: 0.8189]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 101/101 [00:47&lt;00:00,  2.11it/s]
+</pre></div>
+</div>
+<p>The output above shows the model configurations, overall training progress, train loss, validation loss
+and validation metrics, which is an R^2 score.</p>
+<p>To further run the trained model in <code class="docutils literal notranslate"><span class="pre">predict</span></code> mode to obtain predictions for new samples, the
+following command should be run from the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">0</span> <span class="n">python</span> <span class="n">launch</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">1</span> <span class="n">run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">config_file</span><span class="o">=</span><span class="n">example_configs</span><span class="o">/</span><span class="n">getting_started</span><span class="o">.</span><span class="n">py</span>  <span class="o">--</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span>
+</pre></div>
+</div>
+<p>Output will be the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2020</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">04</span> <span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">09</span><span class="p">,</span><span class="mi">379</span> <span class="n">openchem</span> <span class="n">INFO</span><span class="p">:</span> <span class="n">Running</span> <span class="n">on</span> <span class="mi">1</span> <span class="n">GPUs</span>
+<span class="mi">2020</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">04</span> <span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">09</span><span class="p">,</span><span class="mi">380</span> <span class="n">openchem</span> <span class="n">INFO</span><span class="p">:</span> <span class="n">Logging</span> <span class="n">directory</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">logs</span><span class="o">/</span><span class="n">logp_mlp_logs</span>
+<span class="mi">2020</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">04</span> <span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">09</span><span class="p">,</span><span class="mi">380</span> <span class="n">openchem</span> <span class="n">INFO</span><span class="p">:</span> <span class="n">Running</span> <span class="k">with</span> <span class="n">config</span><span class="p">:</span>
+<span class="n">batch_size</span><span class="p">:</span>                                       <span class="mi">256</span>
+<span class="n">logdir</span><span class="p">:</span>                                           <span class="n">logs</span><span class="o">/</span><span class="n">logp_mlp_logs</span>
+<span class="n">lr_scheduler_params</span><span class="o">/</span><span class="n">gamma</span><span class="p">:</span>                        <span class="mf">0.9</span>
+<span class="n">lr_scheduler_params</span><span class="o">/</span><span class="n">step_size</span><span class="p">:</span>                    <span class="mi">15</span>
+<span class="n">mlp_params</span><span class="o">/</span><span class="n">dropout</span><span class="p">:</span>                               <span class="mf">0.5</span>
+<span class="n">mlp_params</span><span class="o">/</span><span class="n">input_size</span><span class="p">:</span>                            <span class="mi">2048</span>
+<span class="n">mlp_params</span><span class="o">/</span><span class="n">n_layers</span><span class="p">:</span>                              <span class="mi">4</span>
+<span class="n">num_epochs</span><span class="p">:</span>                                       <span class="mi">101</span>
+<span class="n">optimizer_params</span><span class="o">/</span><span class="n">lr</span><span class="p">:</span>                              <span class="mf">0.001</span>
+<span class="n">print_every</span><span class="p">:</span>                                      <span class="mi">20</span>
+<span class="n">random_seed</span><span class="p">:</span>                                      <span class="mi">42</span>
+<span class="n">save_every</span><span class="p">:</span>                                       <span class="mi">5</span>
+<span class="n">task</span><span class="p">:</span>                                             <span class="n">regression</span>
+<span class="n">use_cuda</span><span class="p">:</span>                                         <span class="kc">True</span>
+
+<span class="mi">2020</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">04</span> <span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="mi">731</span> <span class="n">openchem</span> <span class="n">INFO</span><span class="p">:</span> <span class="n">Loading</span> <span class="n">model</span> <span class="kn">from</span> <span class="nn">logs</span><span class="o">/</span><span class="n">logp_mlp_logs</span><span class="o">/</span><span class="n">checkpoint</span><span class="o">/</span><span class="n">epoch_100</span>
+<span class="mi">2020</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">04</span> <span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span><span class="mi">395</span> <span class="n">openchem</span><span class="o">.</span><span class="n">predict</span> <span class="n">INFO</span><span class="p">:</span> <span class="n">Predictions</span> <span class="n">saved</span> <span class="n">to</span> <span class="n">logs</span><span class="o">/</span><span class="n">logp_mlp_logs</span><span class="o">/</span><span class="n">predictions</span><span class="o">.</span><span class="n">txt</span>
+<span class="mi">2020</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">04</span> <span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span><span class="mi">395</span> <span class="n">openchem</span><span class="o">.</span><span class="n">predict</span> <span class="n">INFO</span><span class="p">:</span> <span class="n">PREDICTION</span><span class="p">:</span> <span class="p">[</span><span class="n">Time</span><span class="p">:</span> <span class="mi">0</span><span class="n">m</span> <span class="mi">1</span><span class="n">s</span><span class="p">,</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">samples</span><span class="p">:</span> <span class="mi">2835</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This output shows model configuration, where parameters were loaded from and where predictions were saved to.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gcnn_tutorial.html" class="btn btn-neutral float-right" title="GraphCNN for predicting logP" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="blocks.html" class="btn btn-neutral float-left" title="Tutorials and Recipes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Mariya Popova
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #99badd;
+    }
+  </style>
+
+
+</body>
+</html>

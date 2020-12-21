@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="utils" href="utils.html" />
     <link rel="prev" title="criterion" href="criterion.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -142,7 +145,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_data_layer">smiles_data_layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-data.graph_data_layer">graph_data_layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#graph-data-layer">graph_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_protein_data_layer">smiles_protein_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.vanilla_data_layer">vanilla_data_layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#module-data.smiles_enumerator">smiles_enumerator</a></li>
@@ -161,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.graph">graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#id1">utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#module-openchem.utils.logger">logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#logger">logger</a></li>
 </ul>
 </li>
 </ul>
@@ -236,19 +239,19 @@
 <span id="optimizer"></span><h1>optimizer<a class="headerlink" href="#module-optimizer" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-optimizer.openchem_optimizer">
 <span id="openchem-optimizer"></span><h2>openchem_optimizer<a class="headerlink" href="#module-optimizer.openchem_optimizer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer">
-<em class="property">class </em><code class="descclassname">optimizer.openchem_optimizer.</code><code class="descname">OpenChemOptimizer</code><span class="sig-paren">(</span><em>params</em>, <em>model_params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">optimizer.openchem_optimizer.</code><code class="sig-name descname">OpenChemOptimizer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">model_params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.get_lr">
-<code class="descname">get_lr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.get_lr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.get_lr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_lr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.get_lr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.get_lr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the current learning rate.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.load_state_dict">
-<code class="descname">load_state_dict</code><span class="sig-paren">(</span><em>state_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.load_state_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.load_state_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.load_state_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load an optimizer state dict.
 In general we should prefer the configuration of the existing optimizer
 instance (e.g., learning rate) over that found in the state_dict. This
@@ -256,37 +259,37 @@ allows us to resume training from a checkpoint using a new set of
 optimizer args.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.optimizer">
-<code class="descname">optimizer</code><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.optimizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">optimizer</code><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.optimizer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.param_groups">
-<code class="descname">param_groups</code><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.param_groups" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">param_groups</code><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.param_groups" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.set_lr">
-<code class="descname">set_lr</code><span class="sig-paren">(</span><em>lr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.set_lr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.set_lr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_lr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.set_lr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.set_lr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the learning rate.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.state_dict">
-<code class="descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.state_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.state_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.state_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.state_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the optimizer’s state dict.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.step">
-<code class="descname">step</code><span class="sig-paren">(</span><em>closure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.step" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">closure</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a single optimization step.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="optimizer.openchem_optimizer.OpenChemOptimizer.zero_grad">
-<code class="descname">zero_grad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.zero_grad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.zero_grad" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">zero_grad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_optimizer.html#OpenChemOptimizer.zero_grad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_optimizer.OpenChemOptimizer.zero_grad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clears the gradients of all optimized parameters.</p>
 </dd></dl>
 
@@ -295,18 +298,24 @@ optimizer args.</p>
 </div>
 <div class="section" id="module-optimizer.openchem_lr_scheduler">
 <span id="openchem-lr-scheduler"></span><h2>openchem_lr_scheduler<a class="headerlink" href="#module-optimizer.openchem_lr_scheduler" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="optimizer.openchem_lr_scheduler.OpenChemLRScheduler">
-<em class="property">class </em><code class="descclassname">optimizer.openchem_lr_scheduler.</code><code class="descname">OpenChemLRScheduler</code><span class="sig-paren">(</span><em>params</em>, <em>optimizer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_lr_scheduler.html#OpenChemLRScheduler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_lr_scheduler.OpenChemLRScheduler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">optimizer.openchem_lr_scheduler.</code><code class="sig-name descname">OpenChemLRScheduler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">optimizer</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_lr_scheduler.html#OpenChemLRScheduler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_lr_scheduler.OpenChemLRScheduler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="attribute">
+<dl class="py method">
+<dt id="optimizer.openchem_lr_scheduler.OpenChemLRScheduler.by_iteration">
+<em class="property">property </em><code class="sig-name descname">by_iteration</code><a class="headerlink" href="#optimizer.openchem_lr_scheduler.OpenChemLRScheduler.by_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>If true, make step every iteration, else every epoch (default)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="optimizer.openchem_lr_scheduler.OpenChemLRScheduler.scheduler">
-<code class="descname">scheduler</code><a class="headerlink" href="#optimizer.openchem_lr_scheduler.OpenChemLRScheduler.scheduler" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">scheduler</code><a class="headerlink" href="#optimizer.openchem_lr_scheduler.OpenChemLRScheduler.scheduler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="optimizer.openchem_lr_scheduler.OpenChemLRScheduler.step">
-<code class="descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_lr_scheduler.html#OpenChemLRScheduler.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_lr_scheduler.OpenChemLRScheduler.step" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optimizer/openchem_lr_scheduler.html#OpenChemLRScheduler.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.openchem_lr_scheduler.OpenChemLRScheduler.step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a single scheduler step.</p>
 </dd></dl>
 
@@ -326,7 +335,7 @@ optimizer args.</p>
         <a href="utils.html" class="btn btn-neutral float-right" title="utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="criterion.html" class="btn btn-neutral" title="criterion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="criterion.html" class="btn btn-neutral float-left" title="criterion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -335,7 +344,7 @@ optimizer args.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Mariya Popova.
+        &copy; Copyright 2018, Mariya Popova
 
     </p>
   </div>
@@ -352,33 +361,16 @@ optimizer args.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
   <style>
     /* Sidebar header (and topbar for mobile) */

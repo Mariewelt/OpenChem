@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch.nn.modules.loss import _WeightedLoss #, _assert_no_grad
+from torch.nn.modules.loss import _WeightedLoss  #, _assert_no_grad
 
 
 class MultitaskLoss(_WeightedLoss):
@@ -32,7 +32,6 @@ class MultitaskLoss(_WeightedLoss):
         -Output: scalar.
 
     """
-
     def __init__(self, ignore_index, n_tasks):
         super(MultitaskLoss, self).__init__(reduction='none')
         self.n_tasks = n_tasks
@@ -44,8 +43,7 @@ class MultitaskLoss(_WeightedLoss):
         x = torch.zeros(target.size()).cuda()
         y = torch.ones(target.size()).cuda()
         mask = torch.where(target == self.ignore_index, x, y)
-        loss = F.binary_cross_entropy(input, mask*target,
-                                      weight=self.weight)
-        loss = loss*mask
+        loss = F.binary_cross_entropy(input, mask * target, weight=self.weight)
+        loss = loss * mask
         n_samples = mask.sum(dim=0)
-        return (loss.sum(dim=0)/n_samples).mean()
+        return (loss.sum(dim=0) / n_samples).mean()
