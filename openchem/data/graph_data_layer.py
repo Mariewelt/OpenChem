@@ -36,12 +36,10 @@ class GraphDataset(Dataset):
                  file_format="smi",
                  addHs=False,
                  has_3D=False,
-                 allowed_atoms=None,
-                 return_smiles=False,
+                 allowed_atoms=None, 
                  **kwargs):
         super(GraphDataset, self).__init__()
         assert (get_bond_attributes is None) == (edge_attributes is None)
-        self.return_smiles = return_smiles
         self.restrict_min_atoms = restrict_min_atoms
         self.restrict_max_atoms = restrict_max_atoms
         self.kekulize = kekulize
@@ -49,7 +47,7 @@ class GraphDataset(Dataset):
         self.has_3D = has_3D
 
         if file_format == "pickled":
-            data = pickle.load(open(kwargs["pickled"], "rb"))
+            data = pickle.load(open(filename, "rb"))
 
             # this cleanup must be consistent with sanitize_smiles
             mn, mx = restrict_min_atoms, restrict_max_atoms
@@ -65,30 +63,21 @@ class GraphDataset(Dataset):
         elif file_format == "smi":
             data_set = read_smiles_property_file(filename, cols_to_read, delimiter)
             data = data_set[0]
-            if len(cols_to_read) == 1:
-                target = None
-            else:
-                target = data_set[1:]
-            clean_smiles, clean_idx, num_atoms, max_len = sanitize_smiles(data,
-                                                                          min_atoms=restrict_min_atoms,
-                                                                          max_atoms=restrict_max_atoms,
-                                                                          return_num_atoms=True,
-                                                                          return_max_len=True)
-            self.max_len = max_len
-            if target is not None:
-                target = np.asarray(target, dtype=np.float).T
+            target = data_set[1:]
+            clean_smiles, clean_idx, num_atoms = sanitize_smiles(data,
+                                                                 min_atoms=restrict_min_atoms,
+                                                                 max_atoms=restrict_max_atoms,
+                                                                 return_num_atoms=True)
+            target = np.asarray(target, dtype=np.float).T
             clean_smiles = [clean_smiles[i] for i in clean_idx]
             num_atoms = [num_atoms[i] for i in clean_idx]
-            self.clean_idx = clean_idx
-            if target is not None:
-                self.target = target[clean_idx, :]
-            else:
-                self.target = None
+
+            self.target = target[clean_idx, :]
             self.smiles = clean_smiles
             self.num_atoms_all = num_atoms
         elif file_format == "sdf":
             filenames = []
-            os.chdir("/home/Work/data/enamine_hll-500/")
+            os.chdir("/home/mariewelt/Work/OpenChem_pfizer/benchmark_datasets/enamine_hll-500/")
             for file in glob.glob("*.sdf"):
                 filenames.append(file)
             self.num_atoms_all = []
@@ -118,6 +107,15 @@ class GraphDataset(Dataset):
             self.smiles = smiles
             self.rd_mols = rd_mols
             self.target = np.ones(len(self.smiles))
+            #print("x = ", np.mean(x_coord), " +- ", np.std(x_coord))
+            #print("y = ", np.mean(y_coord), " +- ", np.std(y_coord))
+            #print("z = ", np.mean(z_coord), " +- ", np.std(z_coord))
+            #self.x_mean = np.mean(x_coord)
+            #self.x_std = np.std(x_coord)
+            #self.y_mean = np.mean(y_coord)
+            #self.y_std = np.std(y_coord)
+            #self.z_mean = np.mean(z_coord)
+            #self.z_std = np.std(z_coord)
         else:
             raise NotImplementedError()
 
@@ -128,10 +126,7 @@ class GraphDataset(Dataset):
         self.get_bond_attributes = get_bond_attributes
 
     def __len__(self):
-        if self.has_3D:
-            return len(self.rd_mols)
-        else:
-            return len(self.smiles)
+        return len(self.target)
 
     def __getitem__(self, index):
         
@@ -141,9 +136,6 @@ class GraphDataset(Dataset):
                           has_3D=self.has_3D, addHs=self.addHs, from_rdmol=True)
         else:
             sm = self.smiles[index]
-            if self.return_smiles:
-                object = sm + " " * (self.max_len - len(sm) + 1)
-                object = [ord(c) for c in object]
             graph = Graph(sm, self.max_size, self.get_atomic_attributes, self.get_bond_attributes, kekulize=self.kekulize)
         node_feature_matrix = graph.get_node_feature_matrix(self.node_attributes, self.max_size)
 
@@ -152,45 +144,24 @@ class GraphDataset(Dataset):
             adj_matrix = graph.adj_matrix
         else:
             adj_matrix = graph.get_edge_attr_adj_matrix(self.edge_attributes, self.max_size)
+        
         if self.has_3D:
-            if self.target is not None:
-                sample = {
-                    'adj_matrix': adj_matrix.astype('float32'),
-                    'node_feature_matrix': node_feature_matrix.astype('float32'),
-                    'labels': self.target[index].astype('float32'),
-                    'xyz': graph.xyz#graph.xyz#(graph.xyz - mean_coord) / std_coord
-                }
-            elif self.target is None and not self.return_smiles:
-                sample = {
-                    'adj_matrix': adj_matrix.astype('float32'),
-                    'node_feature_matrix': node_feature_matrix.astype('float32'),
-                    'xyz': graph.xyz  # graph.xyz#(graph.xyz - mean_coord) / std_coord
-                }
-            elif self.return_smiles:
-                sample = {
-                    'adj_matrix': adj_matrix.astype('float32'),
-                    'node_feature_matrix': node_feature_matrix.astype('float32'),
-                    'xyz': graph.xyz,
-                    'object': object
-                }
+            #mean_coord = [self.x_mean, self.y_mean, self.z_mean]
+            #std_coord = [self.x_std, self.y_std, self.z_std]
+            #xyz = (graph.xyz - mean_coord) / std_coord
+            #xyz[graph.num_nodes:, :] = 0.0
+            sample = {
+                'adj_matrix': adj_matrix.astype('float32'),
+                'node_feature_matrix': node_feature_matrix.astype('float32'),
+                'labels': self.target[index].astype('float32'),
+                'xyz': graph.xyz#graph.xyz#(graph.xyz - mean_coord) / std_coord
+            }
         else:
-            if self.target is not None:
-                sample = {
-                    'adj_matrix': adj_matrix.astype('float32'),
-                    'node_feature_matrix': node_feature_matrix.astype('float32'),
-                    'labels': self.target[index].astype('float32')
-                }
-            elif self.target is None and not self.return_smiles:
-                sample = {
-                    'adj_matrix': adj_matrix.astype('float32'),
-                    'node_feature_matrix': node_feature_matrix.astype('float32'),
-                }
-            elif self.return_smiles:
-                sample = {
-                    'adj_matrix': adj_matrix.astype('float32'),
-                    'node_feature_matrix': node_feature_matrix.astype('float32'),
-                    'object': np.array(object)
-                }
+            sample = {
+                'adj_matrix': adj_matrix.astype('float32'),
+                'node_feature_matrix': node_feature_matrix.astype('float32'),
+                'labels': self.target[index].astype('float32')
+            }
         return sample
 
 
@@ -302,12 +273,12 @@ class BFSGraphDataset(GraphDataset):
         ii, jj = np.where(adj)
         max_prev_nodes_local = np.abs(ii - jj).max()
         
-        # TODO: remove constant 1008 from here
         if self.has_3D:
+        # TODO: remove constant 1008 from here
             aevs = torch.zeros((self.max_num_nodes, self.max_num_nodes, 1008))
             for i in range(1, num_nodes+1):
                 anum = torch.tensor(node_feature_matrix[:i]).unsqueeze(0).to(dtype=torch.long)
-                coords = torch.from_numpy(xyz_bfs[:i, :]).unsqueeze(0).to(dtype=torch.float)[:, :anum.size()[1], :]
+                coords = torch.from_numpy(xyz_bfs[:i, :]).unsqueeze(0).to(dtype=torch.float)[:, :anum.size()[1], :] 
                 _input = self.species_converter((anum, coords))
                 aevs_ = self.aev_computer(_input)
                 aevs[i-1, :i, :] = aevs_.aevs.squeeze(0)

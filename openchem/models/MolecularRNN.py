@@ -66,8 +66,7 @@ class MolecularRNNModel(OpenChemModel):
         edge_rnn_params = params["edge_rnn_params"]
         self.edge_rnn = EdgeRNN(**edge_rnn_params)
 
-    @staticmethod
-    def cast_inputs(batch, task, use_cuda):
+    def cast_inputs(self, batch):
 
         device = torch.device('cpu')
         if "d_values" in batch.keys():
@@ -78,6 +77,7 @@ class MolecularRNNModel(OpenChemModel):
                 c_out=batch["c_out"].to(device=device),
                 num_nodes=batch["num_nodes"].to(device=device),
                 d_values=batch["d_values"].to(device=device, dtype=torch.float),
+                #xyz_coord=batch["xyz_coord"].to(device=device, dtype=torch.float), 
                 aevs=batch["aevs"].to(device=device, dtype=torch.float)
             )
         else:
@@ -259,7 +259,7 @@ class MolecularRNNModel(OpenChemModel):
                     adj_t = adj
                 adj_all.append(adj_t)
 
-                sstring, rdmol = SmilesFromGraphs(atoms, adj_t)
+                sstring = SmilesFromGraphs(atoms, adj_t, return_rdmol=False)
                 atoms_list.append(atoms)
                 adj_list.append(adj_t)
                 smiles.append(sstring)
@@ -318,7 +318,7 @@ class MolecularRNNModel(OpenChemModel):
             }
         else:
             batch = None
-
+        
         return batch, smiles#, atoms_list, adj_list, collect_node_hiddens
 
     def forward_train(self, inp, **kwargs):
