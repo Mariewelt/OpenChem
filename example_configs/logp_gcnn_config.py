@@ -13,6 +13,7 @@ import torch.nn.functional as F
 from sklearn.metrics import r2_score, mean_squared_error
 
 import pandas as pd
+import numpy as np
 
 import copy
 import pickle
@@ -45,6 +46,23 @@ node_attributes['aromatic'] = Attribute('node', 'aromatic', one_hot=True,
 node_attributes['atom_element'] = Attribute('node', 'atom_element',
                                             one_hot=True,
                                             values=list(range(11)))
+
+
+from openchem.data.utils import read_smiles_property_file
+data = read_smiles_property_file('./benchmark_datasets/logp_dataset/logP_labels.csv',
+                                         cols_to_read=[1,2], keep_header=False)
+
+smiles = data[0]
+labels = np.array(data[1]).reshape(-1, 1)
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(smiles, labels, test_size=0.2,
+                                                            random_state=42)
+
+from openchem.data.utils import save_smiles_property_file
+save_smiles_property_file('./benchmark_datasets/logp_dataset/train.smi', X_train, y_train)
+save_smiles_property_file('./benchmark_datasets/logp_dataset/test.smi', X_test, y_test)
+
 
 train_dataset = GraphDataset(get_atomic_attributes, node_attributes,
                              './benchmark_datasets/logp_dataset/train.smi',

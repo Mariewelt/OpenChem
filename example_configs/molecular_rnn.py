@@ -26,7 +26,12 @@ max_prev_nodes = 12
 # this in Carbon original id in the Periodic Table
 original_start_node_label = 6
 
-edge_relabel_map = {0.: 0, 1.: 1, 2.: 2, 3.: 3}
+edge_relabel_map = {
+    0.: 0, 
+    1.: 1, 
+    2.: 2, 
+    3.: 3
+}
 
 node_relabel_map = {6.0: 0, 7.0: 1, 8.0: 2, 9.0: 3, 15.0: 4, 16.0: 5, 17.0: 6, 35.0: 7, 53.0: 8}
 
@@ -74,7 +79,6 @@ import pickle
 train_dataset = BFSGraphDataset(get_atomic_attributes,
                                 node_attributes,
                                 file_format='pickled',
-                                #fialename='benchmark_datasets/chembl_full/full_chembl_cleaned.smi',
                                 cols_to_read=[0, 1],
                                 filename='benchmark_datasets/chembl_full/full_chembl_cleaned.pkl',
                                 get_bond_attributes=get_edge_attributes,
@@ -126,7 +130,7 @@ model_params = {
     'use_clip_grad': False,
     'batch_size': 512,
     'num_epochs': 251,
-    'logdir': './logs/debug/',
+    'logdir': './logs/molecular_rnn_log',
     'print_every': 1,
     'save_every': 5,
     'train_data_layer': train_dataset,
@@ -164,7 +168,7 @@ model_params = {
     },
     'NodeMLP': OpenChemMLPSimple,
     'node_mlp_params': {
-        'input_size': 128,  #node_rnn_hidden_size,
+        'input_size': 128,
         'n_layers': 2,
         'hidden_size': [128, num_node_classes],
         'activation': [nn.ReLU(inplace=True), identity],
@@ -179,7 +183,7 @@ model_params = {
         'has_input': True,
         'has_output': True,
         'has_output_nonlin': True,
-        'output_size': 128  #node_rnn_hidden_size
+        'output_size': 128  
     },
     'EdgeRNN': GRUPlain,
     'edge_rnn_params': {

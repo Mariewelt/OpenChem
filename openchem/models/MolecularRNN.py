@@ -66,7 +66,8 @@ class MolecularRNNModel(OpenChemModel):
         edge_rnn_params = params["edge_rnn_params"]
         self.edge_rnn = EdgeRNN(**edge_rnn_params)
 
-    def cast_inputs(self, batch):
+    @staticmethod
+    def cast_inputs(batch, task, use_cuda):
 
         device = torch.device('cpu')
         if "d_values" in batch.keys():
@@ -123,7 +124,7 @@ class MolecularRNNModel(OpenChemModel):
             batch, smiles = self.forward_test(**kwargs)
             return smiles
 
-    def forward_test(self, batch_size=128, **kwargs):
+    def forward_test(self, batch_size=512, **kwargs):
         device = torch.device("cuda")
         
         # TODO: handle float type for x_step in case of no node embedding
@@ -259,7 +260,7 @@ class MolecularRNNModel(OpenChemModel):
                     adj_t = adj
                 adj_all.append(adj_t)
 
-                sstring = SmilesFromGraphs(atoms, adj_t, return_rdmol=False)
+                sstring, rdmol = SmilesFromGraphs(atoms, adj_t)
                 atoms_list.append(atoms)
                 adj_list.append(adj_t)
                 smiles.append(sstring)
@@ -293,7 +294,6 @@ class MolecularRNNModel(OpenChemModel):
             adj_encoded_all = [s for i, s in enumerate(adj_encoded_all) if i in idx]
             classes_all = [s for i, s in enumerate(classes_all) if i in idx]
             len_all = [s for i, s in enumerate(len_all) if i in idx]
-
             max_len = max(len_all)
             x = torch.zeros(len(smiles), max_len, self.max_prev_nodes, dtype=torch.long)
             x[:, 0, :] = 1.
@@ -416,6 +416,9 @@ class MolecularRNNModel(OpenChemModel):
         weights = torch.ones(*output_y.shape, dtype=torch.float, device=device)
         weights = pack_padded_sequence(weights, output_y_len, batch_first=True)
         weights = pad_packed_sequence(weights, batch_first=True)[0]
+        
+        if y_pred.size()[1] != output_y.size()[1]:
+            output_y = output_y[:, :y_pred.size()[1], :]
 
         if self.num_edge_classes == 2:
             # loss_edges = F.binary_cross_entropy(

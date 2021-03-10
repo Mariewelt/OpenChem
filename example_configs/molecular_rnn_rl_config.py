@@ -30,10 +30,10 @@ def get_qed(target, smiles):
     return qed(smiles)
 
 
-params = pickle.load(open('logs/rl_start_new/params.pkl', 'rb'))
+params = pickle.load(open('logs/rl_start/params.pkl', 'rb'))
 
 model = Smiles2Label(params)
-weights = torch.load('./logs/rl_start_new/checkpoint/epoch_29', map_location=torch.device("cpu"))
+weights = torch.load('./logs/rl_start/checkpoint/epoch_29', map_location=torch.device("cpu"))
 new_weights = {}
 
 for key in weights.keys():
@@ -65,10 +65,9 @@ max_prev_nodes = 12
 original_start_node_label = 6
 
 edge_relabel_map = {
-    0.: 0,
-    1.: 1,
-    #1.5: 2,
-    2.: 2,
+    0.: 0, 
+    1.: 1, 
+    2.: 2, 
     3.: 3
 }
 
@@ -103,7 +102,6 @@ def get_atomic_attributes(atom):
 def get_edge_attributes(bond):
     attr_dict = dict()
     attr_dict['bond_type'] = bond.GetBondTypeAsDouble()
-    # attr_dict['is_aromatic'] = bond.GetIsAromatic()
     return attr_dict
 
 
@@ -116,7 +114,7 @@ restrict_max_atoms = 50
 train_dataset = BFSGraphDataset(
     get_atomic_attributes,
     node_attributes,
-    './benchmark_datasets/chembl_small/small_chembl.smi',
+    './benchmark_datasets/chembl_full/small_chembl.smi',
     cols_to_read=[0, 1],
     get_bond_attributes=get_edge_attributes,
     edge_attributes=edge_attributes,
@@ -148,10 +146,8 @@ if num_edge_classes > 2:
 else:
     node_rnn_input_size = max_prev_nodes
     node_embedding_dim = max_prev_nodes
-# TODO: maybe update node rnn input size to include previous predicted node label
 if num_node_classes > 2:
     node_rnn_input_size += node_embedding_dim
-
 
 class DummyCriterion(object):
     def __call__(self, inp, out):
@@ -167,11 +163,11 @@ model = MolecularRNNModel
 model_params = {
     'task': 'graph_generation',
     'use_cuda': True,
-    'random_seed': 42,
+    'random_seed': 2,
     'use_clip_grad': False,
     'batch_size': 512,
-    'num_epochs': 16,
-    'logdir': './logs/graphrnn_log',
+    'num_epochs': 100,
+    'logdir': './logs/molecular_rnn_rl_log',
     'print_every': 1,
     'save_every': 1,
     'train_data_layer': train_dataset,
@@ -195,8 +191,8 @@ model_params = {
     'max_prev_nodes': max_prev_nodes,
     'label2atom': label2atom,
     'edge2type': edge2type,
-    "restrict_min_atoms": restrict_min_atoms,
-    "restrict_max_atoms": restrict_max_atoms,
+    "restrict_min_atoms": 10,
+    "restrict_max_atoms": 100,
     "max_atom_bonds": max_atom_bonds,
     'EdgeEmbedding': Embedding,
     'edge_embedding_params': {
@@ -224,7 +220,7 @@ model_params = {
         'num_layers': 4,
         'has_input': True,
         'has_output': True,
-        'has_output_nonlin': False,
+        'has_output_nonlin': True,
         'output_size': 128
     },
     'EdgeRNN': GRUPlain,

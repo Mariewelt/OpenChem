@@ -142,7 +142,7 @@ def fit(model, scheduler, train_loader, optimizer, criterion, params, eval=False
 
     for epoch in tqdm(range(cur_epoch, n_epochs + cur_epoch)):
         model.train()
-        for i_batch, sample_batched in enumerate(train_loader):
+        for i_batch, sample_batched in enumerate(tqdm(train_loader)):
 
             if has_module:
                 task = model.module.task
@@ -264,11 +264,16 @@ def evaluate(model, data_loader, criterion=None, epoch=None):
         loss_total += loss
         n_batches += 1
     
+
     cur_loss = loss_total / n_batches
     if task == 'classification':
         prediction = np.argmax(prediction, axis=1)
+    
+    metrics = calculate_metrics(prediction, ground_truth, eval_metrics)
+    metrics = np.mean(metrics)
+
     if task == "graph_generation":
-        f = open(logdir + "debug_smiles_epoch_" + str(epoch) + ".smi", "w")
+        f = open(logdir + "/debug_smiles_epoch_" + str(epoch) + ".smi", "w")
         if isinstance(metrics, list) and len(metrics) == len(prediction):
             for i in range(len(prediction)):
                 f.writelines(str(prediction[i]) + "," + str(metrics[i]) + "\n")
@@ -276,9 +281,6 @@ def evaluate(model, data_loader, criterion=None, epoch=None):
             for i in range(len(prediction)):
                 f.writelines(str(prediction[i]) + "\n")
             f.close()
-            
-    metrics = calculate_metrics(prediction, ground_truth, eval_metrics)
-    metrics = np.mean(metrics)
 
     if comm.is_main_process():
         textlogger.info('EVALUATION: [Time: %s, Loss: %.4f, Metrics: %.4f]' % (time_since(start), cur_loss, metrics))
