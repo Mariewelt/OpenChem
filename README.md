@@ -63,10 +63,22 @@ If your CUDA version is older than 9.0, check [Pytorch](https://pytorch.org) web
 ## Installation with Docker
 Alternative way of installation is with Docker. We provide a Dockerfile, so you can run your models in a container that already has all the necessary packages installed. You will also need nvidia-docker in order to run models on GPU.
 
+# Publications
+If you use OpenChem in your projects, please cite:
+
+Korshunova, Maria, et al. "OpenChem: A Deep Learning Toolkit for Computational Chemistry and Drug Design." Journal of Chemical Information and Modeling 61.1 (2021): 7-13.
+
+MolecularRNN model paper:
+
+Popova, Mariya, et al. "MolecularRNN: Generating realistic molecular graphs with optimized properties." arXiv preprint arXiv:1905.13372 (2019).
+
+
 # Acknowledgements
 
-OpenChem is sponsored by [the University of North Carolina at Chapel Hill](https://www.unc.edu/) and [NVIDIA Corp.](https://www.nvidia.com/en-us/) 
+OpenChem was supported by [Carnegie Mellon University](https://www.cmu.edu), [the University of North Carolina at Chapel Hill](https://www.unc.edu/) and [NVIDIA Corp.](https://www.nvidia.com/en-us/) 
 <p align="center">
+  <img src="./docs/cmu-wordmark-stacked-r.png" alt="CMU" width="400px">
+  <br>
   <img src="./docs/UNC_logo_RGB.png" alt="UNC" width="400px">
   <img src="./docs/NVLogo_2D_H.png" alt="NVIDIA" width="400px">
   <br>
