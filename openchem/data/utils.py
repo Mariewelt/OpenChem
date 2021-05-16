@@ -330,10 +330,10 @@ def read_smiles_property_file(path, cols_to_read, delimiter=',', keep_header=Fal
         start_position = 1
     assert len(data) > start_position
     data = map(list, zip(*data))
-    data = [d for c, d in enumerate(data)]
-    data_ = [data[c][start_position:] for c in cols_to_read]
+    data = [d[start_position:] for d in data]
+    data = [data[c] for c in cols_to_read]
 
-    return data_
+    return data
 
 
 def save_smiles_property_file(path, smiles, labels, delimiter=','):

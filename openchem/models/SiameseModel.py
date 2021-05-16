@@ -109,6 +109,8 @@ class SiameseModel(OpenChemModel):
             batch_labels = sample["labels"]
             if task == "classification":
                 batch_labels = batch_labels.to(dtype=torch.long)
+            else:
+                batch_labels = batch_labels.to(dtype=torch.float)
         if use_cuda:
             batch_labels = batch_labels.to(device="cuda")
         return (batch_head1, batch_head2), batch_labels

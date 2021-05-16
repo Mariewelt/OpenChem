@@ -1,11 +1,5 @@
-import numpy as np
-import pickle
-
 from torch.utils.data import Dataset
 
-from openchem.data.utils import read_smiles_property_file
-from openchem.data.utils import sanitize_smiles, pad_sequences, seq2tensor
-from openchem.data.utils import get_tokens
 from openchem.data.smiles_data_layer import SmilesDataset
 from openchem.data.graph_data_layer import GraphDataset
 
@@ -15,32 +9,34 @@ class SiameseDataset(Dataset):
                  head1_arguments, head2_arguments):
         super(SiameseDataset, self).__init__()
         assert len(cols_to_read) == 3
-        if head1_type == "smiles":
-            cols_to_read = [cols_to_read[0]] + [cols_to_read[2]]
+        if head1_type == "protein_seq":
+            head1_arguments["sanitize"] = False
+        if head2_type == "protein_seq":
+            head2_arguments["sanitize"] = False
+        if head1_type == "mol_smiles" or head1_type == "protein_seq":
             head1_dataset = SmilesDataset(filename,
-                                          cols_to_read=[0, 2],
+                                          cols_to_read=[cols_to_read[0], cols_to_read[2]],
                                           **head1_arguments)
-        elif head1_type == "graphs":
+        elif head1_type == "mol_graphs":
             raise NotImplementedError()
             head1_dataset = GraphDataset(filename=filename,
-                                         cols_to_read=[0, 2],
+                                         cols_to_read=[cols_to_read[0], cols_to_read[2]],
                                          **head1_arguments)
         else:
-            raise ArgumentError
-        if head2_type == "smiles":
+            raise ValueError()
+        if head2_type == "mol_smiles" or head2_type == "protein_seq":
             head2_dataset = SmilesDataset(filename,
-                                          cols_to_read=[1, 2],
+                                          cols_to_read=[cols_to_read[1], cols_to_read[2]],
                                           **head2_arguments)
-        elif head2_type == "graphs":
+        elif head2_type == "mol_graphs":
             raise NotImplementedError()
             head2_dataset = GraphDataset(filename=filename,
-                                         cols_to_read=[1, 2],
+                                         cols_to_read=[cols_to_read[1], cols_to_read[2]],
                                          **head2_arguments)
         else:
             raise ArgumentError
         self.head1_dataset = head1_dataset
         self.head2_dataset = head2_dataset
-        #assert len(head1_dataset) == len(head2_dataset)
         self.target = head1_dataset.target
 
     def __len__(self):
@@ -53,4 +49,3 @@ class SiameseDataset(Dataset):
                   'head2': head2_sample,
                   'labels': self.target[index]}
         return sample
-
