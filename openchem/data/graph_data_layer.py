@@ -76,7 +76,7 @@ class GraphDataset(Dataset):
                                                                           return_max_len=True)
             self.max_len = max_len
             if target is not None:
-                target = np.asarray(target, dtype=np.float).T
+                target = np.asarray(target, dtype=float).T
             clean_smiles = [clean_smiles[i] for i in clean_idx]
             num_atoms = [num_atoms[i] for i in clean_idx]
             self.clean_idx = clean_idx
