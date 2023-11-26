@@ -83,7 +83,7 @@ class OpenChemModel(nn.Module):
 
     def load_model(self, path):
         weights = torch.load(path)
-        self.load_state_dict(weights)
+        self.load_state_dict(weights, strict=False)
 
     def save_model(self, path):
         torch.save(self.state_dict(), path)
